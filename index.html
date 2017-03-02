@@ -196,11 +196,169 @@
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">微信小程序</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2017/03/02/微信小程序对接支付/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+  
+    <article id="post-jar包在windows下运行命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/02/jar包在windows下运行命令/">jar包在windows下的运行命令</a>
+    </h1>
+  
+
+        
+        <a href="/2017/03/02/jar包在windows下运行命令/" class="archive-article-date">
+  	<time datetime="2017-03-02T09:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>1、打jar包 jar -cvf xx.jar 文件夹名称</p>
+<p>说明一下：<em>.</em>表示把当前目录下面以及子目录的所有class都打到这个xx.jar里。</p>
+<p>-cvf的含义，可以自己去用jar命令去查看</p>
+<p>如果要单独对某个或某些class文件进行打包，可以这样：</p>
+<p>jar -cvf xx.jar Foo.class Bar.class </p>
+<p>2.运行jar</p>
+<p>java -jar xx.jar</p>
+<p>要运行一个jar，则此jar内部的META-INF\MANIFEST.MF文件里必须指明要执行的main方法类</p>
+<p>具体格式如：</p>
+<p>Manifest-Version: 1.0<br>Created-By: 1.6.0_03 (Sun Microsystems Inc.)<br>Main-class: Test<br>如果此处的Test.class在com.xx包下面，则需要指明。</p>
+<p>如果在运行时报了invalid or corrupt jarfile错误，则需要检查Main-class: Test 之间是不是缺少了空格。</p>
+<p>3.指定运行jar里面的class</p>
+<p>java -cp xx.jar com.xx.Test</p>
+<p>4.编译某个java文件，但是依赖某个jar</p>
+<p>javac -cp xx.jar Test.java</p>
+<p> (Test.java里面import了xx.jar里面的某个class)</p>
+<p>5.运行某个java文件，但是依赖某个jar</p>
+<p>java -cp .;xx.jar Test</p>
+<p>注意：引用xx.jar的时候，不要漏掉.;（这个表示当前目录）</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java jar包</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/03/02/jar包在windows下运行命令/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+  
+    <article id="post-solr部署" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/02/solr部署/">solr部署</a>
+    </h1>
+  
+
+        
+        <a href="/2017/03/02/solr部署/" class="archive-article-date">
+  	<time datetime="2017-03-02T09:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="http://www.tuicool.com/articles/mueARf">http://www.tuicool.com/articles/mueARf</a> 参考</p>
+<p>请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：</p>
+<p>复制solr.war到tomcat的webapps目录下，如图操作：</p>
+<p>启动tomcat,如图：<br>
+        
+          <a class="article-more-a" href="/2017/03/02/solr部署/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">solr</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/03/02/solr部署/">展开全文 >></a>
         </p>
       
 
@@ -305,6 +463,18 @@
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">微信小程序</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java jar包</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">solr</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>
