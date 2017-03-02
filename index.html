@@ -254,21 +254,9 @@
 <p>-cvf的含义，可以自己去用jar命令去查看</p>
 <p>如果要单独对某个或某些class文件进行打包，可以这样：</p>
 <p>jar -cvf xx.jar Foo.class Bar.class </p>
-<p>2.运行jar</p>
-<p>java -jar xx.jar</p>
-<p>要运行一个jar，则此jar内部的META-INF\MANIFEST.MF文件里必须指明要执行的main方法类</p>
-<p>具体格式如：</p>
-<p>Manifest-Version: 1.0<br>Created-By: 1.6.0_03 (Sun Microsystems Inc.)<br>Main-class: Test<br>如果此处的Test.class在com.xx包下面，则需要指明。</p>
-<p>如果在运行时报了invalid or corrupt jarfile错误，则需要检查Main-class: Test 之间是不是缺少了空格。</p>
-<p>3.指定运行jar里面的class</p>
-<p>java -cp xx.jar com.xx.Test</p>
-<p>4.编译某个java文件，但是依赖某个jar</p>
-<p>javac -cp xx.jar Test.java</p>
-<p> (Test.java里面import了xx.jar里面的某个class)</p>
-<p>5.运行某个java文件，但是依赖某个jar</p>
-<p>java -cp .;xx.jar Test</p>
-<p>注意：引用xx.jar的时候，不要漏掉.;（这个表示当前目录）</p>
-
+        
+          <a class="article-more-a" href="/2017/03/02/jar包在windows下运行命令/#more">more >></a>
+        
       
 
       
