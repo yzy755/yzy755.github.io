@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2017-03-08T07:48:32.177Z</updated>
+  <updated>2017-03-08T07:50:54.920Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -20,9 +20,9 @@
     <link href="http://yzy755.github.io/2017/03/08/zookeeper%E6%B5%85%E8%AF%BB/"/>
     <id>http://yzy755.github.io/2017/03/08/zookeeper浅读/</id>
     <published>2017-03-08T07:44:27.000Z</published>
-    <updated>2017-03-08T07:48:32.177Z</updated>
+    <updated>2017-03-08T07:50:54.920Z</updated>
     
-    <content type="html"><![CDATA[<p>下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。<br>zookeeper注册中心<br>Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例<br><img src="/2017/03/08/zookeeper浅读/1.png" alt="logo"><br>假设读者对zookeeper有所了解，能够搭建zookeeper服务，其实不了解也没关系，谷歌百度下分分钟搞起。<br>作为测试调试dubbo，我是在本地起的zookeeper<br><img src="/2017/03/08/zookeeper浅读/2.png" alt="logo"><br>指定zookeeper配置文件地址<br><img src="/2017/03/08/zookeeper浅读/3.png" alt="logo"><br>配置文件中两个关键参数：<br>dataDir zookeeper存储文件的地址<br>clientPort 客户端链接的端口号<br>Dubbo服务提供者配置</p>
+    <content type="html"><![CDATA[<p>下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。<br>zookeeper注册中心<br>Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例<br><a id="more"></a><br><img src="/2017/03/08/zookeeper浅读/1.png" alt="logo"><br>假设读者对zookeeper有所了解，能够搭建zookeeper服务，其实不了解也没关系，谷歌百度下分分钟搞起。<br>作为测试调试dubbo，我是在本地起的zookeeper<br><img src="/2017/03/08/zookeeper浅读/2.png" alt="logo"><br>指定zookeeper配置文件地址<br><img src="/2017/03/08/zookeeper浅读/3.png" alt="logo"><br>配置文件中两个关键参数：<br>dataDir zookeeper存储文件的地址<br>clientPort 客户端链接的端口号<br>Dubbo服务提供者配置</p>
 <p><dubbo:registry protocol="”" zookeeper="" ”="" address="127.0.0. 1: 2181 "></dubbo:registry></p>
 <p><beanid="demoservice" class="com.alibaba.dubbo.demo.provi der.DemoServiceImpl"></beanid="demoservice"></p>
 <p><dubbo:serviceinterface="com.alibaba.dubbo.demo.demoservi ce"="" ref="demoService"><br>除了配置注册中心的，其他都一样<br>Dubbo服务消费者配置</dubbo:serviceinterface="com.alibaba.dubbo.demo.demoservi></p>
@@ -35,7 +35,7 @@
     
     <summary type="html">
     
-      &lt;p&gt;下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。&lt;br&gt;zooke
+      &lt;p&gt;下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。&lt;br&gt;zookeeper注册中心&lt;br&gt;Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例&lt;br&gt;&lt;/p&gt;
     
     </summary>
     
