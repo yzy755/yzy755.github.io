@@ -18,7 +18,7 @@
 <meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/2.png">
 <meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/3.png">
 <meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/4.png">
-<meta property="og:updated_time" content="2017-03-08T07:54:48.947Z">
+<meta property="og:updated_time" content="2017-03-08T08:32:46.442Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="zookeeper浅读">
 <meta name="twitter:description" content="下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。zookeeper注册中心Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例">
@@ -54,7 +54,7 @@
 			<img src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/08/150908/34060/webwxgeticon.jpg" class="js-avatar">
 		</a>
 		<hgroup>
-		  <h1 class="header-author"><a href="/">zeyuanYi</a></h1>
+		  <h1 class="header-author"><a href="/">易泽源</a></h1>
 		</hgroup>
 		
 		<p class="header-subtitle">一天进步一点</p>
@@ -64,8 +64,6 @@
 			<ul>
 			
 				<li><a href="/">主页</a></li>
-	        
-				<li><a href="/tags/随笔/">随笔</a></li>
 	        
 			</ul>
 		</nav>
@@ -116,14 +114,12 @@
 				<img src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/08/150908/34060/webwxgeticon.jpg" class="js-avatar">
 			</div>
 			<hgroup>
-			  <h1 class="header-author js-header-author">zeyuanYi</h1>
+			  <h1 class="header-author js-header-author">易泽源</h1>
 			</hgroup>
 			
 			<p class="header-subtitle"><i class="icon icon-quo-left"></i>一天进步一点<i class="icon icon-quo-right"></i></p>
 			
 			
-			
-				
 			
 				
 			
@@ -149,9 +145,7 @@
 				<ul style="width: 50%">
 				
 				
-					<li style="width: 50%"><a href="/">主页</a></li>
-		        
-					<li style="width: 50%"><a href="/tags/随笔/">随笔</a></li>
+					<li style="width: 100%"><a href="/">主页</a></li>
 		        
 				</ul>
 			</nav>
@@ -199,17 +193,7 @@
 <p>2.注册url就是利用客户端在服务器端创建url的节点，默认为临时节点，客户端与服务端断开，几点自动删除<br>zkClient .create(toUrlPath(url),url.getParameter(Constants. DYNAMIC_KEY , true));      </p>
 <p>3.取消注册的url，就是利用zookeeper客户端删除url节点<br>zkClient .delete(toUrlPath(url));</p>
 <ol>
-<li><p>订阅url， 功能是服务消费端订阅服务提供方在zookeeper上注册地址，这个功能流程跟DubboRegister不一样， DubboRegister是通过Dubbo注册中心实现SimpleResgiter在注册中心端，对url变换、过滤筛选然后将获取的provierUrl(提供者ulr)利用服务消费者暴露的服务回调在refer。<br>由于这里注册中心采用的是zookeeper，zookeeper不可能具有dubbo的业务逻辑，这里对订阅的逻辑处理都在消费服务端订阅的时候处理。<br> 1) 对传入url的serviceInterface是*代表订阅url目录下所有节点即所有服务，这个注册中心需要订阅所有<br> 2) 如果指定了订阅接口通过toCategoriesPath(url)转换需要订阅的url</p>
-<pre><code>如传入url consumer://10.33.37.8/com.alibaba.dubbo.demo.DemoService?application=demo-consumer&amp;category=providers,configurators,routers&amp;dubbo=2.5.4-SNAPSHOT&amp;interface=com.alibaba.dubbo.demo.DemoService&amp;methods=sayHello&amp;pid=4088&amp;side=consumer&amp;timestamp=1417405597808
-转换成urls
-/dubbo/com.alibaba.dubbo.demo.DemoService/providers,/dubbo/com.alibaba.dubbo.demo.DemoService/configurators, /dubbo/com.alibaba.dubbo.demo.DemoService/routers
-</code></pre><p> 3) 设配传入的回调接口NotifyListener,转换成dubbo对zookeeper操作的ChildListener<br> 4)以/dubbo/com.alibaba.dubbo.demo.DemoService/providers为例创建节点zkClient.create(path, false);</p>
-<pre><code>但是一般情况下如果服务提供者已经提供服务，那么这个目录节点应该已经存在，Dubbo在Client层屏蔽掉了创建异常。
-</code></pre><p> 5) 以/dubbo/com.alibaba.dubbo.demo.DemoService/providers为例给节点添加监听器，返回所有子目录</p>
-<pre><code>List&lt;String&gt; children = zkClient .addChildListener(path, zkListener);
-if (children != null ) {urls.addAll(toUrlsWithEmpty(url, path,hildren));}
-toUrlsWtihEmpty用来配置是不是需要订阅的url，是加入集合
-</code></pre><p> 6） 主动根据得到服务提供者urls回调NotifyListener,引用服务提供者生成invoker可执行对象</p>
+<li><p>订阅url， 功能是服务消费端订阅服务提供方在zookeeper上注册地址，这个功能流程跟DubboRegister不一样， DubboRegister是通过Dubbo注册中心实现SimpleResgiter在注册中心端，对url变换、过滤筛选然后将获取的provierUrl(提供者ulr)利用服务消费者暴露的服务回调在refer。<br>由于这里注册中心采用的是zookeeper，zookeeper不可能具有dubbo的业务逻辑，这里对订阅的逻辑处理都在消费服务端订阅的时候处理。<br> 1) 对传入url的serviceInterface是*代表订阅url目录下所有节点即所有服务，这个注册中心需要订阅所有<br> 2) 如果指定了订阅接口通过toCategoriesPath(url)转换需要订阅的url<br>  如传入url consumer://10.33.37.8/com.alibaba.dubbo.demo.DemoService?application=demo-consumer&amp;category=providers,configurators,routers&amp;dubbo=2.5.4-SNAPSHOT&amp;interface=com.alibaba.dubbo.demo.DemoService&amp;methods=sayHello&amp;pid=4088&amp;side=consumer&amp;timestamp=1417405597808<br>  转换成urls<br>  /dubbo/com.alibaba.dubbo.demo.DemoService/providers,/dubbo/com.alibaba.dubbo.demo.DemoService/configurators, /dubbo/com.alibaba.dubbo.demo.DemoService/routers<br> 3) 设配传入的回调接口NotifyListener,转换成dubbo对zookeeper操作的ChildListener<br> 4) 以/dubbo/com.alibaba.dubbo.demo.DemoService/providers为例创建节点zkClient.create(path, false);<br>  但是一般情况下如果服务提供者已经提供服务，那么这个目录节点应该已经存在，Dubbo在Client层屏蔽掉了创建异常。<br> 5) 以/dubbo/com.alibaba.dubbo.demo.DemoService/providers为例给节点添加监听器，返回所有子目录<br>  List<string> children = zkClient .addChildListener(path, zkListener);<br>  if (children != null ) {urls.addAll(toUrlsWithEmpty(url, path,hildren));}<br>  toUrlsWtihEmpty用来配置是不是需要订阅的url，是加入集合<br> 6） 主动根据得到服务提供者urls回调NotifyListener,引用服务提供者生成invoker可执行对象</string></p>
 </li>
 <li><p>取消订阅url， 只是去掉url上的注册的监听器</p>
 </li>
@@ -354,7 +338,7 @@ toUrlsWtihEmpty用来配置是不是需要订阅的url，是加入集合
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2017 zeyuanYi
+    		&copy; 2017 易泽源
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
