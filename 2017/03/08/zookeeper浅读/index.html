@@ -6,27 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>solr部署 | 我的博客</title>
+  <title>zookeeper浅读 | 我的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="http://www.tuicool.com/articles/mueARf 参考
-请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：
-复制solr.war到tomcat的webapps目录下，如图操作：
-启动tomcat,如图：">
+  <meta name="description" content="下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。zookeeper注册中心Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例假设读者对zook">
 <meta property="og:type" content="article">
-<meta property="og:title" content="solr部署">
-<meta property="og:url" content="http://yzy755.github.io/2017/03/02/solr部署/index.html">
+<meta property="og:title" content="zookeeper浅读">
+<meta property="og:url" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/index.html">
 <meta property="og:site_name" content="我的博客">
-<meta property="og:description" content="http://www.tuicool.com/articles/mueARf 参考
-请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：
-复制solr.war到tomcat的webapps目录下，如图操作：
-启动tomcat,如图：">
-<meta property="og:updated_time" content="2017-03-02T09:42:11.606Z">
+<meta property="og:description" content="下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。zookeeper注册中心Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例假设读者对zook">
+<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/1.png">
+<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/2.png">
+<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/3.png">
+<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/4.png">
+<meta property="og:updated_time" content="2017-03-08T07:48:32.177Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="solr部署">
-<meta name="twitter:description" content="http://www.tuicool.com/articles/mueARf 参考
-请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：
-复制solr.war到tomcat的webapps目录下，如图操作：
-启动tomcat,如图：">
+<meta name="twitter:title" content="zookeeper浅读">
+<meta name="twitter:description" content="下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。zookeeper注册中心Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例假设读者对zook">
+<meta name="twitter:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/1.png">
   
     <link rel="alternative" href="/atom.xml" title="我的博客" type="application/atom+xml">
   
@@ -170,41 +166,35 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-solr部署" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-zookeeper浅读" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      solr部署
+      zookeeper浅读
     </h1>
   
 
         
-        <a href="/2017/03/02/solr部署/" class="archive-article-date">
-  	<time datetime="2017-03-02T09:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-02</time>
+        <a href="/2017/03/08/zookeeper浅读/" class="archive-article-date">
+  	<time datetime="2017-03-08T07:44:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><a href="http://www.tuicool.com/articles/mueARf" target="_blank" rel="external">http://www.tuicool.com/articles/mueARf</a> 参考</p>
-<p>请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：</p>
-<p>复制solr.war到tomcat的webapps目录下，如图操作：</p>
-<p>启动tomcat,如图：<br><a id="more"></a><br>然后修改webapps\solr\WEB-INF下的web.xml配置文件，如图：</p>
-<p>配置solr_home目录路径，如图：</p>
-<p>然后我们需要去C盘创建一个solr_home文件夹，这就是我们SOLR_HOME根目录啦，如图：</p>
-<p>然后我们需要把E:\solr-5.1.0\server\solr目录下的所有文件及文件夹全部复制到我们刚刚创建的solr_home目录下，如图：</p>
-<p>然后我们需要把E:\solr-5.1.0\server\lib\ext目录下的所有jar包 copy到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF\lib目录下(<br>E:\apache-tomcat-7.0.55是我的tomcat安装根目录，请对照你们自己的tomcat安装目录进行调整，你懂的<br>)，如图：</p>
-<p>然后复制 E:\solr-5.1.0\server\resources目录下的log4j.properties配置文件到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF目录下，如图操作：</p>
-<p>然后重启我们的tomcat,如图：</p>
-<p>打开你的浏览器，地址栏输入 <a href="http://localhost:8080/solr" target="_blank" rel="external">http://localhost:8080/solr</a> ， 访问我们的Solr Web后台。如果你能看到这个界面，即表明Solr5部署成功了，如图：</p>
-<p>然后你就可以通过Solr Web UI添加Core啦，不过添加Core之前，你需要在solr_home目录下创建core文件夹，如图：<br>core目录下需要创建conf和data文件夹，你懂的， 《跟益达学Solr5之使用Jetty部署Solr》<br>这篇博客也提到过，如图：</p>
-<p>剩下的一些配置copy具体你们就参照那篇去操作把，这里就不重复说明了。<br>到此，Solr5如何部署到Tomcat就讲解完毕了！</p>
-<p>IK 分词器安装<br>1.将之前解压的solr-4.3.1 下的contrib和dist 文件夹复制到F:\winsolr\solr_home\solr\collection1下<br>2.将下载的IKAnalyzer的发行包解压，解压后将IKAnalyzer2012FF_u1.jar（分词器jar包）复制到F:\winsolr\solr_home\solr\collection1\contrib\analysis-extras\lib下<br>3.在F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF下新建classes文件夹<br>4.将IKAnalyzer解压出来的IKAnalyzer.cfg.xml（分词器配置文件）和 Stopword.dic（分词器停词字典,可自定义添加内容）复制到<br>  F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF\classes中<br>5.在F:\winsolr\solr_home\solr\collection1\conf下的schema.xml文件中fieldType name=”text_general”这个地方的上方添加以下内容 </p>
-<p>将pinyinfj.jar、lucene-analyzers-smartcn-4.7.0.jar、IKAnalyzer2012FF_u1.jar、pinyinAnalyzer.jar、shentong_tsearch_lib.jar放到solr部署目录的web-inf的lib目录下</p>
+        <p>下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。<br>zookeeper注册中心<br>Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例<br><img src="/2017/03/08/zookeeper浅读/1.png" alt="logo"><br>假设读者对zookeeper有所了解，能够搭建zookeeper服务，其实不了解也没关系，谷歌百度下分分钟搞起。<br>作为测试调试dubbo，我是在本地起的zookeeper<br><img src="/2017/03/08/zookeeper浅读/2.png" alt="logo"><br>指定zookeeper配置文件地址<br><img src="/2017/03/08/zookeeper浅读/3.png" alt="logo"><br>配置文件中两个关键参数：<br>dataDir zookeeper存储文件的地址<br>clientPort 客户端链接的端口号<br>Dubbo服务提供者配置</p>
+<p><dubbo:registry protocol="”" zookeeper="" ”="" address="127.0.0. 1: 2181 "></dubbo:registry></p>
+<p><beanid="demoservice" class="com.alibaba.dubbo.demo.provi der.DemoServiceImpl"></beanid="demoservice"></p>
+<p><dubbo:serviceinterface="com.alibaba.dubbo.demo.demoservi ce"="" ref="demoService"><br>除了配置注册中心的，其他都一样<br>Dubbo服务消费者配置</dubbo:serviceinterface="com.alibaba.dubbo.demo.demoservi></p>
+<p><dubbo:registry protocol="”" zookeeper="" ”="" address="127.0.0. 1: 2181 "><br>&lt; dubbo:reference id = “demoService” interface = “com.alibaba.dubbo.demo.DemoService” /&gt;<br>除了配置注册中心的，其他都一样<br>客户端获取注册器<br>服务的提供者和消费者在RegistryProtocol利用注册中心暴露(export)和引用(refer)服务的时候会根据配置利用Dubbo的SPI机制获取具体注册中心注册器<br>Registry registry = registryFactory .getRegistry(url);<br>这里的RegistryFactory是ZookeeperRegistryFactory看如下工厂代码<br>public class ZookeeperRegistryFactory extends AbstractRegistryFactory {<br>public Registry createRegistry(URL url) {<br>return new ZookeeperRegistry(url, zookeeperTransporter );<br>}<br>}<br>这里创建zookeepr注册器ZookeeperRegistry<br>ZookeeperTransporter是操作zookeepr的客户端的工厂类，用来创建zookeeper客户端，这里客户端并不是zookeeper源代码的自带的，而是采用第三方工具包，主要来简化对zookeeper的操作，例如用zookeeper做注册中心需要对zookeeper节点添加watcher做反向推送，但是每次回调后节点的watcher都会被删除，这些客户会自动维护了这些watcher，在自动添加到节点上去。<br>接口定义：<br>@SPI ( “zkclient” )<br>public interface ZookeeperTransporter {<br>@Adaptive ({Constants. CLIENT_KEY , Constants. TRANSPORTER_KEY })<br>ZookeeperClient connect(URL url);<br>}<br>默认采用zkClient， dubbo源码集成两种zookeeper客户端，除了zkClient还有一个是curator<br><img src="/2017/03/08/zookeeper浅读/4.png" alt="logo"><br>ZookeeperRegistry注册器的实现<br>1.构造器利用客户端创建了对zookeeper的连接，并且添加了自动回复连接的监听器。<br>zkClient = zookeeperTransporter.connect(url);<br>zkClient .addStateListener( new StateListener() {<br>public void stateChanged( int state) {<br>if (state == RECONNECTED )<br>recover();<br>}<br>});<br>2.注册url就是利用客户端在服务器端创建url的节点，默认为临时节点，客户端与服务端断开，几点自动删除<br>zkClient .create(toUrlPath(url),url.getParameter(Constants. DYNAMIC_KEY , true));<br>3.取消注册的url，就是利用zookeeper客户端删除url节点<br>zkClient .delete(toUrlPath(url));</dubbo:registry></p>
+<ol>
+<li>订阅url， 功能是服务消费端订阅服务提供方在zookeeper上注册地址，这个功能流程跟DubboRegister不一样， DubboRegister是通过Dubbo注册中心实现SimpleResgiter在注册中心端，对url变换、过滤筛选然后将获取的provierUrl(提供者ulr)利用服务消费者暴露的服务回调在refer。<br>由于这里注册中心采用的是zookeeper，zookeeper不可能具有dubbo的业务逻辑，这里对订阅的逻辑处理都在消费服务端订阅的时候处理。<br>1) 对传入url的serviceInterface是*代表订阅url目录下所有节点即所有服务，这个注册中心需要订阅所有<br>2) 如果指定了订阅接口通过toCategoriesPath(url)转换需要订阅的url<br>如传入url consumer://10.33.37.8/com.alibaba.dubbo.demo.DemoService?application=demo-consumer&amp;category=providers,configurators,routers&amp;dubbo=2.5.4-SNAPSHOT&amp;interface=com.alibaba.dubbo.demo.DemoService&amp;methods=sayHello&amp;pid=4088&amp;side=consumer&amp;timestamp=1417405597808<br>转换成urls<br>/dubbo/com.alibaba.dubbo.demo.DemoService/providers,/dubbo/com.alibaba.dubbo.demo.DemoService/configurators, /dubbo/com.alibaba.dubbo.demo.DemoService/routers<br>3) 设配传入的回调接口NotifyListener,转换成dubbo对zookeeper操作的ChildListener<br>4)以/dubbo/com.alibaba.dubbo.demo.DemoService/providers为例创建节点zkClient.create(path, false);<br>但是一般情况下如果服务提供者已经提供服务，那么这个目录节点应该已经存在，Dubbo在Client层屏蔽掉了创建异常。<br>5) 以/dubbo/com.alibaba.dubbo.demo.DemoService/providers为例给节点添加监听器，返回所有子目录<br>List<string> children = zkClient .addChildListener(path, zkListener);<br>if (children != null ) {urls.addAll(toUrlsWithEmpty(url, path,hildren));}<br>toUrlsWtihEmpty用来配置是不是需要订阅的url，是加入集合<br>6） 主动根据得到服务提供者urls回调NotifyListener,引用服务提供者生成invoker可执行对象</string></li>
+<li>取消订阅url， 只是去掉url上的注册的监听器</li>
+</ol>
 
       
 
@@ -239,7 +229,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">solr</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">zookeeper</a>
         		</li>
       		
 		</ul>
@@ -295,7 +285,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACG0lEQVR42u3aS1LEMAwFwLn/pcMBAPMkeaaI016lQsi4s1Dp49crXte39f3+b88nb17f2bYwMDBuy7iWa/1M/sNXceV7w8DAeA5jHQrX10kIrvLyvWFgYGCsr9eYPH3EwMDA+CSj+uS6iMXAwMCYB76kxTYP3JtrcQwMjBsy8lLz89dvmW9gYGDcitFr1u8Nl9d4YWBgnM2YDCB7oTn5NM00FAMD4wGMJCBONj35KFGyiIGBcSgjSdSq95N22ySJ/GHnGBgYRzN6Remuo2O9ISgGBsYzGZMRYx5Gq1lcFYyBgfEERp7AJY223lGMajE8KmUxMDBuxWh26QZpZXUwUP6sGBgYBzF6QTb5mXy0kITaqGuIgYFxKCMfSeab7qWJk5YcBgbG2Yy9zfr3nQcZfXsMDIybM3qDgV1Dx+rb/kgNMTAwDmVUj3lVE8H8Q5TL1OpkAwMD4+aMeahNCtr1tkaDUgwMjKMZ83Z/7yBFEtCbYwYMDIxDGZMN5Wnc5M3RXzEwMB7GSFK6alNs/rZRnouBgXEQI//nfIu9YrVcxGJgYBzKuIorSfJ6vOohjx+SQgwMjEMZ1TDXG2HmY8te0omBgfEERh5kq0nbpIgt7wEDA+MBjN5pq/loc1fiiIGBgdEbTyZpZTV8FwYDGBgYGHFSuPf5twdcDAyMf8yoHi3tNfR7JXQU4jEwMI5m7ErUJqlkb+sYGBgPYHwBcbr6CNpX3GwAAAAASUVORK5CYII=" alt="微信分享二维码">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACKUlEQVR42u3aS47CMBAFwLn/pRlpVmxC3nMDmjiVFULBSXnR9Mc/P/H1+LueP+ffPH//euWjb952YWBgXJbxeHkljKN7jp6ytmUnW4OBgXEDxlqQTVbI72xXxsDAwEgC7lpwbIM7BgYGxlrAbXlraSUGBgZGW8Qmpek8vH68FsfAwLggY20w8J3PH59vYGBg/HvGo7zyFPC9zz15KwwMjK0Z7XGHvH2WAPKRQ7RZGBgYt2G0ZWoLbhPBomTFwMDYmtG+7lpIfe8WnIRdDAyMTRlJmtg+oD2ikb/DKNvFwMC4IGPeJssD6Lx5V7TbMDAwNmW0ATd/ubXfFofDMDAwNmXkS0/GkG1/rH0WBgbG3ozPJYLfH21iYGDcgdGGszaxK8aQg2MfGBgY+zHmjf72uMbkYMfhpmBgYGzNmLfG1hp2H0kNMTAwNmXkhWhbpr4Gv16zPnCGgYFxS8akATcJnfkAYPG0CAYGxgUZaw2vtYbaBPyG5h0GBsZlGXkCNylok/DarhwNOzAwMDZi5OVl3rhvGcmI4iTgYmBgbMpoR4xJAZlnoMmz8kMeGBgYuzIe5dU299s78wQRAwPjPoxJ023eemsHqPlfAgYGxn6MPMgWByCCELw2Cq3nqxgYGBsx1oaOa0nbpHw9/BUGBgbG0pGIPMi2YwMMDAyMPMmbBNC2rD3ZCAwMjBsw2sKyDan5aovpKQYGxtaMyWAg2Y68iTYfo2JgYGzH+AVODX+tNDtCtQAAAABJRU5ErkJggg==" alt="微信分享二维码">
     </div>
 </div>
 
@@ -309,15 +299,11 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/03/02/微信小程序对接支付/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          微信小程序对接支付
-        
-      </div>
-    </a>
   
+    <a href="/2017/03/08/TCP的几个状态码/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">TCP的几个状态码</div>
+      <i class="icon-circle-right"></i>
+    </a>
   
 </nav>
 
