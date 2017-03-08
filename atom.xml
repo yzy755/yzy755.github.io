@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2017-03-08T08:08:00.233Z</updated>
+  <updated>2017-03-08T08:11:19.847Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -20,11 +20,10 @@
     <link href="http://yzy755.github.io/2017/03/08/hexo%E7%BC%96%E8%BE%91%E5%8D%9A%E5%AE%A2%E6%95%B4%E7%90%86/"/>
     <id>http://yzy755.github.io/2017/03/08/hexo编辑博客整理/</id>
     <published>2017-03-08T07:56:48.000Z</published>
-    <updated>2017-03-08T08:08:00.233Z</updated>
+    <updated>2017-03-08T08:11:19.847Z</updated>
     
     <content type="html"><![CDATA[<p>一.Hexo搭建Github-Pages博客<br>   1.安装nodejs和git,方法略</p>
-<p>   2.安装hexo<br>      $ npm install -g hexo</p>
-<p>   3.部署hexo<br>      $ hexo init<br>       .<br>    ├── .deploy<br>    ├── public<br>    ├── scaffolds<br>    ├── scripts<br>    ├── source<br>    |   ├── _drafts<br>    |   └── _posts<br>    ├── themes<br>    ├── _config.yml<br>    └── package.json<br>    .deploy：执行hexo deploy命令部署到GitHub上的内容目录<br>    public：执行hexo generate命令，输出的静态网页内容目录<br>    scaffolds：layout模板文件目录，其中的md文件可以添加编辑<br>    scripts：扩展脚本目录，这里可以自定义一些javascript脚本<br>    source：文章源码目录，该目录下的markdown和html文件均会被hexo处理。该页面对应repo的根目录，404文件、favicon.ico文件，CNAME文件等都应该放这里，该目录下可新建页面目录。<br>    _drafts：草稿文章<br>    _posts：发布文章<br>    themes：主题文件目录<br>    _config.yml：全局配置文件，大多数的设置都在这里<br>    package.json：应用程序数据，指明hexo的版本等信息，类似于一般软件中的关于按钮</p>
+<p>   2.安装hexo<br>       $ npm install -g hexo<br><a id="more"></a><br>   3.部署hexo<br>       $ hexo init<br>       .<br>        ├── .deploy<br>        ├── public<br>        ├── scaffolds<br>        ├── scripts<br>        ├── source<br>        |   ├── _drafts<br>        |   └── _posts<br>        ├── themes<br>        ├── _config.yml<br>        └── package.json<br>        .deploy：执行hexo deploy命令部署到GitHub上的内容目录<br>        public：执行hexo generate命令，输出的静态网页内容目录<br>        scaffolds：layout模板文件目录，其中的md文件可以添加编辑<br>        scripts：扩展脚本目录，这里可以自定义一些javascript脚本<br>        source：文章源码目录，该目录下的markdown和html文件均会被hexo处理。该页面对应repo的根目录，404文件、favicon.ico文件，CNAME文件等都应该放这里，该目录下可新建页面目录。<br>        _drafts：草稿文章<br>        _posts：发布文章<br>        themes：主题文件目录<br>        _config.yml：全局配置文件，大多数的设置都在这里<br>        package.json：应用程序数据，指明hexo的版本等信息，类似于一般软件中的关于按钮</p>
 <pre><code>4.Hexo命令
     Hexo下，通过 _config.yml 设置博客，可以想象成我们用的软件里的设置一样，只是它通过一个文件列出这些参数，然后让我们填写和修改。
 
@@ -229,8 +228,7 @@
     <summary type="html">
     
       &lt;p&gt;一.Hexo搭建Github-Pages博客&lt;br&gt;   1.安装nodejs和git,方法略&lt;/p&gt;
-&lt;p&gt;   2.安装hexo&lt;br&gt;      $ npm install -g hexo&lt;/p&gt;
-&lt;p&gt;   3.部署hexo&lt;br&gt;      $ hexo init
+&lt;p&gt;   2.安装hexo&lt;br&gt;       $ npm install -g hexo&lt;br&gt;&lt;/p&gt;
     
     </summary>
     
