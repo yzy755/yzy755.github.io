@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>我的博客</title>
+  <subtitle>一天进步一点</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yzy755.github.io/"/>
+  <updated>2017-03-08T03:52:01.469Z</updated>
+  <id>http://yzy755.github.io/</id>
+  
+  <author>
+    <name>zeyuanYi</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>TCP的几个状态码</title>
+    <link href="http://yzy755.github.io/2017/03/08/TCP%E7%9A%84%E5%87%A0%E4%B8%AA%E7%8A%B6%E6%80%81%E7%A0%81/"/>
+    <id>http://yzy755.github.io/2017/03/08/TCP的几个状态码/</id>
+    <published>2017-03-08T03:48:05.000Z</published>
+    <updated>2017-03-08T03:52:01.469Z</updated>
+    
+    <content type="html"><![CDATA[<p>在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.</p>
+<p>其中，对于我们日常的分析有用的就是前面的五个字段。</p>
+<p>它们的含义是：</p>
+<p>SYN表示建立连接，</p>
+<p>FIN表示关闭连接，</p>
+<p>ACK表示响应，</p>
+<p>PSH表示有 DATA数据传输，</p>
+<p>RST表示连接重置。<br><a id="more"></a></p>
+<p>其中，ACK是可能与SYN，FIN等同时使用的，比如SYN和ACK可能同时为1，它表示的就是建立连接之后的响应，</p>
+<p>如果只是单个的一个SYN，它表示的只是建立连接。</p>
+<p>TCP的几次握手就是通过这样的ACK表现出来的。</p>
+<p>但SYN与FIN是不会同时为1的，因为前者表示的是建立连接，而后者表示的是断开连接。</p>
+<p>RST一般是在FIN之后才会出现为1的情况，表示的是连接重置。</p>
+<p>一般地，当出现FIN包或RST包时，我们便认为客户端与服务器端断开了连接；而当出现SYN和SYN＋ACK包时，我们认为客户端与服务器建立了一个连接。</p>
+<p>PSH为1的情况，一般只出现在 DATA内容不为0的包中，也就是说PSH为1表示的是有真正的TCP数据包内容被传递。</p>
+<p>TCP的连接建立和连接关闭，都是通过请求－响应的模式完成的。</p>
+<p>概念补充-TCP三次握手：<br>TCP(Transmission Control Protocol)传输控制协议<br>TCP是主机对主机层的传输控制协议，提供可靠的连接服务，采用三次握手确认建立一个连接：</p>
+<p>位码即tcp标志位，有6种标示：SYN(synchronous建立联机) ACK(acknowledgement 确认) PSH(push传送) FIN(finish结束) RST(reset重置) URG(urgent紧急)Sequence number(顺序号码) Acknowledge number(确认号码)<br>第一次握手：主机A发送位码为syn＝1，随机产生seq number=1234567的数据包到服务器，主机B由SYN=1知道，A要求建立联机；<br>第二次握手：主机B收到请求后要确认联机信息，向A发送ack number=(主机A的seq+1)，syn=1，ack=1，随机产生seq=7654321的包；<br>第三次握手：主机A收到后检查ack number是否正确，即第一次发送的seq number+1，以及位码ack是否为1，若正确，主机A会再发送ack number=(主机B的seq+1)，ack=1，主机B收到后确认seq值与ack=1则连接建立成功。<br>完成三次握手，主机A与主机B开始传送数据。</p>
+<p>在TCP/IP协议中，TCP协议提供可靠的连接服务，采用三次握手建立一个连接。<br>第一次握手：建立连接时，客户端发送syn包(syn=j)到服务器，并进入SYN_SEND状态，等待服务器确认；<br>第二次握手：服务器收到syn包，必须确认客户的SYN（ack=j+1），同时自己也发送一个SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；<br>第三次握手：客户端收到服务器的SYN＋ACK包，向服务器发送确认包ACK(ack=k+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。完成三次握手，客户端与服务器开始传送数据.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.&lt;/p&gt;
+&lt;p&gt;其中，对于我们日常的分析有用的就是前面的五个字段。&lt;/p&gt;
+&lt;p&gt;它们的含义是：&lt;/p&gt;
+&lt;p&gt;SYN表示建立连接，&lt;/p&gt;
+&lt;p&gt;FIN表示关闭连接，&lt;/p&gt;
+&lt;p&gt;ACK表示响应，&lt;/p&gt;
+&lt;p&gt;PSH表示有 DATA数据传输，&lt;/p&gt;
+&lt;p&gt;RST表示连接重置。&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="tcp" scheme="http://yzy755.github.io/tags/tcp/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>solr部署</title>
+    <link href="http://yzy755.github.io/2017/03/02/solr%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yzy755.github.io/2017/03/02/solr部署/</id>
+    <published>2017-03-02T09:17:53.000Z</published>
+    <updated>2017-03-02T09:42:11.606Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="http://www.tuicool.com/articles/mueARf" target="_blank" rel="external">http://www.tuicool.com/articles/mueARf</a> 参考</p>
+<p>请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：</p>
+<p>复制solr.war到tomcat的webapps目录下，如图操作：</p>
+<p>启动tomcat,如图：<br><a id="more"></a><br>然后修改webapps\solr\WEB-INF下的web.xml配置文件，如图：</p>
+<p>配置solr_home目录路径，如图：</p>
+<p>然后我们需要去C盘创建一个solr_home文件夹，这就是我们SOLR_HOME根目录啦，如图：</p>
+<p>然后我们需要把E:\solr-5.1.0\server\solr目录下的所有文件及文件夹全部复制到我们刚刚创建的solr_home目录下，如图：</p>
+<p>然后我们需要把E:\solr-5.1.0\server\lib\ext目录下的所有jar包 copy到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF\lib目录下(<br>E:\apache-tomcat-7.0.55是我的tomcat安装根目录，请对照你们自己的tomcat安装目录进行调整，你懂的<br>)，如图：</p>
+<p>然后复制 E:\solr-5.1.0\server\resources目录下的log4j.properties配置文件到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF目录下，如图操作：</p>
+<p>然后重启我们的tomcat,如图：</p>
+<p>打开你的浏览器，地址栏输入 <a href="http://localhost:8080/solr" target="_blank" rel="external">http://localhost:8080/solr</a> ， 访问我们的Solr Web后台。如果你能看到这个界面，即表明Solr5部署成功了，如图：</p>
+<p>然后你就可以通过Solr Web UI添加Core啦，不过添加Core之前，你需要在solr_home目录下创建core文件夹，如图：<br>core目录下需要创建conf和data文件夹，你懂的， 《跟益达学Solr5之使用Jetty部署Solr》<br>这篇博客也提到过，如图：</p>
+<p>剩下的一些配置copy具体你们就参照那篇去操作把，这里就不重复说明了。<br>到此，Solr5如何部署到Tomcat就讲解完毕了！</p>
+<p>IK 分词器安装<br>1.将之前解压的solr-4.3.1 下的contrib和dist 文件夹复制到F:\winsolr\solr_home\solr\collection1下<br>2.将下载的IKAnalyzer的发行包解压，解压后将IKAnalyzer2012FF_u1.jar（分词器jar包）复制到F:\winsolr\solr_home\solr\collection1\contrib\analysis-extras\lib下<br>3.在F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF下新建classes文件夹<br>4.将IKAnalyzer解压出来的IKAnalyzer.cfg.xml（分词器配置文件）和 Stopword.dic（分词器停词字典,可自定义添加内容）复制到<br>  F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF\classes中<br>5.在F:\winsolr\solr_home\solr\collection1\conf下的schema.xml文件中fieldType name=”text_general”这个地方的上方添加以下内容 </p>
+<p>将pinyinfj.jar、lucene-analyzers-smartcn-4.7.0.jar、IKAnalyzer2012FF_u1.jar、pinyinAnalyzer.jar、shentong_tsearch_lib.jar放到solr部署目录的web-inf的lib目录下</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;a href=&quot;http://www.tuicool.com/articles/mueARf&quot;&gt;http://www.tuicool.com/articles/mueARf&lt;/a&gt; 参考&lt;/p&gt;
+&lt;p&gt;请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：&lt;/p&gt;
+&lt;p&gt;复制solr.war到tomcat的webapps目录下，如图操作：&lt;/p&gt;
+&lt;p&gt;启动tomcat,如图：&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="solr" scheme="http://yzy755.github.io/tags/solr/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>jar包在windows下的运行命令</title>
+    <link href="http://yzy755.github.io/2017/03/02/jar%E5%8C%85%E5%9C%A8windows%E4%B8%8B%E8%BF%90%E8%A1%8C%E5%91%BD%E4%BB%A4/"/>
+    <id>http://yzy755.github.io/2017/03/02/jar包在windows下运行命令/</id>
+    <published>2017-03-02T09:17:53.000Z</published>
+    <updated>2017-03-02T09:55:46.019Z</updated>
+    
+    <content type="html"><![CDATA[<p>1、打jar包 jar -cvf xx.jar 文件夹名称</p>
+<p>说明一下：<em>.</em>表示把当前目录下面以及子目录的所有class都打到这个xx.jar里。</p>
+<p>-cvf的含义，可以自己去用jar命令去查看</p>
+<p>如果要单独对某个或某些class文件进行打包，可以这样：</p>
+<p>jar -cvf xx.jar Foo.class Bar.class </p>
+<a id="more"></a>
+<p>2.运行jar</p>
+<p>java -jar xx.jar</p>
+<p>要运行一个jar，则此jar内部的META-INF\MANIFEST.MF文件里必须指明要执行的main方法类</p>
+<p>具体格式如：</p>
+<p>Manifest-Version: 1.0<br>Created-By: 1.6.0_03 (Sun Microsystems Inc.)<br>Main-class: Test<br>如果此处的Test.class在com.xx包下面，则需要指明。</p>
+<p>如果在运行时报了invalid or corrupt jarfile错误，则需要检查Main-class: Test 之间是不是缺少了空格。</p>
+<p>3.指定运行jar里面的class</p>
+<p>java -cp xx.jar com.xx.Test</p>
+<p>4.编译某个java文件，但是依赖某个jar</p>
+<p>javac -cp xx.jar Test.java</p>
+<p> (Test.java里面import了xx.jar里面的某个class)</p>
+<p>5.运行某个java文件，但是依赖某个jar</p>
+<p>java -cp .;xx.jar Test</p>
+<p>注意：引用xx.jar的时候，不要漏掉.;（这个表示当前目录）</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;1、打jar包 jar -cvf xx.jar 文件夹名称&lt;/p&gt;
+&lt;p&gt;说明一下：&lt;em&gt;.&lt;/em&gt;表示把当前目录下面以及子目录的所有class都打到这个xx.jar里。&lt;/p&gt;
+&lt;p&gt;-cvf的含义，可以自己去用jar命令去查看&lt;/p&gt;
+&lt;p&gt;如果要单独对某个或某些class文件进行打包，可以这样：&lt;/p&gt;
+&lt;p&gt;jar -cvf xx.jar Foo.class Bar.class &lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="java jar包" scheme="http://yzy755.github.io/tags/java-jar%E5%8C%85/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>微信小程序对接支付</title>
+    <link href="http://yzy755.github.io/2017/03/02/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%AF%B9%E6%8E%A5%E6%94%AF%E4%BB%98/"/>
+    <id>http://yzy755.github.io/2017/03/02/微信小程序对接支付/</id>
+    <published>2017-03-02T09:17:53.000Z</published>
+    <updated>2017-03-02T09:42:41.352Z</updated>
+    
+    <content type="html"><![CDATA[<p>所有支付方式都需要通过 「统一下单」的 API 来获取一个支付凭证。<br>但在小程序内测期间，还没有「统一下单」的概念。HTML 5 应用发起支付需要直接通过前端构造参数来发起（不经过后端验证），很容易造成支付凭证泄露等安全问题。<br>为此，微信支付将其流程进行了优化：在所有支付场景中插入「统一下单」的特性。推荐开发者在后端完成支付参数的构建等行为。<br>该优化带来以下好处:</p>
+<pre><code>* 尽可能让开发者不犯低级错误，造成财务损失。
+* 简化构造支付参数的复杂度，所有支付方式可共享一个支付后端接口。
+</code></pre><a id="more"></a>
+<p>通过「统一下单」获取到相对应 prepay_id 或者 code_url 等参数，即可通过各种支付模式的 SDK 来进行微信支付的发起。<br>需要注意的是，必须对通知参数进行签名验证，以确保安全。<br>进行签名验证时，除去签名字段（一般参数名为: sign）不需要参与签名外，其余所有接收到的参数均需要参与签名。<br>比如拼接的请求支付宝的参数为total_fee,body,appid，那么签名就必须用这三个参数<br>得到prepay_id后还需在发起wx.requestPayment前对 wx.requestPayment请求所需的参数进行签名<br>所需的参数为’timeStamp’: res.data.timeStamp,<br>            ‘nonceStr’: nonce_str,<br>            ‘package’: ‘prepay_id=’+prepay_id,<br>            ‘signType’: ‘MD5’,<br>            ‘paySign’: res.data.sign,<br>但是后台生成该签名还需appId（I大写！！）随后用返回的参数和生成的timeStamp进行请求（ appId、timeStamp、nonceStr、package、signType）。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;所有支付方式都需要通过 「统一下单」的 API 来获取一个支付凭证。&lt;br&gt;但在小程序内测期间，还没有「统一下单」的概念。HTML 5 应用发起支付需要直接通过前端构造参数来发起（不经过后端验证），很容易造成支付凭证泄露等安全问题。&lt;br&gt;为此，微信支付将其流程进行了优化：在所有支付场景中插入「统一下单」的特性。推荐开发者在后端完成支付参数的构建等行为。&lt;br&gt;该优化带来以下好处:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;* 尽可能让开发者不犯低级错误，造成财务损失。
+* 简化构造支付参数的复杂度，所有支付方式可共享一个支付后端接口。
+&lt;/code&gt;&lt;/pre&gt;
+    
+    </summary>
+    
+    
+      <category term="微信小程序" scheme="http://yzy755.github.io/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/"/>
+    
+  </entry>
+  
+</feed>
