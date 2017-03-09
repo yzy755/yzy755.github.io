@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="我的博客">
 <meta property="og:description" content="一.Hexo搭建Github-Pages博客   1.安装nodejs和git,方法略
    2.安装hexo       $ npm install -g hexo">
-<meta property="og:updated_time" content="2017-03-09T09:12:37.990Z">
+<meta property="og:updated_time" content="2017-03-09T09:51:32.491Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hexo编辑博客整理">
 <meta name="twitter:description" content="一.Hexo搭建Github-Pages博客   1.安装nodejs和git,方法略
@@ -391,6 +391,43 @@
     └── rules.jpg
     同时，生成的 html 是
     &lt;img src=&quot;/2015/10/18/MacGesture2-Publish/logo.jpg&quot; alt=&quot;logo&quot;&gt;
+
+12.添加评论插件
+    在_config.yml中添加多说的配置：
+      duoshuo_shortname: 你站点的short_name ps:只需要写你注册填写的内容
+
+      修改themes\landscape\layout\_partial\article.ejs模板
+    把
+
+      &lt;% if (!index &amp;&amp; post.comments &amp;&amp; config.disqus_shortname){ %&gt;
+      &lt;section id=&quot;comments&quot;&gt;
+        &lt;div id=&quot;disqus_thread&quot;&gt;
+          &lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;//disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+        &lt;/div&gt;
+      &lt;/section&gt;
+      &lt;% } %&gt;
+    改为
+
+      &lt;% if (!index &amp;&amp; post.comments &amp;&amp; config.duoshuo_shortname){ %&gt;
+      &lt;section id=&quot;comments&quot;&gt;
+        &lt;!-- 多说评论框 start --&gt;
+        &lt;div class=&quot;ds-thread&quot; data-thread-key=&quot;&lt;%= post.layout %&gt;-&lt;%= post.slug %&gt;&quot; data-title=&quot;&lt;%= post.title %&gt;&quot; data-url=&quot;&lt;%= page.permalink %&gt;&quot;&gt;&lt;/div&gt;
+        &lt;!-- 多说评论框 end --&gt;
+        &lt;!-- 多说公共JS代码 start (一个网页只需插入一次) --&gt;
+        &lt;script type=&quot;text/javascript&quot;&gt;
+        var duoshuoQuery = {short_name:&apos;&lt;%= config.duoshuo_shortname %&gt;&apos;};
+          (function() {
+            var ds = document.createElement(&apos;script&apos;);
+            ds.type = &apos;text/javascript&apos;;ds.async = true;
+            ds.src = (document.location.protocol == &apos;https:&apos; ? &apos;https:&apos; : &apos;http:&apos;) + &apos;//static.duoshuo.com/embed.js&apos;;
+            ds.charset = &apos;UTF-8&apos;;
+            (document.getElementsByTagName(&apos;head&apos;)[0] 
+             || document.getElementsByTagName(&apos;body&apos;)[0]).appendChild(ds);
+          })();
+          &lt;/script&gt;
+        &lt;!-- 多说公共JS代码 end --&gt;
+      &lt;/section&gt;
+      &lt;% } %&gt;
 </code></pre>
       
 

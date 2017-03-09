@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2017-03-09T09:12:37.990Z</updated>
+  <updated>2017-03-09T09:51:32.491Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yzy755.github.io/2017/03/08/hexo%E7%BC%96%E8%BE%91%E5%8D%9A%E5%AE%A2%E6%95%B4%E7%90%86/"/>
     <id>http://yzy755.github.io/2017/03/08/hexo编辑博客整理/</id>
     <published>2017-03-08T07:56:48.000Z</published>
-    <updated>2017-03-09T09:12:37.990Z</updated>
+    <updated>2017-03-09T09:51:32.491Z</updated>
     
     <content type="html"><![CDATA[<p>一.Hexo搭建Github-Pages博客<br>   1.安装nodejs和git,方法略</p>
 <p>   2.安装hexo<br>       $ npm install -g hexo<br><a id="more"></a><br>   3.部署hexo<br>       $ hexo init<br>       .<br>        ├── .deploy<br>        ├── public<br>        ├── scaffolds<br>        ├── scripts<br>        ├── source<br>        |   ├── _drafts<br>        |   └── _posts<br>        ├── themes<br>        ├── _config.yml<br>        └── package.json<br>        .deploy：执行hexo deploy命令部署到GitHub上的内容目录<br>        public：执行hexo generate命令，输出的静态网页内容目录<br>        scaffolds：layout模板文件目录，其中的md文件可以添加编辑<br>        scripts：扩展脚本目录，这里可以自定义一些javascript脚本<br>        source：文章源码目录，该目录下的markdown和html文件均会被hexo处理。该页面对应repo的根目录，404文件、favicon.ico文件，CNAME文件等都应该放这里，该目录下可新建页面目录。<br>        _drafts：草稿文章<br>        _posts：发布文章<br>        themes：主题文件目录<br>        _config.yml：全局配置文件，大多数的设置都在这里<br>        package.json：应用程序数据，指明hexo的版本等信息，类似于一般软件中的关于按钮</p>
@@ -223,6 +223,43 @@
     └── rules.jpg
     同时，生成的 html 是
     &lt;img src=&quot;/2015/10/18/MacGesture2-Publish/logo.jpg&quot; alt=&quot;logo&quot;&gt;
+
+12.添加评论插件
+    在_config.yml中添加多说的配置：
+      duoshuo_shortname: 你站点的short_name ps:只需要写你注册填写的内容
+
+      修改themes\landscape\layout\_partial\article.ejs模板
+    把
+
+      &lt;% if (!index &amp;&amp; post.comments &amp;&amp; config.disqus_shortname){ %&gt;
+      &lt;section id=&quot;comments&quot;&gt;
+        &lt;div id=&quot;disqus_thread&quot;&gt;
+          &lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;//disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+        &lt;/div&gt;
+      &lt;/section&gt;
+      &lt;% } %&gt;
+    改为
+
+      &lt;% if (!index &amp;&amp; post.comments &amp;&amp; config.duoshuo_shortname){ %&gt;
+      &lt;section id=&quot;comments&quot;&gt;
+        &lt;!-- 多说评论框 start --&gt;
+        &lt;div class=&quot;ds-thread&quot; data-thread-key=&quot;&lt;%= post.layout %&gt;-&lt;%= post.slug %&gt;&quot; data-title=&quot;&lt;%= post.title %&gt;&quot; data-url=&quot;&lt;%= page.permalink %&gt;&quot;&gt;&lt;/div&gt;
+        &lt;!-- 多说评论框 end --&gt;
+        &lt;!-- 多说公共JS代码 start (一个网页只需插入一次) --&gt;
+        &lt;script type=&quot;text/javascript&quot;&gt;
+        var duoshuoQuery = {short_name:&apos;&lt;%= config.duoshuo_shortname %&gt;&apos;};
+          (function() {
+            var ds = document.createElement(&apos;script&apos;);
+            ds.type = &apos;text/javascript&apos;;ds.async = true;
+            ds.src = (document.location.protocol == &apos;https:&apos; ? &apos;https:&apos; : &apos;http:&apos;) + &apos;//static.duoshuo.com/embed.js&apos;;
+            ds.charset = &apos;UTF-8&apos;;
+            (document.getElementsByTagName(&apos;head&apos;)[0] 
+             || document.getElementsByTagName(&apos;body&apos;)[0]).appendChild(ds);
+          })();
+          &lt;/script&gt;
+        &lt;!-- 多说公共JS代码 end --&gt;
+      &lt;/section&gt;
+      &lt;% } %&gt;
 </code></pre>]]></content>
     
     <summary type="html">
