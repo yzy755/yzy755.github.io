@@ -280,7 +280,7 @@
     <link href="http://yzy755.github.io/2017/03/08/TCP%E7%9A%84%E5%87%A0%E4%B8%AA%E7%8A%B6%E6%80%81%E7%A0%81/"/>
     <id>http://yzy755.github.io/2017/03/08/TCP的几个状态码/</id>
     <published>2017-03-08T03:48:05.000Z</published>
-    <updated>2017-03-08T07:40:11.006Z</updated>
+    <updated>2017-03-09T09:06:42.775Z</updated>
     
     <content type="html"><![CDATA[<p>在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.</p>
 <p>其中，对于我们日常的分析有用的就是前面的五个字段。</p>
@@ -324,7 +324,7 @@
     </summary>
     
     
-      <category term="tcp 三次握手 四次挥手" scheme="http://yzy755.github.io/tags/tcp-%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B-%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/"/>
+      <category term="tcp、三次握手、四次挥手" scheme="http://yzy755.github.io/tags/tcp%E3%80%81%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E3%80%81%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/"/>
     
   </entry>
   
