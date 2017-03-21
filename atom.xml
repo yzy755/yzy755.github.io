@@ -468,13 +468,15 @@
     <link href="http://yzy755.github.io/2017/03/02/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%AF%B9%E6%8E%A5%E6%94%AF%E4%BB%98/"/>
     <id>http://yzy755.github.io/2017/03/02/微信小程序对接支付/</id>
     <published>2017-03-02T09:17:53.000Z</published>
-    <updated>2017-03-09T09:12:11.559Z</updated>
+    <updated>2017-03-21T02:31:02.910Z</updated>
     
     <content type="html"><![CDATA[<p>所有支付方式都需要通过 「统一下单」的 API 来获取一个支付凭证。<br>但在小程序内测期间，还没有「统一下单」的概念。HTML 5 应用发起支付需要直接通过前端构造参数来发起（不经过后端验证），很容易造成支付凭证泄露等安全问题。<br>为此，微信支付将其流程进行了优化：在所有支付场景中插入「统一下单」的特性。推荐开发者在后端完成支付参数的构建等行为。<br>该优化带来以下好处:</p>
 <pre><code>* 尽可能让开发者不犯低级错误，造成财务损失。
 * 简化构造支付参数的复杂度，所有支付方式可共享一个支付后端接口。
 </code></pre><a id="more"></a>
 <p>通过「统一下单」获取到相对应 prepay_id 或者 code_url 等参数，即可通过各种支付模式的 SDK 来进行微信支付的发起。<br>需要注意的是，必须对通知参数进行签名验证，以确保安全。<br>进行签名验证时，除去签名字段（一般参数名为: sign）不需要参与签名外，其余所有接收到的参数均需要参与签名。<br>比如拼接的请求支付宝的参数为total_fee,body,appid，那么签名就必须用这三个参数<br>得到prepay_id后还需在发起wx.requestPayment前对 wx.requestPayment请求所需的参数进行签名<br>所需的参数为’timeStamp’: res.data.timeStamp,<br>            ‘nonceStr’: nonce_str,<br>            ‘package’: ‘prepay_id=’+prepay_id,<br>            ‘signType’: ‘MD5’,<br>            ‘paySign’: res.data.sign,<br>但是后台生成该签名还需appId（I大写！！）随后用返回的参数和生成的timeStamp进行请求（ appId、timeStamp、nonceStr、package、signType）。</p>
+<p>之后又将微信支付集成到了web端，官方对于网页版的微信支付有两种模式，我使用的是更为简单的模式二，参考<a href="https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_5" target="_blank" rel="external">https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_5</a><br>时序图如下：<br><img src="/2017/03/02/微信小程序对接支付/timing.png" alt="logo"><br>与小程序的统一下单api所需的参数不同的是：小程序的trade_type一定是”JSAPI”,相应的一定要穿当前使用小程序的用户openid；扫码支付模式二的trade_type是”NATIVE”，不需要用户的openid,其他参数相同，为：<br>        wxRequestParam.setAppid(ConstantUtil.APP_ID);<br>        wxRequestParam.setMch_id(ConstantUtil.MCH_ID);<br>        wxRequestParam.setNonce_str(WXUtil.getNonceStr());<br>        wxRequestParam.setBody(commonsOrder.getTitle());<br>        wxRequestParam.setSpbill_create_ip(request.getRemoteAddr().startsWith(“0”)?”127.0.0.1”:request.getRemoteAddr());<br>        wxRequestParam.setOut_trade_no(commonsOrder.getOrderCode());<br>        wxRequestParam.setTotal_fee(StringUtils.substringBefore(String.valueOf(commonsOrder.getOrderFee().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() * 100), “.”));<br>        wxRequestParam.setNotify_url(ConstantUtil.NOTIFY_URL);<br>        wxRequestParam.setSign(sign);<br>        wxRequestParam.setTrade_type(“NATIVE”);<br>        // 下面是小程序不同的参数<br>        wxRequestParam.setOpenid(openid);<br>        wxRequestParam.setTrade_type(“JSAPI”);</p>
+<p>统一下单后返回参数中有一个code_url，使用<a href="http://qr.liantu.com/api.php?text=code_url即可看到一张二维码，扫码就支付啦，是不是比较简单-" target="_blank" rel="external">http://qr.liantu.com/api.php?text=code_url即可看到一张二维码，扫码就支付啦，是不是比较简单-</a> -</p>
 ]]></content>
     
     <summary type="html">
@@ -489,7 +491,7 @@
       <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     
     
-      <category term="微信小程序" scheme="http://yzy755.github.io/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/"/>
+      <category term="-微信小程序 -微信支付" scheme="http://yzy755.github.io/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F-%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98/"/>
     
   </entry>
   
