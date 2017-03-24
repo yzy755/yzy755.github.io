@@ -113,10 +113,9 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
     <link href="http://yzy755.github.io/2017/03/10/linux%E7%8E%AF%E5%A2%83%E4%B8%8Bffmpeg%E5%8A%A0%E5%85%A5libx264%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/"/>
     <id>http://yzy755.github.io/2017/03/10/linux环境下ffmpeg加入libx264编译方法/</id>
     <published>2017-03-10T08:50:48.000Z</published>
-    <updated>2017-03-24T10:22:28.669Z</updated>
+    <updated>2017-03-24T10:23:22.503Z</updated>
     
-    <content type="html"><![CDATA[<p>下载源码<br>  libx264 <a href="http://download.videolan.org/x264/snapshots/" target="_blank" rel="external">http://download.videolan.org/x264/snapshots/</a> 最新版<br>  yasm <a href="http://yasm.tortall.net/Download.html" target="_blank" rel="external">http://yasm.tortall.net/Download.html</a> 版本为yasm-1.3.0(yasm是汇编编译器,因为ffmpeg中为了提高效率用到了汇编指令)<br>  ffmpeg <a href="http://www.ffmpeg.org/download.html" target="_blank" rel="external">http://www.ffmpeg.org/download.html</a> 版本为ffmpge-2.6.3</p>
-<p>编译</p>
+    <content type="html"><![CDATA[<p>下载源码<br>  libx264 <a href="http://download.videolan.org/x264/snapshots/" target="_blank" rel="external">http://download.videolan.org/x264/snapshots/</a> 最新版<br>  yasm <a href="http://yasm.tortall.net/Download.html" target="_blank" rel="external">http://yasm.tortall.net/Download.html</a> 版本为yasm-1.3.0(yasm是汇编编译器,因为ffmpeg中为了提高效率用到了汇编指令)<br>  ffmpeg <a href="http://www.ffmpeg.org/download.html" target="_blank" rel="external">http://www.ffmpeg.org/download.html</a> 版本为ffmpge-2.6.3<br><a id="more"></a><br>编译</p>
 <ol>
 <li><p>yasm<br>解压yasm-1.3.0至当前目录<br>tar -zxvf yasm.1.3.0.tar.gz<br>cd yasm<br>./configure –prefix=/usr/local/yasm<br>make<br>make install</p>
 </li>
@@ -129,7 +128,7 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
     
     <summary type="html">
     
-      &lt;p&gt;下载源码&lt;br&gt;  libx264 &lt;a href=&quot;http://download.videolan.org/x264/snapshots/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://download.videolan.org/x264
+      &lt;p&gt;下载源码&lt;br&gt;  libx264 &lt;a href=&quot;http://download.videolan.org/x264/snapshots/&quot;&gt;http://download.videolan.org/x264/snapshots/&lt;/a&gt; 最新版&lt;br&gt;  yasm &lt;a href=&quot;http://yasm.tortall.net/Download.html&quot;&gt;http://yasm.tortall.net/Download.html&lt;/a&gt; 版本为yasm-1.3.0(yasm是汇编编译器,因为ffmpeg中为了提高效率用到了汇编指令)&lt;br&gt;  ffmpeg &lt;a href=&quot;http://www.ffmpeg.org/download.html&quot;&gt;http://www.ffmpeg.org/download.html&lt;/a&gt; 版本为ffmpge-2.6.3&lt;br&gt;&lt;/p&gt;
     
     </summary>
     
