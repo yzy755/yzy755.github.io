@@ -329,6 +329,92 @@
 
  
   
+    <article id="post-linux环境下ffmpeg加入libx264编译方法" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/10/linux环境下ffmpeg加入libx264编译方法/">linux环境下ffmpeg加入libx264编译方法</a>
+    </h1>
+  
+
+        
+        <a href="/2017/03/10/linux环境下ffmpeg加入libx264编译方法/" class="archive-article-date">
+  	<time datetime="2017-03-10T08:50:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-10</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>下载源码<br>  libx264 <a href="http://download.videolan.org/x264/snapshots/" target="_blank" rel="external">http://download.videolan.org/x264/snapshots/</a> 最新版<br>  yasm <a href="http://yasm.tortall.net/Download.html" target="_blank" rel="external">http://yasm.tortall.net/Download.html</a> 版本为yasm-1.3.0(yasm是汇编编译器,因为ffmpeg中为了提高效率用到了汇编指令)<br>  ffmpeg <a href="http://www.ffmpeg.org/download.html" target="_blank" rel="external">http://www.ffmpeg.org/download.html</a> 版本为ffmpge-2.6.3</p>
+<p>编译</p>
+<ol>
+<li><p>yasm<br>解压yasm-1.3.0至当前目录<br>tar -zxvf yasm.1.3.0.tar.gz<br>cd yasm<br>./configure –prefix=/usr/local/yasm<br>make<br>make install</p>
+</li>
+<li><p>libx264<br>解压x264-snapshot-20140424-2245.tar至当前目录<br>tar -zxvf x264-snapshot-20140424-2245.tar<br>cd x264<br>./configure –prefix=/usr/local/x264 –enable-shared –enable-static –enable-yasm<br>make<br>make install</p>
+</li>
+<li><p>ffmpeg<br>解压ffmpeg-2.8.0.tar至当前目录<br>tar -zxvf ffmpeg-2.8.0.tar<br>cd ffmpeg<br>./configure –prefix=/usr/local/ffmpeg –enable-shared –enable-libx264 –enable-gpl –enable-pthreads –extra-cflags=-I/usr/local/x264/include –extra-ldflags=-L/usr/local/x264/lib<br>make<br>make install<br>容易出现的问题<br>error while loading shared libraries: libpostproc.so.53（libx264.so.148）: cannot open shared object file: No such file or directory<br>运行 ldd $(which ffmpeg) 命令  ps:ldd命令用于判断某个可执行的 binary 档案含有什么动态函式库<br>在linux下安装ffmpeg出现此问题运行改命令示例：<br>linux-vdso.so.1 =&gt;  (0x00007fff6173b000)<br>   libavdevice.so.56 =&gt; /usr/local/ffmpeg/lib/libavdevice.so.56 (0x00007f61761fc000)<br>   libavfilter.so.5 =&gt; /usr/local/ffmpeg/lib/libavfilter.so.5 (0x00007f6175e70000)<br>   libavformat.so.56 =&gt; /usr/local/ffmpeg/lib/libavformat.so.56 (0x00007f6175a8c000)<br>   libavcodec.so.56 =&gt; /usr/local/ffmpeg/lib/libavcodec.so.56 (0x00007f61745eb000)<br>   libpostproc.so.53 =&gt; not found<br>   libswresample.so.1 =&gt; /usr/local/ffmpeg/lib/libswresample.so.1 (0x00007f61743cf000)<br>   libswscale.so.3 =&gt; /usr/local/ffmpeg/lib/libswscale.so.3 (0x00007f617413e000)<br>   libavutil.so.54 =&gt; /usr/local/ffmpeg/lib/libavutil.so.54 (0x00007f6173ed7000)<br>   libm.so.6 =&gt; /lib64/libm.so.6 (0x00007f6173c52000)<br>   libpthread.so.0 =&gt; /lib64/libpthread.so.0 (0x00007f6173a35000)<br>   libc.so.6 =&gt; /lib64/libc.so.6 (0x00007f61736a1000)<br>   libpostproc.so.53 =&gt; not found<br>   libz.so.1 =&gt; /lib64/libz.so.1 (0x00007f617348a000)<br>   libx264.so.148 =&gt; not found<br>   librt.so.1 =&gt; /lib64/librt.so.1 (0x00007f6173281000)<br>   /lib64/ld-linux-x86-64.so.2 (0x00007f617641c000)<br>可以看到libpostproc.so.53和libx264.so.148 not found<br>出现这类错误表示，系统不知道xxx.so放在哪个目录下，这时候就要在/etc/ld.so.conf中加入xxx.so所在的目录。<br>一般而言，有很多的so会存放在/usr/local/lib这个目录底下，去这个目录底下找，果然发现自己所需要的.so文件。<br>所以，在/etc/ld.so.conf中加入/usr/local/lib这一行，保存之后，再运行：/sbin/ldconfig –v(或者直接运行ldconfig命令)更新一下配置即可。</p>
+</li>
+</ol>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">ffmpeg</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">编译</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/03/10/linux环境下ffmpeg加入libx264编译方法/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+ 
+  
     <article id="post-hexo编辑博客整理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -951,6 +1037,14 @@
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">调优</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">ffmpeg</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">编译</a>
               </li>
             
             <div class="clearfix"></div>
