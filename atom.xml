@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2017-03-09T09:51:32.491Z</updated>
+  <updated>2017-03-24T09:40:14.205Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -14,6 +14,35 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>jvm内存分配</title>
+    <link href="http://yzy755.github.io/2017/03/24/jvm%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/"/>
+    <id>http://yzy755.github.io/2017/03/24/jvm内存分配/</id>
+    <published>2017-03-24T07:56:48.000Z</published>
+    <updated>2017-03-24T09:40:14.205Z</updated>
+    
+    <content type="html"><![CDATA[<pre><code>java内存组成介绍：堆(Heap)和非堆(Non-heap)内存
+
+   按照官方的说法：“Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)”。可以看出JVM主要管理两种类型的内存：堆和非堆。简单来说堆就是Java代码可及的内存，是留给开发人员使用的；非堆就是JVM留给 自己用的，所以方法区、JVM内部处理或优化所需的内存(如JIT编译后的代码缓存)、每个类结构(如运行时常数池、字段和方法数据)以及方法和构造方法 的代码都在非堆内存中。
+</code></pre>]]></content>
+    
+    <summary type="html">
+    
+      &lt;pre&gt;&lt;code&gt;java内存组成介绍：堆(Heap)和非堆(Non-heap)内存
+
+   按照官方的说法：“Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(N
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="jvm" scheme="http://yzy755.github.io/tags/jvm/"/>
+    
+      <category term="内存分配" scheme="http://yzy755.github.io/tags/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/"/>
+    
+  </entry>
   
   <entry>
     <title>hexo编辑博客整理</title>
