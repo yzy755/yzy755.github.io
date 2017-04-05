@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>我的博客</title>
-  <subtitle>一天进步一点</subtitle>
+  <title>易泽源的博客</title>
+  <subtitle>一天进步一点 程序员由入门到放弃</subtitle>
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
