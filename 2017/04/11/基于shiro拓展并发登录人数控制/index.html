@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="易泽源的博客">
 <meta property="og:description" content="在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！">
 <meta property="og:image" content="http://yzy755.github.io/2017/04/11/基于shiro拓展并发登录人数控制/filter.png">
-<meta property="og:updated_time" content="2017-04-11T09:24:21.448Z">
+<meta property="og:updated_time" content="2017-04-11T09:33:13.003Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于shiro拓展并发登录人数控制">
 <meta name="twitter:description" content="在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！">
@@ -207,118 +207,131 @@ onPreHandle会自动调用这两个方法决定是否继续处理：
     void saveRequest(ServletRequest request) //将请求保存起来，如登录成功后再重定向回该请求  
     void redirectToLogin(ServletRequest request, ServletResponse response) //重定向到登录页面 
     比如基于表单的身份验证就需要使用这些功能。
-</code></pre><p>如果我们想进行访问访问的控制就可以继承AccessControlFilter；如果我们要添加一些通用数据我们可以直接继承PathMatchingFilter。所以定义一个类继承AccessControlFilter重写onAccessDenied方法，isAccessAllowed方法直接返回false，使程序进入拒绝访问的处理过程，也就是onAccessDenied方法，在这个方法中，我们的思路就是<br>    1.使用链表记录同一用户的登录sessionid，用shiro提供的cache记录用户和session的映射关系，用户名为key,链表为value<br>    2.用户登录后使用subject拿到用户名，以用户名取出当前服务器存储的sessionid链表，判断链表中有无当前登录的sessionid，无则push<br>    3.判断链表的的长度，若大于系统允许的登录数，链表进行移除操作，获得移除的session并标记为被踢出（移除的顺序可配置为踢前者或者后者）<br>    4.被移除的session（客户端）再次访问系统页面时，走完上述过程发现自己有被踢出的标记，调用subject.logout()方法，并重定向到踢出的提示页面<br>帖一波代码：<br>public class KickoutSessionControlFilter extends AccessControlFilter<br>{<br>    private Logger logger = LoggerFactory.getLogger(KickoutSessionControlFilter.class);<br>    private String kickoutUrl; // 踢出后到的地址<br>    private boolean kickoutAfter; // 踢出之前登录的或之后登录的用户 (在配置文件中配)<br>    private int maxSession = 1; // 同一个帐号最大会话数 默认1</p>
-<pre><code>private SessionManager sessionManager;
+</code></pre><p>如果我们想进行访问访问的控制就可以继承AccessControlFilter；如果我们要添加一些通用数据我们可以直接继承PathMatchingFilter。所以定义一个类继承AccessControlFilter重写onAccessDenied方法，isAccessAllowed方法直接返回false，使程序进入拒绝访问的处理过程，也就是onAccessDenied方法，在这个方法中，我们的思路就是<br>    1.使用链表记录同一用户的登录sessionid，用shiro提供的cache记录用户和session的映射关系，用户名为key,链表为value<br>    2.用户登录后使用subject拿到用户名，以用户名取出当前服务器存储的sessionid链表，判断链表中有无当前登录的sessionid，无则push<br>    3.判断链表的的长度，若大于系统允许的登录数，链表进行移除操作，获得移除的session并标记为被踢出（移除的顺序可配置为踢前者或者后者）<br>    4.被移除的session（客户端）再次访问系统页面时，走完上述过程发现自己有被踢出的标记，调用subject.logout()方法，并重定向到踢出的提示页面<br>帖一波代码：<br>    public class KickoutSessionControlFilter extends AccessControlFilter<br>    {<br>        private Logger logger = LoggerFactory.getLogger(KickoutSessionControlFilter.class);<br>        private String kickoutUrl; // 踢出后到的地址<br>        private boolean kickoutAfter; // 踢出之前登录的或之后登录的用户 (在配置文件中配)<br>        private int maxSession = 1; // 同一个帐号最大会话数 默认1</p>
+<pre><code>    private SessionManager sessionManager;
 
-private Cache&lt;String, Deque&lt;Serializable&gt;&gt; cache;
-@Override
-protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception
-{
-    return false;
-}
-
-@Override
-protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception
-{
-    Subject subject = getSubject(request, response);
-    if (!subject.isAuthenticated() &amp;&amp; !subject.isRemembered())
+    private Cache&lt;String, Deque&lt;Serializable&gt;&gt; cache;
+    @Override
+    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception
     {
-        // 如果没有登录，直接进行之后的流程
+        return false;
+    }
+
+    @Override
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception
+    {
+        Subject subject = getSubject(request, response);
+        if (!subject.isAuthenticated() &amp;&amp; !subject.isRemembered())
+        {
+            // 如果没有登录，直接进行之后的流程
+            return true;
+        }
+
+        Session session = subject.getSession();
+        String username = (String) subject.getPrincipal();
+        Serializable sessionId = session.getId();
+
+        // 同步控制
+        Deque&lt;Serializable&gt; deque = cache.get(username);
+        if (deque == null)
+        {
+            deque = new LinkedList&lt;Serializable&gt;();
+        }
+
+        // 如果队列里没有此sessionId，且用户没有被踢出；放入队列
+        if (!deque.contains(sessionId) &amp;&amp; session.getAttribute(&quot;kickout&quot;) == null)
+        {
+            deque.push(sessionId);
+        }
+
+        // 如果队列里的sessionId数超出最大会话数，开始踢人
+        while (deque.size() &gt; maxSession)
+        {
+            Serializable kickoutSessionId = null;
+            if (kickoutAfter)
+            { // 如果踢出后者
+                kickoutSessionId = deque.removeFirst();
+            }
+            else
+            { // 否则踢出前者
+                kickoutSessionId = deque.removeLast();
+            }
+            try
+            {
+                Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
+                if (kickoutSession != null)
+                {
+                    // 设置会话的kickout属性表示踢出了
+                    kickoutSession.setAttribute(&quot;kickout&quot;, true);
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                logger.error(e.getMessage(), e);
+            }
+        }
+        cache.put(username, deque);
+
+        // 如果被踢出了，直接退出，重定向到踢出后的地址
+        if (session.getAttribute(&quot;kickout&quot;) != null)
+        {
+            try
+            {
+                subject.logout();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                logger.error(e.getMessage(), e);
+            }
+            saveRequest(request);
+            WebUtils.issueRedirect(request, response, kickoutUrl);
+            return false;
+        }
         return true;
     }
 
-    Session session = subject.getSession();
-    String username = (String) subject.getPrincipal();
-    Serializable sessionId = session.getId();
-
-    // 同步控制
-    Deque&lt;Serializable&gt; deque = cache.get(username);
-    if (deque == null)
+    public void setKickoutUrl(String kickoutUrl)
     {
-        deque = new LinkedList&lt;Serializable&gt;();
+        this.kickoutUrl = kickoutUrl;
     }
 
-    // 如果队列里没有此sessionId，且用户没有被踢出；放入队列
-    if (!deque.contains(sessionId) &amp;&amp; session.getAttribute(&quot;kickout&quot;) == null)
+    public void setKickoutAfter(boolean kickoutAfter)
     {
-        deque.push(sessionId);
+        this.kickoutAfter = kickoutAfter;
     }
 
-    // 如果队列里的sessionId数超出最大会话数，开始踢人
-    while (deque.size() &gt; maxSession)
+    public void setMaxSession(int maxSession)
     {
-        Serializable kickoutSessionId = null;
-        if (kickoutAfter)
-        { // 如果踢出后者
-            kickoutSessionId = deque.removeFirst();
-        }
-        else
-        { // 否则踢出前者
-            kickoutSessionId = deque.removeLast();
-        }
-        try
-        {
-            Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
-            if (kickoutSession != null)
-            {
-                // 设置会话的kickout属性表示踢出了
-                kickoutSession.setAttribute(&quot;kickout&quot;, true);
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            logger.error(e.getMessage(), e);
-        }
+        this.maxSession = maxSession;
     }
-    cache.put(username, deque);
 
-    // 如果被踢出了，直接退出，重定向到踢出后的地址
-    if (session.getAttribute(&quot;kickout&quot;) != null)
+    public void setSessionManager(SessionManager sessionManager)
     {
-        try
-        {
-            subject.logout();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            logger.error(e.getMessage(), e);
-        }
-        saveRequest(request);
-        WebUtils.issueRedirect(request, response, kickoutUrl);
-        return false;
+        this.sessionManager = sessionManager;
     }
-    return true;
-}
 
-public void setKickoutUrl(String kickoutUrl)
-{
-    this.kickoutUrl = kickoutUrl;
+    public void setCacheManager(CacheManager cacheManager)
+    {
+        this.cache = cacheManager.getCache(&quot;shiro-kickout-session&quot;);
+    }
 }
+</code></pre><p>当然上述的实现离不开shiro的正确配置，帖一波配置：</p>
+<pre><code>&lt;bean id=&quot;securityManager&quot; class=&quot;org.apache.shiro.web.mgt.DefaultWebSecurityManager&quot;&gt;
+    &lt;property name=&quot;realms&quot;&gt;
+        &lt;util:list id=&quot;beanList&quot;&gt;
+            &lt;ref bean=&quot;myCasRealm&quot; /&gt;
+            &lt;ref bean=&quot;myLoginRealm&quot; /&gt;
+        &lt;/util:list&gt;
+    &lt;/property&gt;
+    &lt;!-- &lt;property name=&quot;realm&quot; ref=&quot;myCasRealm&quot; /&gt; --&gt;
+    &lt;property name=&quot;subjectFactory&quot; ref=&quot;casSubjectFactory&quot; /&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot; /&gt;
+&lt;/bean&gt;
 
-public void setKickoutAfter(boolean kickoutAfter)
-{
-    this.kickoutAfter = kickoutAfter;
-}
-
-public void setMaxSession(int maxSession)
-{
-    this.maxSession = maxSession;
-}
-
-public void setSessionManager(SessionManager sessionManager)
-{
-    this.sessionManager = sessionManager;
-}
-
-public void setCacheManager(CacheManager cacheManager)
-{
-    this.cache = cacheManager.getCache(&quot;shiro-kickout-session&quot;);
-}
-</code></pre><p>}</p>
-<p>当然上述的实现离不开shiro的正确配置，帖一波配置：<br>    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager"><br>        <property name="realms"><br>            <util:list id="beanList"><br>                <ref bean="myCasRealm"><br>                <ref bean="myLoginRealm"><br>            </ref></ref></util:list><br>        </property><br>        <!-- <property name="realm" ref="myCasRealm" /> --><br>        <property name="subjectFactory" ref="casSubjectFactory"><br>        <property name="cacheManager" ref="cacheManager"><br>        <property name="sessionManager" ref="sessionManager"><br>    </property></property></property></bean></p>
-<pre><code>&lt;!-- 如果要实现cas的remember me的功能，需要用到下面这个bean，并设置到securityManager的subjectFactory中 --&gt;
+&lt;!-- 如果要实现cas的remember me的功能，需要用到下面这个bean，并设置到securityManager的subjectFactory中 --&gt;
 &lt;bean id=&quot;casSubjectFactory&quot; class=&quot;org.apache.shiro.cas.CasSubjectFactory&quot; /&gt;
 
 &lt;!-- 項目自定义的Realm --&gt;
@@ -598,15 +611,6 @@ public void setCacheManager(CacheManager cacheManager)
 
   
 <nav id="article-nav">
-  
-    <a href="/2017/04/11/基于shiro拓展用户客户端登录个数/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          基于shiro拓展并发登录人数控制
-        
-      </div>
-    </a>
   
   
     <a href="/2017/03/24/jvm调优总结 -Xms -Xmx -Xmn -Xss/" id="article-nav-older" class="article-nav-link-wrap">
