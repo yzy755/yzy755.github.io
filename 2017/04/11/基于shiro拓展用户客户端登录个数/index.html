@@ -6,17 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>易泽源的博客</title>
+  <title>基于shiro拓展并发登录人数控制 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="记录学习点滴">
-<meta property="og:type" content="website">
-<meta property="og:title" content="易泽源的博客">
-<meta property="og:url" content="http://yzy755.github.io/index.html">
+  <meta name="description" content="在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于shiro拓展并发登录人数控制">
+<meta property="og:url" content="http://yzy755.github.io/2017/04/11/基于shiro拓展用户客户端登录个数/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="记录学习点滴">
+<meta property="og:description" content="在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！">
+<meta property="og:image" content="http://yzy755.github.io/2017/04/11/基于shiro拓展用户客户端登录个数/filter.png">
+<meta property="og:updated_time" content="2017-04-11T09:27:59.663Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="易泽源的博客">
-<meta name="twitter:description" content="记录学习点滴">
+<meta name="twitter:title" content="基于shiro拓展并发登录人数控制">
+<meta name="twitter:description" content="在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！">
+<meta name="twitter:image" content="http://yzy755.github.io/2017/04/11/基于shiro拓展用户客户端登录个数/filter.png">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -166,16 +169,14 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-    <article id="post-基于shiro拓展用户客户端登录个数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+            <article id="post-基于shiro拓展用户客户端登录个数" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/04/11/基于shiro拓展用户客户端登录个数/">基于shiro拓展并发登录人数控制</a>
+    <h1 class="article-title" itemprop="name">
+      基于shiro拓展并发登录人数控制
     </h1>
   
 
@@ -188,12 +189,339 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！</p>
-        
-          <a class="article-more-a" href="/2017/04/11/基于shiro拓展用户客户端登录个数/#more">more >></a>
-        
+        <p>在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！<a id="more"></a><br>spring security就直接提供了相应的功能；我的项目使用的权限框架是apach的shiro，Shiro的话没有提供默认实现，不过可以很容易的在Shiro中加入这个功能<br>我们来看下shiro拦截机制中filter的关系图<br><img src="/2017/04/11/基于shiro拓展用户客户端登录个数/filter.png" alt="logo"><br>这里只介绍AccessControlFilter：<br>    AccessControlFilter提供了访问控制的基础功能；比如是否允许访问/当访问拒绝时如何处理等：<br>        abstract boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception;<br>        boolean onAccessDenied(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception;<br>        abstract boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception;</p>
+<pre><code>    isAccessAllowed：表示是否允许访问；mappedValue就是[urls]配置中拦截器参数部分，如果允许访问返回true，否则false；
+    onAccessDenied：表示当访问拒绝时是否已经处理了；如果返回true表示需要继续处理；如果返回false表示该拦截器实例已经处理了，将直接返回即可。
+
+onPreHandle会自动调用这两个方法决定是否继续处理：
+    boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {  
+        return isAccessAllowed(request, response, mappedValue) || onAccessDenied(request, response, mappedValue);  
+    }   
+
+另外AccessControlFilter还提供了如下方法用于处理如登录成功后/重定向到上一个请求： 
+    void setLoginUrl(String loginUrl) //身份验证时使用，默认/login.jsp  
+    String getLoginUrl()  
+    Subject getSubject(ServletRequest request, ServletResponse response) //获取Subject实例  
+    boolean isLoginRequest(ServletRequest request, ServletResponse response)//当前请求是否是登录请求  
+    void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException //将当前请求保存起来并重定向到登录页面  
+    void saveRequest(ServletRequest request) //将请求保存起来，如登录成功后再重定向回该请求  
+    void redirectToLogin(ServletRequest request, ServletResponse response) //重定向到登录页面 
+    比如基于表单的身份验证就需要使用这些功能。
+</code></pre><p>如果我们想进行访问访问的控制就可以继承AccessControlFilter；如果我们要添加一些通用数据我们可以直接继承PathMatchingFilter。所以定义一个类继承AccessControlFilter重写onAccessDenied方法，isAccessAllowed方法直接返回false，使程序进入拒绝访问的处理过程，也就是onAccessDenied方法，在这个方法中，我们的思路就是<br>    1.使用链表记录同一用户的登录sessionid，用shiro提供的cache记录用户和session的映射关系，用户名为key,链表为value<br>    2.用户登录后使用subject拿到用户名，以用户名取出当前服务器存储的sessionid链表，判断链表中有无当前登录的sessionid，无则push<br>    3.判断链表的的长度，若大于系统允许的登录数，链表进行移除操作，获得移除的session并标记为被踢出（移除的顺序可配置为踢前者或者后者）<br>    4.被移除的session（客户端）再次访问系统页面时，走完上述过程发现自己有被踢出的标记，调用subject.logout()方法，并重定向到踢出的提示页面<br>帖一波代码：<br>public class KickoutSessionControlFilter extends AccessControlFilter<br>{<br>    private Logger logger = LoggerFactory.getLogger(KickoutSessionControlFilter.class);<br>    private String kickoutUrl; // 踢出后到的地址<br>    private boolean kickoutAfter; // 踢出之前登录的或之后登录的用户 (在配置文件中配)<br>    private int maxSession = 1; // 同一个帐号最大会话数 默认1</p>
+<pre><code>private SessionManager sessionManager;
+
+private Cache&lt;String, Deque&lt;Serializable&gt;&gt; cache;
+@Override
+protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception
+{
+    return false;
+}
+
+@Override
+protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception
+{
+    Subject subject = getSubject(request, response);
+    if (!subject.isAuthenticated() &amp;&amp; !subject.isRemembered())
+    {
+        // 如果没有登录，直接进行之后的流程
+        return true;
+    }
+
+    Session session = subject.getSession();
+    String username = (String) subject.getPrincipal();
+    Serializable sessionId = session.getId();
+
+    // 同步控制
+    Deque&lt;Serializable&gt; deque = cache.get(username);
+    if (deque == null)
+    {
+        deque = new LinkedList&lt;Serializable&gt;();
+    }
+
+    // 如果队列里没有此sessionId，且用户没有被踢出；放入队列
+    if (!deque.contains(sessionId) &amp;&amp; session.getAttribute(&quot;kickout&quot;) == null)
+    {
+        deque.push(sessionId);
+    }
+
+    // 如果队列里的sessionId数超出最大会话数，开始踢人
+    while (deque.size() &gt; maxSession)
+    {
+        Serializable kickoutSessionId = null;
+        if (kickoutAfter)
+        { // 如果踢出后者
+            kickoutSessionId = deque.removeFirst();
+        }
+        else
+        { // 否则踢出前者
+            kickoutSessionId = deque.removeLast();
+        }
+        try
+        {
+            Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
+            if (kickoutSession != null)
+            {
+                // 设置会话的kickout属性表示踢出了
+                kickoutSession.setAttribute(&quot;kickout&quot;, true);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        }
+    }
+    cache.put(username, deque);
+
+    // 如果被踢出了，直接退出，重定向到踢出后的地址
+    if (session.getAttribute(&quot;kickout&quot;) != null)
+    {
+        try
+        {
+            subject.logout();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        }
+        saveRequest(request);
+        WebUtils.issueRedirect(request, response, kickoutUrl);
+        return false;
+    }
+    return true;
+}
+
+public void setKickoutUrl(String kickoutUrl)
+{
+    this.kickoutUrl = kickoutUrl;
+}
+
+public void setKickoutAfter(boolean kickoutAfter)
+{
+    this.kickoutAfter = kickoutAfter;
+}
+
+public void setMaxSession(int maxSession)
+{
+    this.maxSession = maxSession;
+}
+
+public void setSessionManager(SessionManager sessionManager)
+{
+    this.sessionManager = sessionManager;
+}
+
+public void setCacheManager(CacheManager cacheManager)
+{
+    this.cache = cacheManager.getCache(&quot;shiro-kickout-session&quot;);
+}
+</code></pre><p>}</p>
+<p>当然上述的实现离不开shiro的正确配置，帖一波配置：</p>
+<pre><code>&lt;!-- Shiro&apos;s main business-tier object for web-enabled applications --&gt;
+&lt;bean id=&quot;securityManager&quot; class=&quot;org.apache.shiro.web.mgt.DefaultWebSecurityManager&quot;&gt;
+    &lt;property name=&quot;realms&quot;&gt;
+        &lt;util:list id=&quot;beanList&quot;&gt;
+            &lt;ref bean=&quot;myCasRealm&quot; /&gt;
+            &lt;ref bean=&quot;myLoginRealm&quot; /&gt;
+        &lt;/util:list&gt;
+    &lt;/property&gt;
+    &lt;!-- &lt;property name=&quot;realm&quot; ref=&quot;myCasRealm&quot; /&gt; --&gt;
+    &lt;property name=&quot;subjectFactory&quot; ref=&quot;casSubjectFactory&quot; /&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- 如果要实现cas的remember me的功能，需要用到下面这个bean，并设置到securityManager的subjectFactory中 --&gt;
+&lt;bean id=&quot;casSubjectFactory&quot; class=&quot;org.apache.shiro.cas.CasSubjectFactory&quot; /&gt;
+
+&lt;!-- 項目自定义的Realm --&gt;
+&lt;bean id=&quot;myCasRealm&quot; class=&quot;com.booway.shiro.MyCasRealm&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;casServerUrlPrefix&quot; value=&quot;${cas.server.url}&quot; /&gt;
+    &lt;!-- 客户端的回调地址设置，必须和下面的shiro-cas过滤器拦截的地址一致 --&gt;
+    &lt;property name=&quot;casService&quot; value=&quot;/cas&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- 項目自定义的Realm --&gt;
+&lt;bean id=&quot;myLoginRealm&quot; class=&quot;com.booway.shiro.MyLoginRealm&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;casServerUrlPrefix&quot; value=&quot;${cas.server.url}&quot; /&gt;
+    &lt;!-- 客户端的回调地址设置，必须和下面的shiro-cas过滤器拦截的地址一致 --&gt;
+    &lt;property name=&quot;casService&quot; value=&quot;/cas&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- 用户授权信息Cache --&gt;
+&lt;bean id=&quot;cacheManager&quot; class=&quot;org.apache.shiro.cache.MemoryConstrainedCacheManager&quot; /&gt;
+
+&lt;!-- 会话ID生成器 --&gt;
+&lt;bean id=&quot;sessionIdGenerator&quot; class=&quot;org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator&quot;/&gt;
+
+&lt;!-- 会话DAO --&gt;
+&lt;bean id=&quot;sessionDAO&quot; class=&quot;org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO&quot;&gt;
+    &lt;property name=&quot;activeSessionsCacheName&quot; value=&quot;shiro-activeSessionCache&quot;/&gt;
+    &lt;property name=&quot;sessionIdGenerator&quot; ref=&quot;sessionIdGenerator&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;!-- 会话Cookie模板 --&gt;
+&lt;bean id=&quot;sessionIdCookie&quot; class=&quot;org.apache.shiro.web.servlet.SimpleCookie&quot;&gt;
+    &lt;constructor-arg value=&quot;sid&quot;/&gt;
+    &lt;property name=&quot;httpOnly&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;maxAge&quot; value=&quot;3600&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;!-- 会话管理器 --&gt;
+&lt;bean id=&quot;sessionManager&quot; class=&quot;org.apache.shiro.web.session.mgt.DefaultWebSessionManager&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;globalSessionTimeout&quot; value=&quot;1800000&quot;/&gt;
+    &lt;property name=&quot;deleteInvalidSessions&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;sessionValidationSchedulerEnabled&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;sessionValidationScheduler&quot; ref=&quot;sessionValidationScheduler&quot;/&gt;
+    &lt;property name=&quot;sessionDAO&quot; ref=&quot;sessionDAO&quot;/&gt;
+    &lt;property name=&quot;sessionIdCookieEnabled&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;sessionIdCookie&quot; ref=&quot;sessionIdCookie&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;!-- 会话验证调度器 --&gt;
+&lt;bean id=&quot;sessionValidationScheduler&quot; class=&quot;org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler&quot;&gt;
+    &lt;property name=&quot;sessionValidationInterval&quot; value=&quot;1800000&quot;/&gt;
+    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;kickoutSessionControlFilter&quot;
+    class=&quot;com.booway.shiro.KickoutSessionControlFilter&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot; /&gt;
+
+    &lt;property name=&quot;kickoutAfter&quot; value=&quot;false&quot; /&gt;
+    &lt;property name=&quot;maxSession&quot; value=&quot;1&quot; /&gt;
+    &lt;property name=&quot;kickoutUrl&quot; value=&quot;/kickout.xhtml&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- Shiro Filter --&gt;
+&lt;bean id=&quot;shiroFilter&quot; class=&quot;com.booway.shiro.ShiroFilterFactoryBean&quot;&gt;
+    &lt;property name=&quot;securityManager&quot; ref=&quot;securityManager&quot; /&gt;
+    &lt;!-- 用于调用Controller --&gt;
+    &lt;property name=&quot;service&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
+    &lt;property name=&quot;loginUrl&quot; value=&quot;${cas.server.login.url}?service=&quot; /&gt;
+    &lt;!-- 用户访问未授权页面后跳转的错误信息页面 --&gt;
+    &lt;property name=&quot;unauthorizedUrl&quot; value=&quot;/401.html&quot;&gt;&lt;/property&gt;
+
+    &lt;!-- 自己实现的formAuthcFilter，加入key type --&gt;
+    &lt;property name=&quot;filters&quot;&gt;
+        &lt;util:map&gt;
+            &lt;entry key=&quot;casFilter&quot; value-ref=&quot;casFilter&quot;&gt;
+            &lt;/entry&gt;
+            &lt;entry key=&quot;singleSignOutFilter&quot; value-ref=&quot;singleSignOutFilter&quot;&gt;
+            &lt;/entry&gt;
+            &lt;entry key=&quot;roles&quot; value-ref=&quot;roleFilter&quot;&gt;
+            &lt;/entry&gt;
+            &lt;entry key=&quot;kickout&quot; value-ref=&quot;kickoutSessionControlFilter&quot;&gt;
+            &lt;/entry&gt;
+        &lt;/util:map&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&quot;filterChainDefinitions&quot;&gt;
+        &lt;value&gt;
+            /** = singleSignOutFilter,casFilter,kickout
+
+        &lt;/value&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;casFilter&quot; class=&quot;com.booway.shiro.MyCasFilter&quot;&gt;
+    &lt;!-- 配置验证错误时的失败页面 --&gt;
+    &lt;property name=&quot;failureUrl&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
+    &lt;property name=&quot;successUrl&quot; value=&quot;/index.xhtml&quot; /&gt;
+    &lt;property name=&quot;casLoginUrl&quot; value=&quot;${cas.server.login.url}&quot; /&gt;
+    &lt;property name=&quot;interceptUrlPrefix&quot;&gt;
+        &lt;list&gt;
+
+        &lt;/list&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&quot;loginUrls&quot;&gt;
+        &lt;list&gt;
+            &lt;value&gt;/index/login.xhtml&lt;/value&gt;
+        &lt;/list&gt;
+    &lt;/property&gt;
+    &lt;!-- &lt;property name=&quot;excludeUrls&quot;&gt; &lt;list&gt; &lt;value&gt;/index.xhtml&lt;/value&gt; &lt;/list&gt; 
+        &lt;/property&gt; --&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;userFilter&quot; class=&quot;com.booway.shiro.MyUserFilter&quot;&gt;
+    &lt;!-- 配置验证错误时的失败页面 --&gt;
+    &lt;property name=&quot;failureUrl&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
+
+&lt;/bean&gt;
+
+&lt;bean id=&quot;logoutFilter&quot; class=&quot;com.booway.shiro.MyLogoutFilter&quot;&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;roleFilter&quot; class=&quot;com.booway.shiro.RolesAuthorizationFilter&quot;&gt;
+&lt;/bean&gt;
+
+&lt;!-- 退出过滤器 --&gt;
+&lt;bean id=&quot;singleSignOutFilter&quot; class=&quot;com.booway.shiro.CustomSingleSignOutFilter&quot;&gt;
+&lt;/bean&gt;
+
+&lt;!-- 保证实现了Shiro内部lifecycle函数的bean执行 --&gt;
+&lt;bean id=&quot;lifecycleBeanPostProcessor&quot; class=&quot;org.apache.shiro.spring.LifecycleBeanPostProcessor&quot; /&gt;
+
+&lt;!-- AOP式方法级权限检查 --&gt;
+&lt;bean
+    class=&quot;org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator&quot;
+    depends-on=&quot;lifecycleBeanPostProcessor&quot;&gt;
+    &lt;property name=&quot;proxyTargetClass&quot; value=&quot;true&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;bean
+    class=&quot;org.springframework.beans.factory.config.MethodInvokingFactoryBean&quot;&gt;
+    &lt;property name=&quot;staticMethod&quot;
+        value=&quot;org.apache.shiro.SecurityUtils.setSecurityManager&quot; /&gt;
+    &lt;property name=&quot;arguments&quot; ref=&quot;securityManager&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- 开启Shiro的注解(如@RequiresRoles,@RequiresPermissions), 需借助SpringAOP扫描使用Shiro注解的类,并在必要时进行安全逻辑验证 --&gt;
+&lt;bean
+    class=&quot;org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor&quot;&gt;
+    &lt;property name=&quot;securityManager&quot; ref=&quot;securityManager&quot; /&gt;
+&lt;/bean&gt;
+</code></pre><p>这样一个shiro的拓展就完成啦！</p>
+
       
 
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/22432/alipay.jpg">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/79227/wxpay.png">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
       
     </div>
     <div class="article-info article-info-index">
@@ -224,748 +552,106 @@
 
 
       
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/04/11/基于shiro拓展用户客户端登录个数/">展开全文 >></a>
-        </p>
-      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsUlEQVR42u3aO1LDQBAFQO5/aZMQQIHEm8+6FLQil5HkbQWr4c18fMTH69vx/Zv7z1ffXP319+f7O68deHh4eIOl/z6ufux+iVf3uTonuTY5848V4uHh4R3jVbfsZAfuvVR6r5/L7/Hw8PAew0uOSZk+ORMPDw/vabwkVrgvxCfxBB4eHt5zeNUg4H7L7hXW88gDDw8P7z28vIv0nM9H+nt4eHh44656rxlW/cWkKG+uFg8PD+8Arxo0JMvKl1iNFXrRMB4eHt453rytNW/836+n+grBw8PDO8fLXwCTgGArFF6OJ/Dw8PCKvByTg/MoIR84GMUQeHh4eAd4+Va+Rc3j4LWBADw8PLwl3qQU7sUQc1jvZYOHh4e3y8tHS7eGSs+V7IV0GQ8PD2/MqzaieoxqE6v6EPHw8PDew8sbUXnIOw8aqrHvP/fEw8PDO8zb2r6rD6tXmievHDw8PLxzvOpQaVKCV8dYq/eJMmk8PDy8JV6+xF4sO2l6Lbxy8PDw8A7wJpdVG2bJ1t+LLcpn4uHh4Y15vRGBpPFfLYXzIYZ8AAsPDw/vNG/SAJsU5c3iOIih8fDw8HZ5+YY+GSbIt/VeQ+6fYhoPDw/vAC//5z8poHtDWnnEkDyyr2/w8PDwDvC2yuL3DFc122Z4eHh4h3mFDbcVW/RCkGowEb2L8PDw8FZ5+eaeF9aTEYGo0ZWEuXh4eHirvGpgOtml82CiF1jg4eHhneO9ikey0KTUzgeneo/jR0qNh4eHt8rr/Udf3fSbpXBx1GB04OHh4RV51RGrrTGs6vBB81o8PDy8Y7x8U67GuHmw2xvJWohx8fDw8A7zJsFrNVDoteXw8PDwnsY7EV7kD6I80oqHh4d3jNdrPk1i2bwQXyip8fDw8FZ588t6IW+1NF8eF8DDw8Pr8D4BYgo/pCWRSggAAAAASUVORK5CYII=" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
 
+  
+<nav id="article-nav">
+  
+  
+    <a href="/2017/04/11/基于shiro拓展并发登录人数控制/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">基于shiro拓展并发登录人数控制</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
 
 
 
+
+
+
+  
+    <div class="duoshuo"></div>
+  
 
 
 
  
+  <section id="comments">
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="post-基于shiro拓展用户客户端登录个数" data-title="基于shiro拓展并发登录人数控制" data-url="http://yzy755.github.io/2017/04/11/基于shiro拓展用户客户端登录个数/"></div>
+    <!-- 多说评论框 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'yzy755'};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+    <!-- 多说公共JS代码 end -->
+  </section>
   
-    <article id="post-基于shiro拓展并发登录人数控制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/04/11/基于shiro拓展并发登录人数控制/">基于shiro拓展并发登录人数控制</a>
-    </h1>
-  
-
-        
-        <a href="/2017/04/11/基于shiro拓展并发登录人数控制/" class="archive-article-date">
-  	<time datetime="2017-04-11T09:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-04-11</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！</p>
-        
-          <a class="article-more-a" href="/2017/04/11/基于shiro拓展并发登录人数控制/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">shiro</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/04/11/基于shiro拓展并发登录人数控制/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
- 
-  
-    <article id="post-jvm调优总结 -Xms -Xmx -Xmn -Xss" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/24/jvm调优总结 -Xms -Xmx -Xmn -Xss/">jvm调优总结 -Xms -Xmx -Xmn -Xss</a>
-    </h1>
-  
-
-        
-        <a href="/2017/03/24/jvm调优总结 -Xms -Xmx -Xmn -Xss/" class="archive-article-date">
-  	<time datetime="2017-03-24T09:50:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-24</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>堆大小设置<br>JVM 中最大堆大小有三方面限制：相关操作系统的数据模型（32-bt还是64-bit）限制；系统的可用虚拟内存限制；系统的可用物理内存限制。32位系统下，一般限制在1.5G~2G；64为操作系统对内存无限制。我在Windows Server 2003 系统，3.5G物理内存，JDK5.0下测试，最大可设置为1478m。<br></p>
-        
-          <a class="article-more-a" href="/2017/03/24/jvm调优总结 -Xms -Xmx -Xmn -Xss/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">jvm</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">调优</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/24/jvm调优总结 -Xms -Xmx -Xmn -Xss/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
- 
-  
-    <article id="post-jvm内存分配" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/24/jvm内存分配/">jvm内存分配</a>
-    </h1>
-  
-
-        
-        <a href="/2017/03/24/jvm内存分配/" class="archive-article-date">
-  	<time datetime="2017-03-24T07:56:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-24</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <pre><code>java内存组成介绍：堆(Heap)和非堆(Non-heap)内存
-
-   按照官方的说法：“Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)”。可以看出JVM主要管理两种类型的内存：堆和非堆。简单来说堆就是Java代码可及的内存，是留给开发人员使用的；非堆就是JVM留给 自己用的，所以方法区、JVM内部处理或优化所需的内存(如JIT编译后的代码缓存)、每个类结构(如运行时常数池、字段和方法数据)以及方法和构造方法 的代码都在非堆内存中。
-</code></pre>
-        
-          <a class="article-more-a" href="/2017/03/24/jvm内存分配/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">jvm</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">内存分配</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/24/jvm内存分配/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
- 
-  
-    <article id="post-linux环境下ffmpeg加入libx264编译方法" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/10/linux环境下ffmpeg加入libx264编译方法/">linux环境下ffmpeg加入libx264编译方法</a>
-    </h1>
-  
-
-        
-        <a href="/2017/03/10/linux环境下ffmpeg加入libx264编译方法/" class="archive-article-date">
-  	<time datetime="2017-03-10T08:50:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-10</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>下载源码<br>  libx264 <a href="http://download.videolan.org/x264/snapshots/">http://download.videolan.org/x264/snapshots/</a> 最新版<br>  yasm <a href="http://yasm.tortall.net/Download.html">http://yasm.tortall.net/Download.html</a> 版本为yasm-1.3.0(yasm是汇编编译器,因为ffmpeg中为了提高效率用到了汇编指令)<br>  ffmpeg <a href="http://www.ffmpeg.org/download.html">http://www.ffmpeg.org/download.html</a> 版本为ffmpge-2.6.3<br></p>
-        
-          <a class="article-more-a" href="/2017/03/10/linux环境下ffmpeg加入libx264编译方法/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">ffmpeg</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">编译</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/10/linux环境下ffmpeg加入libx264编译方法/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
- 
-  
-    <article id="post-hexo编辑博客整理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/08/hexo编辑博客整理/">hexo编辑博客整理</a>
-    </h1>
-  
-
-        
-        <a href="/2017/03/08/hexo编辑博客整理/" class="archive-article-date">
-  	<time datetime="2017-03-08T07:56:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>一.Hexo搭建Github-Pages博客<br>   1.安装nodejs和git,方法略</p>
-<p>   2.安装hexo<br>       $ npm install -g hexo<br></p>
-        
-          <a class="article-more-a" href="/2017/03/08/hexo编辑博客整理/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">hexo</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/08/hexo编辑博客整理/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
- 
-  
-    <article id="post-zookeeper浅读" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/08/zookeeper浅读/">zookeeper浅读</a>
-    </h1>
-  
-
-        
-        <a href="/2017/03/08/zookeeper浅读/" class="archive-article-date">
-  	<time datetime="2017-03-08T07:44:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。<br>zookeeper注册中心<br>Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例<br></p>
-        
-          <a class="article-more-a" href="/2017/03/08/zookeeper浅读/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">zookeeper</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/原理研究/" class="article-tag-list-link color5">原理研究</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/08/zookeeper浅读/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
- 
-  
-    <article id="post-TCP的几个状态码" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/08/TCP的几个状态码/">TCP的几个状态码</a>
-    </h1>
-  
-
-        
-        <a href="/2017/03/08/TCP的几个状态码/" class="archive-article-date">
-  	<time datetime="2017-03-08T03:48:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.</p>
-<p>其中，对于我们日常的分析有用的就是前面的五个字段。</p>
-<p>它们的含义是：</p>
-<p>SYN表示建立连接，</p>
-<p>FIN表示关闭连接，</p>
-<p>ACK表示响应，</p>
-<p>PSH表示有 DATA数据传输，</p>
-<p>RST表示连接重置。<br></p>
-        
-          <a class="article-more-a" href="/2017/03/08/TCP的几个状态码/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tcp</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">三次握手</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">四次挥手</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/08/TCP的几个状态码/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
- 
-  
-    <article id="post-微信小程序对接支付" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/02/微信小程序对接支付/">微信小程序对接支付</a>
-    </h1>
-  
-
-        
-        <a href="/2017/03/02/微信小程序对接支付/" class="archive-article-date">
-  	<time datetime="2017-03-02T09:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>所有支付方式都需要通过 「统一下单」的 API 来获取一个支付凭证。<br>但在小程序内测期间，还没有「统一下单」的概念。HTML 5 应用发起支付需要直接通过前端构造参数来发起（不经过后端验证），很容易造成支付凭证泄露等安全问题。<br>为此，微信支付将其流程进行了优化：在所有支付场景中插入「统一下单」的特性。推荐开发者在后端完成支付参数的构建等行为。<br>该优化带来以下好处:</p>
-<pre><code>* 尽可能让开发者不犯低级错误，造成财务损失。
-* 简化构造支付参数的复杂度，所有支付方式可共享一个支付后端接口。
-</code></pre>
-        
-          <a class="article-more-a" href="/2017/03/02/微信小程序对接支付/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">微信小程序</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">微信支付</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/02/微信小程序对接支付/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
- 
-  
-    <article id="post-solr部署" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/02/solr部署/">solr部署</a>
-    </h1>
-  
-
-        
-        <a href="/2017/03/02/solr部署/" class="archive-article-date">
-  	<time datetime="2017-03-02T09:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><a href="http://www.tuicool.com/articles/mueARf">http://www.tuicool.com/articles/mueARf</a> 参考</p>
-<p>请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：</p>
-<p>复制solr.war到tomcat的webapps目录下，如图操作：</p>
-<p>启动tomcat,如图：<br></p>
-        
-          <a class="article-more-a" href="/2017/03/02/solr部署/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">solr</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/02/solr部署/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
- 
-  
-  
-    <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
-    </nav>
-  
-
-
           </div>
         </div>
       </div>
@@ -985,8 +671,8 @@
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,

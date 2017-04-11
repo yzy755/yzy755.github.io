@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2017-04-11T09:24:21.448Z</updated>
+  <updated>2017-04-11T09:27:59.663Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -14,6 +14,327 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>基于shiro拓展并发登录人数控制</title>
+    <link href="http://yzy755.github.io/2017/04/11/%E5%9F%BA%E4%BA%8Eshiro%E6%8B%93%E5%B1%95%E7%94%A8%E6%88%B7%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%99%BB%E5%BD%95%E4%B8%AA%E6%95%B0/"/>
+    <id>http://yzy755.github.io/2017/04/11/基于shiro拓展用户客户端登录个数/</id>
+    <published>2017-04-11T09:17:53.000Z</published>
+    <updated>2017-04-11T09:27:59.663Z</updated>
+    
+    <content type="html"><![CDATA[<p>在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！<a id="more"></a><br>spring security就直接提供了相应的功能；我的项目使用的权限框架是apach的shiro，Shiro的话没有提供默认实现，不过可以很容易的在Shiro中加入这个功能<br>我们来看下shiro拦截机制中filter的关系图<br><img src="/2017/04/11/基于shiro拓展用户客户端登录个数/filter.png" alt="logo"><br>这里只介绍AccessControlFilter：<br>    AccessControlFilter提供了访问控制的基础功能；比如是否允许访问/当访问拒绝时如何处理等：<br>        abstract boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception;<br>        boolean onAccessDenied(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception;<br>        abstract boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception;</p>
+<pre><code>    isAccessAllowed：表示是否允许访问；mappedValue就是[urls]配置中拦截器参数部分，如果允许访问返回true，否则false；
+    onAccessDenied：表示当访问拒绝时是否已经处理了；如果返回true表示需要继续处理；如果返回false表示该拦截器实例已经处理了，将直接返回即可。
+
+onPreHandle会自动调用这两个方法决定是否继续处理：
+    boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {  
+        return isAccessAllowed(request, response, mappedValue) || onAccessDenied(request, response, mappedValue);  
+    }   
+
+另外AccessControlFilter还提供了如下方法用于处理如登录成功后/重定向到上一个请求： 
+    void setLoginUrl(String loginUrl) //身份验证时使用，默认/login.jsp  
+    String getLoginUrl()  
+    Subject getSubject(ServletRequest request, ServletResponse response) //获取Subject实例  
+    boolean isLoginRequest(ServletRequest request, ServletResponse response)//当前请求是否是登录请求  
+    void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException //将当前请求保存起来并重定向到登录页面  
+    void saveRequest(ServletRequest request) //将请求保存起来，如登录成功后再重定向回该请求  
+    void redirectToLogin(ServletRequest request, ServletResponse response) //重定向到登录页面 
+    比如基于表单的身份验证就需要使用这些功能。
+</code></pre><p>如果我们想进行访问访问的控制就可以继承AccessControlFilter；如果我们要添加一些通用数据我们可以直接继承PathMatchingFilter。所以定义一个类继承AccessControlFilter重写onAccessDenied方法，isAccessAllowed方法直接返回false，使程序进入拒绝访问的处理过程，也就是onAccessDenied方法，在这个方法中，我们的思路就是<br>    1.使用链表记录同一用户的登录sessionid，用shiro提供的cache记录用户和session的映射关系，用户名为key,链表为value<br>    2.用户登录后使用subject拿到用户名，以用户名取出当前服务器存储的sessionid链表，判断链表中有无当前登录的sessionid，无则push<br>    3.判断链表的的长度，若大于系统允许的登录数，链表进行移除操作，获得移除的session并标记为被踢出（移除的顺序可配置为踢前者或者后者）<br>    4.被移除的session（客户端）再次访问系统页面时，走完上述过程发现自己有被踢出的标记，调用subject.logout()方法，并重定向到踢出的提示页面<br>帖一波代码：<br>public class KickoutSessionControlFilter extends AccessControlFilter<br>{<br>    private Logger logger = LoggerFactory.getLogger(KickoutSessionControlFilter.class);<br>    private String kickoutUrl; // 踢出后到的地址<br>    private boolean kickoutAfter; // 踢出之前登录的或之后登录的用户 (在配置文件中配)<br>    private int maxSession = 1; // 同一个帐号最大会话数 默认1</p>
+<pre><code>private SessionManager sessionManager;
+
+private Cache&lt;String, Deque&lt;Serializable&gt;&gt; cache;
+@Override
+protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception
+{
+    return false;
+}
+
+@Override
+protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception
+{
+    Subject subject = getSubject(request, response);
+    if (!subject.isAuthenticated() &amp;&amp; !subject.isRemembered())
+    {
+        // 如果没有登录，直接进行之后的流程
+        return true;
+    }
+
+    Session session = subject.getSession();
+    String username = (String) subject.getPrincipal();
+    Serializable sessionId = session.getId();
+
+    // 同步控制
+    Deque&lt;Serializable&gt; deque = cache.get(username);
+    if (deque == null)
+    {
+        deque = new LinkedList&lt;Serializable&gt;();
+    }
+
+    // 如果队列里没有此sessionId，且用户没有被踢出；放入队列
+    if (!deque.contains(sessionId) &amp;&amp; session.getAttribute(&quot;kickout&quot;) == null)
+    {
+        deque.push(sessionId);
+    }
+
+    // 如果队列里的sessionId数超出最大会话数，开始踢人
+    while (deque.size() &gt; maxSession)
+    {
+        Serializable kickoutSessionId = null;
+        if (kickoutAfter)
+        { // 如果踢出后者
+            kickoutSessionId = deque.removeFirst();
+        }
+        else
+        { // 否则踢出前者
+            kickoutSessionId = deque.removeLast();
+        }
+        try
+        {
+            Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
+            if (kickoutSession != null)
+            {
+                // 设置会话的kickout属性表示踢出了
+                kickoutSession.setAttribute(&quot;kickout&quot;, true);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        }
+    }
+    cache.put(username, deque);
+
+    // 如果被踢出了，直接退出，重定向到踢出后的地址
+    if (session.getAttribute(&quot;kickout&quot;) != null)
+    {
+        try
+        {
+            subject.logout();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        }
+        saveRequest(request);
+        WebUtils.issueRedirect(request, response, kickoutUrl);
+        return false;
+    }
+    return true;
+}
+
+public void setKickoutUrl(String kickoutUrl)
+{
+    this.kickoutUrl = kickoutUrl;
+}
+
+public void setKickoutAfter(boolean kickoutAfter)
+{
+    this.kickoutAfter = kickoutAfter;
+}
+
+public void setMaxSession(int maxSession)
+{
+    this.maxSession = maxSession;
+}
+
+public void setSessionManager(SessionManager sessionManager)
+{
+    this.sessionManager = sessionManager;
+}
+
+public void setCacheManager(CacheManager cacheManager)
+{
+    this.cache = cacheManager.getCache(&quot;shiro-kickout-session&quot;);
+}
+</code></pre><p>}</p>
+<p>当然上述的实现离不开shiro的正确配置，帖一波配置：</p>
+<pre><code>&lt;!-- Shiro&apos;s main business-tier object for web-enabled applications --&gt;
+&lt;bean id=&quot;securityManager&quot; class=&quot;org.apache.shiro.web.mgt.DefaultWebSecurityManager&quot;&gt;
+    &lt;property name=&quot;realms&quot;&gt;
+        &lt;util:list id=&quot;beanList&quot;&gt;
+            &lt;ref bean=&quot;myCasRealm&quot; /&gt;
+            &lt;ref bean=&quot;myLoginRealm&quot; /&gt;
+        &lt;/util:list&gt;
+    &lt;/property&gt;
+    &lt;!-- &lt;property name=&quot;realm&quot; ref=&quot;myCasRealm&quot; /&gt; --&gt;
+    &lt;property name=&quot;subjectFactory&quot; ref=&quot;casSubjectFactory&quot; /&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- 如果要实现cas的remember me的功能，需要用到下面这个bean，并设置到securityManager的subjectFactory中 --&gt;
+&lt;bean id=&quot;casSubjectFactory&quot; class=&quot;org.apache.shiro.cas.CasSubjectFactory&quot; /&gt;
+
+&lt;!-- 項目自定义的Realm --&gt;
+&lt;bean id=&quot;myCasRealm&quot; class=&quot;com.booway.shiro.MyCasRealm&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;casServerUrlPrefix&quot; value=&quot;${cas.server.url}&quot; /&gt;
+    &lt;!-- 客户端的回调地址设置，必须和下面的shiro-cas过滤器拦截的地址一致 --&gt;
+    &lt;property name=&quot;casService&quot; value=&quot;/cas&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- 項目自定义的Realm --&gt;
+&lt;bean id=&quot;myLoginRealm&quot; class=&quot;com.booway.shiro.MyLoginRealm&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;casServerUrlPrefix&quot; value=&quot;${cas.server.url}&quot; /&gt;
+    &lt;!-- 客户端的回调地址设置，必须和下面的shiro-cas过滤器拦截的地址一致 --&gt;
+    &lt;property name=&quot;casService&quot; value=&quot;/cas&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- 用户授权信息Cache --&gt;
+&lt;bean id=&quot;cacheManager&quot; class=&quot;org.apache.shiro.cache.MemoryConstrainedCacheManager&quot; /&gt;
+
+&lt;!-- 会话ID生成器 --&gt;
+&lt;bean id=&quot;sessionIdGenerator&quot; class=&quot;org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator&quot;/&gt;
+
+&lt;!-- 会话DAO --&gt;
+&lt;bean id=&quot;sessionDAO&quot; class=&quot;org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO&quot;&gt;
+    &lt;property name=&quot;activeSessionsCacheName&quot; value=&quot;shiro-activeSessionCache&quot;/&gt;
+    &lt;property name=&quot;sessionIdGenerator&quot; ref=&quot;sessionIdGenerator&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;!-- 会话Cookie模板 --&gt;
+&lt;bean id=&quot;sessionIdCookie&quot; class=&quot;org.apache.shiro.web.servlet.SimpleCookie&quot;&gt;
+    &lt;constructor-arg value=&quot;sid&quot;/&gt;
+    &lt;property name=&quot;httpOnly&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;maxAge&quot; value=&quot;3600&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;!-- 会话管理器 --&gt;
+&lt;bean id=&quot;sessionManager&quot; class=&quot;org.apache.shiro.web.session.mgt.DefaultWebSessionManager&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;globalSessionTimeout&quot; value=&quot;1800000&quot;/&gt;
+    &lt;property name=&quot;deleteInvalidSessions&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;sessionValidationSchedulerEnabled&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;sessionValidationScheduler&quot; ref=&quot;sessionValidationScheduler&quot;/&gt;
+    &lt;property name=&quot;sessionDAO&quot; ref=&quot;sessionDAO&quot;/&gt;
+    &lt;property name=&quot;sessionIdCookieEnabled&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;sessionIdCookie&quot; ref=&quot;sessionIdCookie&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;!-- 会话验证调度器 --&gt;
+&lt;bean id=&quot;sessionValidationScheduler&quot; class=&quot;org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler&quot;&gt;
+    &lt;property name=&quot;sessionValidationInterval&quot; value=&quot;1800000&quot;/&gt;
+    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;kickoutSessionControlFilter&quot;
+    class=&quot;com.booway.shiro.KickoutSessionControlFilter&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot; /&gt;
+
+    &lt;property name=&quot;kickoutAfter&quot; value=&quot;false&quot; /&gt;
+    &lt;property name=&quot;maxSession&quot; value=&quot;1&quot; /&gt;
+    &lt;property name=&quot;kickoutUrl&quot; value=&quot;/kickout.xhtml&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- Shiro Filter --&gt;
+&lt;bean id=&quot;shiroFilter&quot; class=&quot;com.booway.shiro.ShiroFilterFactoryBean&quot;&gt;
+    &lt;property name=&quot;securityManager&quot; ref=&quot;securityManager&quot; /&gt;
+    &lt;!-- 用于调用Controller --&gt;
+    &lt;property name=&quot;service&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
+    &lt;property name=&quot;loginUrl&quot; value=&quot;${cas.server.login.url}?service=&quot; /&gt;
+    &lt;!-- 用户访问未授权页面后跳转的错误信息页面 --&gt;
+    &lt;property name=&quot;unauthorizedUrl&quot; value=&quot;/401.html&quot;&gt;&lt;/property&gt;
+
+    &lt;!-- 自己实现的formAuthcFilter，加入key type --&gt;
+    &lt;property name=&quot;filters&quot;&gt;
+        &lt;util:map&gt;
+            &lt;entry key=&quot;casFilter&quot; value-ref=&quot;casFilter&quot;&gt;
+            &lt;/entry&gt;
+            &lt;entry key=&quot;singleSignOutFilter&quot; value-ref=&quot;singleSignOutFilter&quot;&gt;
+            &lt;/entry&gt;
+            &lt;entry key=&quot;roles&quot; value-ref=&quot;roleFilter&quot;&gt;
+            &lt;/entry&gt;
+            &lt;entry key=&quot;kickout&quot; value-ref=&quot;kickoutSessionControlFilter&quot;&gt;
+            &lt;/entry&gt;
+        &lt;/util:map&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&quot;filterChainDefinitions&quot;&gt;
+        &lt;value&gt;
+            /** = singleSignOutFilter,casFilter,kickout
+
+        &lt;/value&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;casFilter&quot; class=&quot;com.booway.shiro.MyCasFilter&quot;&gt;
+    &lt;!-- 配置验证错误时的失败页面 --&gt;
+    &lt;property name=&quot;failureUrl&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
+    &lt;property name=&quot;successUrl&quot; value=&quot;/index.xhtml&quot; /&gt;
+    &lt;property name=&quot;casLoginUrl&quot; value=&quot;${cas.server.login.url}&quot; /&gt;
+    &lt;property name=&quot;interceptUrlPrefix&quot;&gt;
+        &lt;list&gt;
+
+        &lt;/list&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&quot;loginUrls&quot;&gt;
+        &lt;list&gt;
+            &lt;value&gt;/index/login.xhtml&lt;/value&gt;
+        &lt;/list&gt;
+    &lt;/property&gt;
+    &lt;!-- &lt;property name=&quot;excludeUrls&quot;&gt; &lt;list&gt; &lt;value&gt;/index.xhtml&lt;/value&gt; &lt;/list&gt; 
+        &lt;/property&gt; --&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;userFilter&quot; class=&quot;com.booway.shiro.MyUserFilter&quot;&gt;
+    &lt;!-- 配置验证错误时的失败页面 --&gt;
+    &lt;property name=&quot;failureUrl&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
+
+&lt;/bean&gt;
+
+&lt;bean id=&quot;logoutFilter&quot; class=&quot;com.booway.shiro.MyLogoutFilter&quot;&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;roleFilter&quot; class=&quot;com.booway.shiro.RolesAuthorizationFilter&quot;&gt;
+&lt;/bean&gt;
+
+&lt;!-- 退出过滤器 --&gt;
+&lt;bean id=&quot;singleSignOutFilter&quot; class=&quot;com.booway.shiro.CustomSingleSignOutFilter&quot;&gt;
+&lt;/bean&gt;
+
+&lt;!-- 保证实现了Shiro内部lifecycle函数的bean执行 --&gt;
+&lt;bean id=&quot;lifecycleBeanPostProcessor&quot; class=&quot;org.apache.shiro.spring.LifecycleBeanPostProcessor&quot; /&gt;
+
+&lt;!-- AOP式方法级权限检查 --&gt;
+&lt;bean
+    class=&quot;org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator&quot;
+    depends-on=&quot;lifecycleBeanPostProcessor&quot;&gt;
+    &lt;property name=&quot;proxyTargetClass&quot; value=&quot;true&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;bean
+    class=&quot;org.springframework.beans.factory.config.MethodInvokingFactoryBean&quot;&gt;
+    &lt;property name=&quot;staticMethod&quot;
+        value=&quot;org.apache.shiro.SecurityUtils.setSecurityManager&quot; /&gt;
+    &lt;property name=&quot;arguments&quot; ref=&quot;securityManager&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- 开启Shiro的注解(如@RequiresRoles,@RequiresPermissions), 需借助SpringAOP扫描使用Shiro注解的类,并在必要时进行安全逻辑验证 --&gt;
+&lt;bean
+    class=&quot;org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor&quot;&gt;
+    &lt;property name=&quot;securityManager&quot; ref=&quot;securityManager&quot; /&gt;
+&lt;/bean&gt;
+</code></pre><p>这样一个shiro的拓展就完成啦！</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="shiro" scheme="http://yzy755.github.io/tags/shiro/"/>
+    
+  </entry>
   
   <entry>
     <title>基于shiro拓展并发登录人数控制</title>
@@ -809,99 +1130,11 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
   </entry>
   
   <entry>
-    <title>jar包在windows下的运行命令</title>
-    <link href="http://yzy755.github.io/2017/03/02/jar%E5%8C%85%E5%9C%A8windows%E4%B8%8B%E8%BF%90%E8%A1%8C%E5%91%BD%E4%BB%A4/"/>
-    <id>http://yzy755.github.io/2017/03/02/jar包在windows下运行命令/</id>
-    <published>2017-03-02T09:17:53.000Z</published>
-    <updated>2017-03-09T09:13:47.771Z</updated>
-    
-    <content type="html"><![CDATA[<p>1、打jar包 jar -cvf xx.jar 文件夹名称</p>
-<p>说明一下：<em>.</em>表示把当前目录下面以及子目录的所有class都打到这个xx.jar里。</p>
-<p>-cvf的含义，可以自己去用jar命令去查看</p>
-<p>如果要单独对某个或某些class文件进行打包，可以这样：</p>
-<p>jar -cvf xx.jar Foo.class Bar.class </p>
-<a id="more"></a>
-<p>2.运行jar</p>
-<p>java -jar xx.jar</p>
-<p>要运行一个jar，则此jar内部的META-INF\MANIFEST.MF文件里必须指明要执行的main方法类</p>
-<p>具体格式如：</p>
-<p>Manifest-Version: 1.0<br>Created-By: 1.6.0_03 (Sun Microsystems Inc.)<br>Main-class: Test<br>如果此处的Test.class在com.xx包下面，则需要指明。</p>
-<p>如果在运行时报了invalid or corrupt jarfile错误，则需要检查Main-class: Test 之间是不是缺少了空格。</p>
-<p>3.指定运行jar里面的class</p>
-<p>java -cp xx.jar com.xx.Test</p>
-<p>4.编译某个java文件，但是依赖某个jar</p>
-<p>javac -cp xx.jar Test.java</p>
-<p> (Test.java里面import了xx.jar里面的某个class)</p>
-<p>5.运行某个java文件，但是依赖某个jar</p>
-<p>java -cp .;xx.jar Test</p>
-<p>注意：引用xx.jar的时候，不要漏掉.;（这个表示当前目录）</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;1、打jar包 jar -cvf xx.jar 文件夹名称&lt;/p&gt;
-&lt;p&gt;说明一下：&lt;em&gt;.&lt;/em&gt;表示把当前目录下面以及子目录的所有class都打到这个xx.jar里。&lt;/p&gt;
-&lt;p&gt;-cvf的含义，可以自己去用jar命令去查看&lt;/p&gt;
-&lt;p&gt;如果要单独对某个或某些class文件进行打包，可以这样：&lt;/p&gt;
-&lt;p&gt;jar -cvf xx.jar Foo.class Bar.class &lt;/p&gt;
-    
-    </summary>
-    
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    
-    
-      <category term="java" scheme="http://yzy755.github.io/tags/java/"/>
-    
-      <category term="jar包" scheme="http://yzy755.github.io/tags/jar%E5%8C%85/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>solr部署</title>
-    <link href="http://yzy755.github.io/2017/03/02/solr%E9%83%A8%E7%BD%B2/"/>
-    <id>http://yzy755.github.io/2017/03/02/solr部署/</id>
-    <published>2017-03-02T09:17:53.000Z</published>
-    <updated>2017-03-09T09:12:45.411Z</updated>
-    
-    <content type="html"><![CDATA[<p><a href="http://www.tuicool.com/articles/mueARf" target="_blank" rel="external">http://www.tuicool.com/articles/mueARf</a> 参考</p>
-<p>请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：</p>
-<p>复制solr.war到tomcat的webapps目录下，如图操作：</p>
-<p>启动tomcat,如图：<br><a id="more"></a><br>然后修改webapps\solr\WEB-INF下的web.xml配置文件，如图：</p>
-<p>配置solr_home目录路径，如图：</p>
-<p>然后我们需要去C盘创建一个solr_home文件夹，这就是我们SOLR_HOME根目录啦，如图：</p>
-<p>然后我们需要把E:\solr-5.1.0\server\solr目录下的所有文件及文件夹全部复制到我们刚刚创建的solr_home目录下，如图：</p>
-<p>然后我们需要把E:\solr-5.1.0\server\lib\ext目录下的所有jar包 copy到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF\lib目录下(<br>E:\apache-tomcat-7.0.55是我的tomcat安装根目录，请对照你们自己的tomcat安装目录进行调整，你懂的<br>)，如图：</p>
-<p>然后复制 E:\solr-5.1.0\server\resources目录下的log4j.properties配置文件到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF目录下，如图操作：</p>
-<p>然后重启我们的tomcat,如图：</p>
-<p>打开你的浏览器，地址栏输入 <a href="http://localhost:8080/solr" target="_blank" rel="external">http://localhost:8080/solr</a> ， 访问我们的Solr Web后台。如果你能看到这个界面，即表明Solr5部署成功了，如图：</p>
-<p>然后你就可以通过Solr Web UI添加Core啦，不过添加Core之前，你需要在solr_home目录下创建core文件夹，如图：<br>core目录下需要创建conf和data文件夹，你懂的， 《跟益达学Solr5之使用Jetty部署Solr》<br>这篇博客也提到过，如图：</p>
-<p>剩下的一些配置copy具体你们就参照那篇去操作把，这里就不重复说明了。<br>到此，Solr5如何部署到Tomcat就讲解完毕了！</p>
-<p>IK 分词器安装<br>1.将之前解压的solr-4.3.1 下的contrib和dist 文件夹复制到F:\winsolr\solr_home\solr\collection1下<br>2.将下载的IKAnalyzer的发行包解压，解压后将IKAnalyzer2012FF_u1.jar（分词器jar包）复制到F:\winsolr\solr_home\solr\collection1\contrib\analysis-extras\lib下<br>3.在F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF下新建classes文件夹<br>4.将IKAnalyzer解压出来的IKAnalyzer.cfg.xml（分词器配置文件）和 Stopword.dic（分词器停词字典,可自定义添加内容）复制到<br>  F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF\classes中<br>5.在F:\winsolr\solr_home\solr\collection1\conf下的schema.xml文件中fieldType name=”text_general”这个地方的上方添加以下内容 </p>
-<p>将pinyinfj.jar、lucene-analyzers-smartcn-4.7.0.jar、IKAnalyzer2012FF_u1.jar、pinyinAnalyzer.jar、shentong_tsearch_lib.jar放到solr部署目录的web-inf的lib目录下</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;a href=&quot;http://www.tuicool.com/articles/mueARf&quot;&gt;http://www.tuicool.com/articles/mueARf&lt;/a&gt; 参考&lt;/p&gt;
-&lt;p&gt;请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：&lt;/p&gt;
-&lt;p&gt;复制solr.war到tomcat的webapps目录下，如图操作：&lt;/p&gt;
-&lt;p&gt;启动tomcat,如图：&lt;br&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    
-    
-      <category term="solr" scheme="http://yzy755.github.io/tags/solr/"/>
-    
-  </entry>
-  
-  <entry>
     <title>微信小程序对接支付</title>
     <link href="http://yzy755.github.io/2017/03/02/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%AF%B9%E6%8E%A5%E6%94%AF%E4%BB%98/"/>
     <id>http://yzy755.github.io/2017/03/02/微信小程序对接支付/</id>
     <published>2017-03-02T09:17:53.000Z</published>
-    <updated>2017-04-07T07:47:55.261Z</updated>
+    <updated>2017-04-11T09:28:05.484Z</updated>
     
     <content type="html"><![CDATA[<p>所有支付方式都需要通过 「统一下单」的 API 来获取一个支付凭证。<br>但在小程序内测期间，还没有「统一下单」的概念。HTML 5 应用发起支付需要直接通过前端构造参数来发起（不经过后端验证），很容易造成支付凭证泄露等安全问题。<br>为此，微信支付将其流程进行了优化：在所有支付场景中插入「统一下单」的特性。推荐开发者在后端完成支付参数的构建等行为。<br>该优化带来以下好处:</p>
 <pre><code>* 尽可能让开发者不犯低级错误，造成财务损失。
@@ -910,8 +1143,18 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
 <p>通过「统一下单」获取到相对应 prepay_id 或者 code_url 等参数，即可通过各种支付模式的 SDK 来进行微信支付的发起。<br>需要注意的是，必须对通知参数进行签名验证，以确保安全。<br>进行签名验证时，除去签名字段（一般参数名为: sign）不需要参与签名外，其余所有接收到的参数均需要参与签名。<br>比如拼接的请求支付宝的参数为total_fee,body,appid，那么签名就必须用这三个参数<br>得到prepay_id后还需在发起wx.requestPayment前对 wx.requestPayment请求所需的参数进行签名<br>所需的参数为’timeStamp’: res.data.timeStamp,<br>            ‘nonceStr’: nonce_str,<br>            ‘package’: ‘prepay_id=’+prepay_id,<br>            ‘signType’: ‘MD5’,<br>            ‘paySign’: res.data.sign,<br>但是后台生成该签名还需appId（I大写！！）随后用返回的参数和生成的timeStamp进行请求（ appId、timeStamp、nonceStr、package、signType）。</p>
 <p>之后又将微信支付集成到了web端，官方对于网页版的微信支付有两种模式，我使用的是更为简单的模式二，参考<a href="https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_5" target="_blank" rel="external">https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_5</a><br>时序图如下：<br><img src="/2017/03/02/微信小程序对接支付/timing.png" alt="logo"><br>与小程序的统一下单api所需的参数不同的是：小程序的trade_type一定是”JSAPI”,相应的一定要传当前使用小程序的用户openid；扫码支付模式二的trade_type是”NATIVE”，不需要用户的openid,其他参数相同，为：<br>        wxRequestParam.setAppid(ConstantUtil.APP_ID);<br>        wxRequestParam.setMch_id(ConstantUtil.MCH_ID);<br>        wxRequestParam.setNonce_str(WXUtil.getNonceStr());<br>        wxRequestParam.setBody(commonsOrder.getTitle());<br>        wxRequestParam.setSpbill_create_ip(request.getRemoteAddr().startsWith(“0”)?”127.0.0.1”:request.getRemoteAddr());<br>        wxRequestParam.setOut_trade_no(commonsOrder.getOrderCode());<br>        wxRequestParam.setTotal_fee(StringUtils.substringBefore(String.valueOf(commonsOrder.getOrderFee().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() * 100), “.”));<br>        wxRequestParam.setNotify_url(ConstantUtil.NOTIFY_URL);<br>        wxRequestParam.setSign(sign);<br>        wxRequestParam.setTrade_type(“NATIVE”);<br>        // 下面是小程序不同的参数<br>        wxRequestParam.setOpenid(openid);<br>        wxRequestParam.setTrade_type(“JSAPI”);</p>
 <p>统一下单后返回参数中有一个code_url，使用 <a href="http://qr.liantu.com/api.php?text=code_url" target="_blank" rel="external">http://qr.liantu.com/api.php?text=code_url</a> 即可看到一张二维码，扫码就支付啦，是不是比较简单- -</p>
-<p>——————————————–2017.4.6更新——————————————————<br>老大说使用其他网站平台生成二维码感觉不靠谱，所以去网上看了下有没有自己“画”二维码的库类，当然是有的，google爸爸就有一套基于nio的图片制作工具：<br>添加依赖：<br>    <dependency><br>        <groupid>com.google.zxing</groupid><br>        <artifactid>core</artifactid><br>        <version>3.0.0</version><br>    </dependency><br>    <dependency><br>        <groupid>com.google.zxing</groupid><br>        <artifactid>javase</artifactid><br>        <version>3.0.0</version><br>    </dependency> </p>
-<p>编写工具类，代码如下：<br>    /**</p>
+<p>——————————————–2017.4.6更新——————————————————<br>老大说使用其他网站平台生成二维码感觉不靠谱，所以去网上看了下有没有自己“画”二维码的库类，当然是有的，google爸爸就有一套基于nio的图片制作工具：<br>添加依赖：</p>
+<pre><code>&lt;dependency&gt;  
+    &lt;groupId&gt;com.google.zxing&lt;/groupId&gt;  
+    &lt;artifactId&gt;core&lt;/artifactId&gt;  
+    &lt;version&gt;3.0.0&lt;/version&gt;  
+&lt;/dependency&gt;  
+&lt;dependency&gt;  
+    &lt;groupId&gt;com.google.zxing&lt;/groupId&gt;  
+    &lt;artifactId&gt;javase&lt;/artifactId&gt;  
+    &lt;version&gt;3.0.0&lt;/version&gt;  
+&lt;/dependency&gt; 
+</code></pre><p>编写工具类，代码如下：<br>    /**</p>
 <pre><code> * @param qrImagePath 生成的图片绝对路径
  * @param qrImageName 生成的图片名称
  * @param content 待扫描的内容
@@ -962,6 +1205,94 @@ public static String UrlEncode(String src)
       <category term="微信小程序" scheme="http://yzy755.github.io/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/"/>
     
       <category term="微信支付" scheme="http://yzy755.github.io/tags/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>solr部署</title>
+    <link href="http://yzy755.github.io/2017/03/02/solr%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yzy755.github.io/2017/03/02/solr部署/</id>
+    <published>2017-03-02T09:17:53.000Z</published>
+    <updated>2017-03-09T09:12:45.411Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="http://www.tuicool.com/articles/mueARf" target="_blank" rel="external">http://www.tuicool.com/articles/mueARf</a> 参考</p>
+<p>请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：</p>
+<p>复制solr.war到tomcat的webapps目录下，如图操作：</p>
+<p>启动tomcat,如图：<br><a id="more"></a><br>然后修改webapps\solr\WEB-INF下的web.xml配置文件，如图：</p>
+<p>配置solr_home目录路径，如图：</p>
+<p>然后我们需要去C盘创建一个solr_home文件夹，这就是我们SOLR_HOME根目录啦，如图：</p>
+<p>然后我们需要把E:\solr-5.1.0\server\solr目录下的所有文件及文件夹全部复制到我们刚刚创建的solr_home目录下，如图：</p>
+<p>然后我们需要把E:\solr-5.1.0\server\lib\ext目录下的所有jar包 copy到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF\lib目录下(<br>E:\apache-tomcat-7.0.55是我的tomcat安装根目录，请对照你们自己的tomcat安装目录进行调整，你懂的<br>)，如图：</p>
+<p>然后复制 E:\solr-5.1.0\server\resources目录下的log4j.properties配置文件到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF目录下，如图操作：</p>
+<p>然后重启我们的tomcat,如图：</p>
+<p>打开你的浏览器，地址栏输入 <a href="http://localhost:8080/solr" target="_blank" rel="external">http://localhost:8080/solr</a> ， 访问我们的Solr Web后台。如果你能看到这个界面，即表明Solr5部署成功了，如图：</p>
+<p>然后你就可以通过Solr Web UI添加Core啦，不过添加Core之前，你需要在solr_home目录下创建core文件夹，如图：<br>core目录下需要创建conf和data文件夹，你懂的， 《跟益达学Solr5之使用Jetty部署Solr》<br>这篇博客也提到过，如图：</p>
+<p>剩下的一些配置copy具体你们就参照那篇去操作把，这里就不重复说明了。<br>到此，Solr5如何部署到Tomcat就讲解完毕了！</p>
+<p>IK 分词器安装<br>1.将之前解压的solr-4.3.1 下的contrib和dist 文件夹复制到F:\winsolr\solr_home\solr\collection1下<br>2.将下载的IKAnalyzer的发行包解压，解压后将IKAnalyzer2012FF_u1.jar（分词器jar包）复制到F:\winsolr\solr_home\solr\collection1\contrib\analysis-extras\lib下<br>3.在F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF下新建classes文件夹<br>4.将IKAnalyzer解压出来的IKAnalyzer.cfg.xml（分词器配置文件）和 Stopword.dic（分词器停词字典,可自定义添加内容）复制到<br>  F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF\classes中<br>5.在F:\winsolr\solr_home\solr\collection1\conf下的schema.xml文件中fieldType name=”text_general”这个地方的上方添加以下内容 </p>
+<p>将pinyinfj.jar、lucene-analyzers-smartcn-4.7.0.jar、IKAnalyzer2012FF_u1.jar、pinyinAnalyzer.jar、shentong_tsearch_lib.jar放到solr部署目录的web-inf的lib目录下</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;a href=&quot;http://www.tuicool.com/articles/mueARf&quot;&gt;http://www.tuicool.com/articles/mueARf&lt;/a&gt; 参考&lt;/p&gt;
+&lt;p&gt;请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：&lt;/p&gt;
+&lt;p&gt;复制solr.war到tomcat的webapps目录下，如图操作：&lt;/p&gt;
+&lt;p&gt;启动tomcat,如图：&lt;br&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="solr" scheme="http://yzy755.github.io/tags/solr/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>jar包在windows下的运行命令</title>
+    <link href="http://yzy755.github.io/2017/03/02/jar%E5%8C%85%E5%9C%A8windows%E4%B8%8B%E8%BF%90%E8%A1%8C%E5%91%BD%E4%BB%A4/"/>
+    <id>http://yzy755.github.io/2017/03/02/jar包在windows下运行命令/</id>
+    <published>2017-03-02T09:17:53.000Z</published>
+    <updated>2017-03-09T09:13:47.771Z</updated>
+    
+    <content type="html"><![CDATA[<p>1、打jar包 jar -cvf xx.jar 文件夹名称</p>
+<p>说明一下：<em>.</em>表示把当前目录下面以及子目录的所有class都打到这个xx.jar里。</p>
+<p>-cvf的含义，可以自己去用jar命令去查看</p>
+<p>如果要单独对某个或某些class文件进行打包，可以这样：</p>
+<p>jar -cvf xx.jar Foo.class Bar.class </p>
+<a id="more"></a>
+<p>2.运行jar</p>
+<p>java -jar xx.jar</p>
+<p>要运行一个jar，则此jar内部的META-INF\MANIFEST.MF文件里必须指明要执行的main方法类</p>
+<p>具体格式如：</p>
+<p>Manifest-Version: 1.0<br>Created-By: 1.6.0_03 (Sun Microsystems Inc.)<br>Main-class: Test<br>如果此处的Test.class在com.xx包下面，则需要指明。</p>
+<p>如果在运行时报了invalid or corrupt jarfile错误，则需要检查Main-class: Test 之间是不是缺少了空格。</p>
+<p>3.指定运行jar里面的class</p>
+<p>java -cp xx.jar com.xx.Test</p>
+<p>4.编译某个java文件，但是依赖某个jar</p>
+<p>javac -cp xx.jar Test.java</p>
+<p> (Test.java里面import了xx.jar里面的某个class)</p>
+<p>5.运行某个java文件，但是依赖某个jar</p>
+<p>java -cp .;xx.jar Test</p>
+<p>注意：引用xx.jar的时候，不要漏掉.;（这个表示当前目录）</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;1、打jar包 jar -cvf xx.jar 文件夹名称&lt;/p&gt;
+&lt;p&gt;说明一下：&lt;em&gt;.&lt;/em&gt;表示把当前目录下面以及子目录的所有class都打到这个xx.jar里。&lt;/p&gt;
+&lt;p&gt;-cvf的含义，可以自己去用jar命令去查看&lt;/p&gt;
+&lt;p&gt;如果要单独对某个或某些class文件进行打包，可以这样：&lt;/p&gt;
+&lt;p&gt;jar -cvf xx.jar Foo.class Bar.class &lt;/p&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="java" scheme="http://yzy755.github.io/tags/java/"/>
+    
+      <category term="jar包" scheme="http://yzy755.github.io/tags/jar%E5%8C%85/"/>
     
   </entry>
   
