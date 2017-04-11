@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2017-03-24T10:09:32.023Z</updated>
+  <updated>2017-04-11T09:24:21.448Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -14,6 +14,313 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>基于shiro拓展并发登录人数控制</title>
+    <link href="http://yzy755.github.io/2017/04/11/%E5%9F%BA%E4%BA%8Eshiro%E6%8B%93%E5%B1%95%E5%B9%B6%E5%8F%91%E7%99%BB%E5%BD%95%E4%BA%BA%E6%95%B0%E6%8E%A7%E5%88%B6/"/>
+    <id>http://yzy755.github.io/2017/04/11/基于shiro拓展并发登录人数控制/</id>
+    <published>2017-04-11T09:17:53.000Z</published>
+    <updated>2017-04-11T09:24:21.448Z</updated>
+    
+    <content type="html"><![CDATA[<p>在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！<a id="more"></a><br>spring security就直接提供了相应的功能；我的项目使用的权限框架是apach的shiro，Shiro的话没有提供默认实现，不过可以很容易的在Shiro中加入这个功能<br>我们来看下shiro拦截机制中filter的关系图<br><img src="/2017/04/11/基于shiro拓展并发登录人数控制/filter.png" alt="logo"><br>这里只介绍AccessControlFilter：<br>    AccessControlFilter提供了访问控制的基础功能；比如是否允许访问/当访问拒绝时如何处理等：<br>        abstract boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception;<br>        boolean onAccessDenied(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception;<br>        abstract boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception;</p>
+<pre><code>    isAccessAllowed：表示是否允许访问；mappedValue就是[urls]配置中拦截器参数部分，如果允许访问返回true，否则false；
+    onAccessDenied：表示当访问拒绝时是否已经处理了；如果返回true表示需要继续处理；如果返回false表示该拦截器实例已经处理了，将直接返回即可。
+
+onPreHandle会自动调用这两个方法决定是否继续处理：
+    boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {  
+        return isAccessAllowed(request, response, mappedValue) || onAccessDenied(request, response, mappedValue);  
+    }   
+
+另外AccessControlFilter还提供了如下方法用于处理如登录成功后/重定向到上一个请求： 
+    void setLoginUrl(String loginUrl) //身份验证时使用，默认/login.jsp  
+    String getLoginUrl()  
+    Subject getSubject(ServletRequest request, ServletResponse response) //获取Subject实例  
+    boolean isLoginRequest(ServletRequest request, ServletResponse response)//当前请求是否是登录请求  
+    void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException //将当前请求保存起来并重定向到登录页面  
+    void saveRequest(ServletRequest request) //将请求保存起来，如登录成功后再重定向回该请求  
+    void redirectToLogin(ServletRequest request, ServletResponse response) //重定向到登录页面 
+    比如基于表单的身份验证就需要使用这些功能。
+</code></pre><p>如果我们想进行访问访问的控制就可以继承AccessControlFilter；如果我们要添加一些通用数据我们可以直接继承PathMatchingFilter。所以定义一个类继承AccessControlFilter重写onAccessDenied方法，isAccessAllowed方法直接返回false，使程序进入拒绝访问的处理过程，也就是onAccessDenied方法，在这个方法中，我们的思路就是<br>    1.使用链表记录同一用户的登录sessionid，用shiro提供的cache记录用户和session的映射关系，用户名为key,链表为value<br>    2.用户登录后使用subject拿到用户名，以用户名取出当前服务器存储的sessionid链表，判断链表中有无当前登录的sessionid，无则push<br>    3.判断链表的的长度，若大于系统允许的登录数，链表进行移除操作，获得移除的session并标记为被踢出（移除的顺序可配置为踢前者或者后者）<br>    4.被移除的session（客户端）再次访问系统页面时，走完上述过程发现自己有被踢出的标记，调用subject.logout()方法，并重定向到踢出的提示页面<br>帖一波代码：<br>public class KickoutSessionControlFilter extends AccessControlFilter<br>{<br>    private Logger logger = LoggerFactory.getLogger(KickoutSessionControlFilter.class);<br>    private String kickoutUrl; // 踢出后到的地址<br>    private boolean kickoutAfter; // 踢出之前登录的或之后登录的用户 (在配置文件中配)<br>    private int maxSession = 1; // 同一个帐号最大会话数 默认1</p>
+<pre><code>private SessionManager sessionManager;
+
+private Cache&lt;String, Deque&lt;Serializable&gt;&gt; cache;
+@Override
+protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception
+{
+    return false;
+}
+
+@Override
+protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception
+{
+    Subject subject = getSubject(request, response);
+    if (!subject.isAuthenticated() &amp;&amp; !subject.isRemembered())
+    {
+        // 如果没有登录，直接进行之后的流程
+        return true;
+    }
+
+    Session session = subject.getSession();
+    String username = (String) subject.getPrincipal();
+    Serializable sessionId = session.getId();
+
+    // 同步控制
+    Deque&lt;Serializable&gt; deque = cache.get(username);
+    if (deque == null)
+    {
+        deque = new LinkedList&lt;Serializable&gt;();
+    }
+
+    // 如果队列里没有此sessionId，且用户没有被踢出；放入队列
+    if (!deque.contains(sessionId) &amp;&amp; session.getAttribute(&quot;kickout&quot;) == null)
+    {
+        deque.push(sessionId);
+    }
+
+    // 如果队列里的sessionId数超出最大会话数，开始踢人
+    while (deque.size() &gt; maxSession)
+    {
+        Serializable kickoutSessionId = null;
+        if (kickoutAfter)
+        { // 如果踢出后者
+            kickoutSessionId = deque.removeFirst();
+        }
+        else
+        { // 否则踢出前者
+            kickoutSessionId = deque.removeLast();
+        }
+        try
+        {
+            Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
+            if (kickoutSession != null)
+            {
+                // 设置会话的kickout属性表示踢出了
+                kickoutSession.setAttribute(&quot;kickout&quot;, true);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        }
+    }
+    cache.put(username, deque);
+
+    // 如果被踢出了，直接退出，重定向到踢出后的地址
+    if (session.getAttribute(&quot;kickout&quot;) != null)
+    {
+        try
+        {
+            subject.logout();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        }
+        saveRequest(request);
+        WebUtils.issueRedirect(request, response, kickoutUrl);
+        return false;
+    }
+    return true;
+}
+
+public void setKickoutUrl(String kickoutUrl)
+{
+    this.kickoutUrl = kickoutUrl;
+}
+
+public void setKickoutAfter(boolean kickoutAfter)
+{
+    this.kickoutAfter = kickoutAfter;
+}
+
+public void setMaxSession(int maxSession)
+{
+    this.maxSession = maxSession;
+}
+
+public void setSessionManager(SessionManager sessionManager)
+{
+    this.sessionManager = sessionManager;
+}
+
+public void setCacheManager(CacheManager cacheManager)
+{
+    this.cache = cacheManager.getCache(&quot;shiro-kickout-session&quot;);
+}
+</code></pre><p>}</p>
+<p>当然上述的实现离不开shiro的正确配置，帖一波配置：<br>    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager"><br>        <property name="realms"><br>            <util:list id="beanList"><br>                <ref bean="myCasRealm"><br>                <ref bean="myLoginRealm"><br>            </ref></ref></util:list><br>        </property><br>        <!-- <property name="realm" ref="myCasRealm" /> --><br>        <property name="subjectFactory" ref="casSubjectFactory"><br>        <property name="cacheManager" ref="cacheManager"><br>        <property name="sessionManager" ref="sessionManager"><br>    </property></property></property></bean></p>
+<pre><code>&lt;!-- 如果要实现cas的remember me的功能，需要用到下面这个bean，并设置到securityManager的subjectFactory中 --&gt;
+&lt;bean id=&quot;casSubjectFactory&quot; class=&quot;org.apache.shiro.cas.CasSubjectFactory&quot; /&gt;
+
+&lt;!-- 項目自定义的Realm --&gt;
+&lt;bean id=&quot;myCasRealm&quot; class=&quot;com.booway.shiro.MyCasRealm&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;casServerUrlPrefix&quot; value=&quot;${cas.server.url}&quot; /&gt;
+    &lt;!-- 客户端的回调地址设置，必须和下面的shiro-cas过滤器拦截的地址一致 --&gt;
+    &lt;property name=&quot;casService&quot; value=&quot;/cas&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- 項目自定义的Realm --&gt;
+&lt;bean id=&quot;myLoginRealm&quot; class=&quot;com.booway.shiro.MyLoginRealm&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;casServerUrlPrefix&quot; value=&quot;${cas.server.url}&quot; /&gt;
+    &lt;!-- 客户端的回调地址设置，必须和下面的shiro-cas过滤器拦截的地址一致 --&gt;
+    &lt;property name=&quot;casService&quot; value=&quot;/cas&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- 用户授权信息Cache --&gt;
+&lt;bean id=&quot;cacheManager&quot; class=&quot;org.apache.shiro.cache.MemoryConstrainedCacheManager&quot; /&gt;
+
+&lt;!-- 会话ID生成器 --&gt;
+&lt;bean id=&quot;sessionIdGenerator&quot; class=&quot;org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator&quot;/&gt;
+
+&lt;!-- 会话DAO --&gt;
+&lt;bean id=&quot;sessionDAO&quot; class=&quot;org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO&quot;&gt;
+    &lt;property name=&quot;activeSessionsCacheName&quot; value=&quot;shiro-activeSessionCache&quot;/&gt;
+    &lt;property name=&quot;sessionIdGenerator&quot; ref=&quot;sessionIdGenerator&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;!-- 会话Cookie模板 --&gt;
+&lt;bean id=&quot;sessionIdCookie&quot; class=&quot;org.apache.shiro.web.servlet.SimpleCookie&quot;&gt;
+    &lt;constructor-arg value=&quot;sid&quot;/&gt;
+    &lt;property name=&quot;httpOnly&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;maxAge&quot; value=&quot;3600&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;!-- 会话管理器 --&gt;
+&lt;bean id=&quot;sessionManager&quot; class=&quot;org.apache.shiro.web.session.mgt.DefaultWebSessionManager&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;globalSessionTimeout&quot; value=&quot;1800000&quot;/&gt;
+    &lt;property name=&quot;deleteInvalidSessions&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;sessionValidationSchedulerEnabled&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;sessionValidationScheduler&quot; ref=&quot;sessionValidationScheduler&quot;/&gt;
+    &lt;property name=&quot;sessionDAO&quot; ref=&quot;sessionDAO&quot;/&gt;
+    &lt;property name=&quot;sessionIdCookieEnabled&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;sessionIdCookie&quot; ref=&quot;sessionIdCookie&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;!-- 会话验证调度器 --&gt;
+&lt;bean id=&quot;sessionValidationScheduler&quot; class=&quot;org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler&quot;&gt;
+    &lt;property name=&quot;sessionValidationInterval&quot; value=&quot;1800000&quot;/&gt;
+    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;kickoutSessionControlFilter&quot;
+    class=&quot;com.booway.shiro.KickoutSessionControlFilter&quot;&gt;
+    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
+    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot; /&gt;
+
+    &lt;property name=&quot;kickoutAfter&quot; value=&quot;false&quot; /&gt;
+    &lt;property name=&quot;maxSession&quot; value=&quot;1&quot; /&gt;
+    &lt;property name=&quot;kickoutUrl&quot; value=&quot;/kickout.xhtml&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- Shiro Filter --&gt;
+&lt;bean id=&quot;shiroFilter&quot; class=&quot;com.booway.shiro.ShiroFilterFactoryBean&quot;&gt;
+    &lt;property name=&quot;securityManager&quot; ref=&quot;securityManager&quot; /&gt;
+    &lt;!-- 用于调用Controller --&gt;
+    &lt;property name=&quot;service&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
+    &lt;property name=&quot;loginUrl&quot; value=&quot;${cas.server.login.url}?service=&quot; /&gt;
+    &lt;!-- 用户访问未授权页面后跳转的错误信息页面 --&gt;
+    &lt;property name=&quot;unauthorizedUrl&quot; value=&quot;/401.html&quot;&gt;&lt;/property&gt;
+
+    &lt;!-- 自己实现的formAuthcFilter，加入key type --&gt;
+    &lt;property name=&quot;filters&quot;&gt;
+        &lt;util:map&gt;
+            &lt;entry key=&quot;casFilter&quot; value-ref=&quot;casFilter&quot;&gt;
+            &lt;/entry&gt;
+            &lt;entry key=&quot;singleSignOutFilter&quot; value-ref=&quot;singleSignOutFilter&quot;&gt;
+            &lt;/entry&gt;
+            &lt;entry key=&quot;roles&quot; value-ref=&quot;roleFilter&quot;&gt;
+            &lt;/entry&gt;
+            &lt;entry key=&quot;kickout&quot; value-ref=&quot;kickoutSessionControlFilter&quot;&gt;
+            &lt;/entry&gt;
+        &lt;/util:map&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&quot;filterChainDefinitions&quot;&gt;
+        &lt;value&gt;
+            /** = singleSignOutFilter,casFilter,kickout
+
+        &lt;/value&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;casFilter&quot; class=&quot;com.booway.shiro.MyCasFilter&quot;&gt;
+    &lt;!-- 配置验证错误时的失败页面 --&gt;
+    &lt;property name=&quot;failureUrl&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
+    &lt;property name=&quot;successUrl&quot; value=&quot;/index.xhtml&quot; /&gt;
+    &lt;property name=&quot;casLoginUrl&quot; value=&quot;${cas.server.login.url}&quot; /&gt;
+    &lt;property name=&quot;interceptUrlPrefix&quot;&gt;
+        &lt;list&gt;
+
+        &lt;/list&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&quot;loginUrls&quot;&gt;
+        &lt;list&gt;
+            &lt;value&gt;/index/login.xhtml&lt;/value&gt;
+        &lt;/list&gt;
+    &lt;/property&gt;
+    &lt;!-- &lt;property name=&quot;excludeUrls&quot;&gt; &lt;list&gt; &lt;value&gt;/index.xhtml&lt;/value&gt; &lt;/list&gt; 
+        &lt;/property&gt; --&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;userFilter&quot; class=&quot;com.booway.shiro.MyUserFilter&quot;&gt;
+    &lt;!-- 配置验证错误时的失败页面 --&gt;
+    &lt;property name=&quot;failureUrl&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
+
+&lt;/bean&gt;
+
+&lt;bean id=&quot;logoutFilter&quot; class=&quot;com.booway.shiro.MyLogoutFilter&quot;&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;roleFilter&quot; class=&quot;com.booway.shiro.RolesAuthorizationFilter&quot;&gt;
+&lt;/bean&gt;
+
+&lt;!-- 退出过滤器 --&gt;
+&lt;bean id=&quot;singleSignOutFilter&quot; class=&quot;com.booway.shiro.CustomSingleSignOutFilter&quot;&gt;
+&lt;/bean&gt;
+
+&lt;!-- 保证实现了Shiro内部lifecycle函数的bean执行 --&gt;
+&lt;bean id=&quot;lifecycleBeanPostProcessor&quot; class=&quot;org.apache.shiro.spring.LifecycleBeanPostProcessor&quot; /&gt;
+
+&lt;!-- AOP式方法级权限检查 --&gt;
+&lt;bean
+    class=&quot;org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator&quot;
+    depends-on=&quot;lifecycleBeanPostProcessor&quot;&gt;
+    &lt;property name=&quot;proxyTargetClass&quot; value=&quot;true&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;bean
+    class=&quot;org.springframework.beans.factory.config.MethodInvokingFactoryBean&quot;&gt;
+    &lt;property name=&quot;staticMethod&quot;
+        value=&quot;org.apache.shiro.SecurityUtils.setSecurityManager&quot; /&gt;
+    &lt;property name=&quot;arguments&quot; ref=&quot;securityManager&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;!-- 开启Shiro的注解(如@RequiresRoles,@RequiresPermissions), 需借助SpringAOP扫描使用Shiro注解的类,并在必要时进行安全逻辑验证 --&gt;
+&lt;bean
+    class=&quot;org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor&quot;&gt;
+    &lt;property name=&quot;securityManager&quot; ref=&quot;securityManager&quot; /&gt;
+&lt;/bean&gt;
+</code></pre><p>这样一个shiro的拓展就完成啦！</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="shiro" scheme="http://yzy755.github.io/tags/shiro/"/>
+    
+  </entry>
   
   <entry>
     <title>jvm调优总结 -Xms -Xmx -Xmn -Xss</title>
