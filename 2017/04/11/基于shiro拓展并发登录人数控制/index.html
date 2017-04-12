@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="易泽源的博客">
 <meta property="og:description" content="在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！">
 <meta property="og:image" content="http://yzy755.github.io/2017/04/11/基于shiro拓展并发登录人数控制/filter.png">
-<meta property="og:updated_time" content="2017-04-11T09:33:13.003Z">
+<meta property="og:updated_time" content="2017-04-12T03:35:20.557Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于shiro拓展并发登录人数控制">
 <meta name="twitter:description" content="在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！">
@@ -207,8 +207,15 @@ onPreHandle会自动调用这两个方法决定是否继续处理：
     void saveRequest(ServletRequest request) //将请求保存起来，如登录成功后再重定向回该请求  
     void redirectToLogin(ServletRequest request, ServletResponse response) //重定向到登录页面 
     比如基于表单的身份验证就需要使用这些功能。
-</code></pre><p>如果我们想进行访问访问的控制就可以继承AccessControlFilter；如果我们要添加一些通用数据我们可以直接继承PathMatchingFilter。所以定义一个类继承AccessControlFilter重写onAccessDenied方法，isAccessAllowed方法直接返回false，使程序进入拒绝访问的处理过程，也就是onAccessDenied方法，在这个方法中，我们的思路就是<br>    1.使用链表记录同一用户的登录sessionid，用shiro提供的cache记录用户和session的映射关系，用户名为key,链表为value<br>    2.用户登录后使用subject拿到用户名，以用户名取出当前服务器存储的sessionid链表，判断链表中有无当前登录的sessionid，无则push<br>    3.判断链表的的长度，若大于系统允许的登录数，链表进行移除操作，获得移除的session并标记为被踢出（移除的顺序可配置为踢前者或者后者）<br>    4.被移除的session（客户端）再次访问系统页面时，走完上述过程发现自己有被踢出的标记，调用subject.logout()方法，并重定向到踢出的提示页面<br>帖一波代码：<br>    public class KickoutSessionControlFilter extends AccessControlFilter<br>    {<br>        private Logger logger = LoggerFactory.getLogger(KickoutSessionControlFilter.class);<br>        private String kickoutUrl; // 踢出后到的地址<br>        private boolean kickoutAfter; // 踢出之前登录的或之后登录的用户 (在配置文件中配)<br>        private int maxSession = 1; // 同一个帐号最大会话数 默认1</p>
-<pre><code>    private SessionManager sessionManager;
+</code></pre><p>如果我们想进行访问访问的控制就可以继承AccessControlFilter；如果我们要添加一些通用数据我们可以直接继承PathMatchingFilter。所以定义一个类继承AccessControlFilter重写onAccessDenied方法，isAccessAllowed方法直接返回false，使程序进入拒绝访问的处理过程，也就是onAccessDenied方法，在这个方法中，我们的思路就是<br>    1.使用链表记录同一用户的登录sessionid，用shiro提供的cache记录用户和session的映射关系，用户名为key,链表为value<br>    2.用户登录后使用subject拿到用户名，以用户名取出当前服务器存储的sessionid链表，判断链表中有无当前登录的sessionid，无则push<br>    3.判断链表的的长度，若大于系统允许的登录数，链表进行移除操作，获得移除的session并标记为被踢出（移除的顺序可配置为踢前者或者后者）<br>    4.被移除的session（客户端）再次访问系统页面时，走完上述过程发现自己有被踢出的标记，调用subject.logout()方法，并重定向到踢出的提示页面<br>帖一波代码：</p>
+<pre><code>public class KickoutSessionControlFilter extends AccessControlFilter
+{
+    private Logger logger = LoggerFactory.getLogger(KickoutSessionControlFilter.class);
+    private String kickoutUrl; // 踢出后到的地址
+    private boolean kickoutAfter; // 踢出之前登录的或之后登录的用户 (在配置文件中配)
+    private int maxSession = 1; // 同一个帐号最大会话数 默认1
+
+    private SessionManager sessionManager;
 
     private Cache&lt;String, Deque&lt;Serializable&gt;&gt; cache;
     @Override
