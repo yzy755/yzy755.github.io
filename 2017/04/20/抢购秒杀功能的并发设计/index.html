@@ -14,7 +14,7 @@
 <meta property="og:url" content="http://yzy755.github.io/2017/04/20/抢购秒杀功能的并发设计/index.html">
 <meta property="og:site_name" content="易泽源的博客">
 <meta property="og:description" content="最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！">
-<meta property="og:updated_time" content="2017-04-20T07:42:11.472Z">
+<meta property="og:updated_time" content="2017-04-20T07:45:26.167Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="抢购秒杀功能的并发设计">
 <meta name="twitter:description" content="最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！">
@@ -246,6 +246,10 @@
             }).start();
         }
     }
+
+    运行后可以看出，程序运行的结果是不确定的，这说明了++ currAge并不是原子级别的操作。
+
+    原因是声明为volatile的变量若与自身相关，如以下的声明方式：n=n+1,n++等，那么声明为volatile的变量就不起作用，也就是说关键字volatile无效。
 </code></pre>
       
 
