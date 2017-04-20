@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2017-04-20T07:36:22.420Z</updated>
+  <updated>2017-04-20T07:42:11.472Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yzy755.github.io/2017/04/20/%E6%8A%A2%E8%B4%AD%E7%A7%92%E6%9D%80%E5%8A%9F%E8%83%BD%E7%9A%84%E5%B9%B6%E5%8F%91%E8%AE%BE%E8%AE%A1/"/>
     <id>http://yzy755.github.io/2017/04/20/抢购秒杀功能的并发设计/</id>
     <published>2017-04-20T06:54:36.000Z</published>
-    <updated>2017-04-20T07:36:22.420Z</updated>
+    <updated>2017-04-20T07:42:11.472Z</updated>
     
     <content type="html"><![CDATA[<p>最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！<br><a id="more"></a><br>其实说到底就是多线程并发请求的数据一致性的问题，当然也有很多处理方法，最先想到的肯定是锁（synchronized），可以明确的是加锁是肯定可以解决该问题的，但是所谓互联网项目，若有朝一日并发请求量有的突破，这种线程阻塞的访问方式肯定是体验糟糕的，所以我想试试其他方式。</p>
 <p>首先想到的就是基于单线程，多路复用io（mutiplexing）模式的redis，结合我们的业务是关于众筹抢购的，用户占用众筹名额的记录用redis记录非常适用：<br>redis提供了 INCR key 方法，下面是该方法官方的解释：<br>    对存储在指定key的数值执行原子的加1操作。<br>    如果指定的key不存在，那么在执行incr操作之前，会先将它的值设定为0。<br>    如果指定的key中存储的值不是字符串类型（fix：）或者存储的字符串类型不能表示为一个整数，<br>    那么执行这个命令时服务器会返回一个错误(eq:(error) ERR value is not an integer or out of range)。<br>    这个操作仅限于64位的有符号整型数据。<br>注意看，是原子的加1操作，所以记录众筹的数量后，不管并发多少用户抢购众筹，众筹数都是原子加1，不会出现少加从而出现超卖的情况，加上我们业务控制到达限额数量后停止购买功能。<br>有个问题是用户抢占了名额后迟迟不付款，所以我利用了原先就有的检查未付款订单过期的任务，在检查到未支付的众筹订单过期后使用 DECRBY key decrement 做减操作，该方法官方的解释：<br>    将key对应的数字减decrement。如果key不存在，操作之前，key就会被置为0。如果key的value类型错误或者是个不能表示成数字的字符串，就返回错误。这个操作最多支持64位有符号的正型数字。<br>当热，值的添加和删除肯定也是要用到的，参考官方文档 <a href="http://www.redis.cn/" target="_blank" rel="external">http://www.redis.cn/</a><br>这样就释放的未支付抢占的名额，同样这是原子操作。这样整体就保持了高效和线程安全。</p>
@@ -48,6 +48,39 @@
     大多数编程情形都会与这两个条件的其中之一冲突，使得 volatile 变量不能像 synchronized 那样普遍适用于实现线程安全。清单 1 显示了一个非线程安全的数值范围类。它包含了一个不变式 —— 下界总是小于或等于上界。
 
     所以，还是离volatile远点吧，要始终牢记使用 volatile 的限制 —— 只有在状态真正独立于程序内其他内容时才能使用 volatile。
+
+    贴一段我的测试代码
+
+    @Test
+    public void setSynchronizedValue() {
+        final Jedis superjedis = getJedis();
+        superjedis.set(&quot;age&quot;, &quot;1&quot;);
+        for (int i = 0; i &lt; 50; i++) {
+            new Thread(new Runnable() {
+                Jedis jedis = getJedis();
+                @Override
+                public void run() {
+                    System.out.println(jedis.incr(&quot;age&quot;));
+                }
+            }).start();
+        }
+
+    }
+
+    @Test
+    public void setNormalValue() {
+        for (int i = 0; i &lt; 50; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // TODO Auto-generated method stub
+                    int currAge = age; // age 使用volatile static全局定义
+                    System.out.println(++ currAge);
+                    testInt = currAge;
+                }
+            }).start();
+        }
+    }
 </code></pre>]]></content>
     
     <summary type="html">

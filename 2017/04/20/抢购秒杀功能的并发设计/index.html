@@ -14,7 +14,7 @@
 <meta property="og:url" content="http://yzy755.github.io/2017/04/20/抢购秒杀功能的并发设计/index.html">
 <meta property="og:site_name" content="易泽源的博客">
 <meta property="og:description" content="最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！">
-<meta property="og:updated_time" content="2017-04-20T07:36:22.420Z">
+<meta property="og:updated_time" content="2017-04-20T07:42:11.472Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="抢购秒杀功能的并发设计">
 <meta name="twitter:description" content="最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！">
@@ -213,6 +213,39 @@
     大多数编程情形都会与这两个条件的其中之一冲突，使得 volatile 变量不能像 synchronized 那样普遍适用于实现线程安全。清单 1 显示了一个非线程安全的数值范围类。它包含了一个不变式 —— 下界总是小于或等于上界。
 
     所以，还是离volatile远点吧，要始终牢记使用 volatile 的限制 —— 只有在状态真正独立于程序内其他内容时才能使用 volatile。
+
+    贴一段我的测试代码
+
+    @Test
+    public void setSynchronizedValue() {
+        final Jedis superjedis = getJedis();
+        superjedis.set(&quot;age&quot;, &quot;1&quot;);
+        for (int i = 0; i &lt; 50; i++) {
+            new Thread(new Runnable() {
+                Jedis jedis = getJedis();
+                @Override
+                public void run() {
+                    System.out.println(jedis.incr(&quot;age&quot;));
+                }
+            }).start();
+        }
+
+    }
+
+    @Test
+    public void setNormalValue() {
+        for (int i = 0; i &lt; 50; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // TODO Auto-generated method stub
+                    int currAge = age; // age 使用volatile static全局定义
+                    System.out.println(++ currAge);
+                    testInt = currAge;
+                }
+            }).start();
+        }
+    }
 </code></pre>
       
 
