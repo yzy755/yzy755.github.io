@@ -6,18 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>jvm调优总结 -Xms -Xmx -Xmn -Xss | 易泽源的博客</title>
+  <title>抢购秒杀功能的并发设计 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="堆大小设置JVM 中最大堆大小有三方面限制：相关操作系统的数据模型（32-bt还是64-bit）限制；系统的可用虚拟内存限制；系统的可用物理内存限制。32位系统下，一般限制在1.5G~2G；64为操作系统对内存无限制。我在Windows Server 2003 系统，3.5G物理内存，JDK5.0下测试，最大可设置为1478m。">
+  <meta name="description" content="最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！">
 <meta property="og:type" content="article">
-<meta property="og:title" content="jvm调优总结 -Xms -Xmx -Xmn -Xss">
-<meta property="og:url" content="http://yzy755.github.io/2017/03/24/jvm调优总结 -Xms -Xmx -Xmn -Xss/index.html">
+<meta property="og:title" content="抢购秒杀功能的并发设计">
+<meta property="og:url" content="http://yzy755.github.io/2017/04/20/抢购秒杀功能的并发设计/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="堆大小设置JVM 中最大堆大小有三方面限制：相关操作系统的数据模型（32-bt还是64-bit）限制；系统的可用虚拟内存限制；系统的可用物理内存限制。32位系统下，一般限制在1.5G~2G；64为操作系统对内存无限制。我在Windows Server 2003 系统，3.5G物理内存，JDK5.0下测试，最大可设置为1478m。">
-<meta property="og:updated_time" content="2017-03-24T10:09:32.023Z">
+<meta property="og:description" content="最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！">
+<meta property="og:updated_time" content="2017-04-20T07:36:22.420Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jvm调优总结 -Xms -Xmx -Xmn -Xss">
-<meta name="twitter:description" content="堆大小设置JVM 中最大堆大小有三方面限制：相关操作系统的数据模型（32-bt还是64-bit）限制；系统的可用虚拟内存限制；系统的可用物理内存限制。32位系统下，一般限制在1.5G~2G；64为操作系统对内存无限制。我在Windows Server 2003 系统，3.5G物理内存，JDK5.0下测试，最大可设置为1478m。">
+<meta name="twitter:title" content="抢购秒杀功能的并发设计">
+<meta name="twitter:description" content="最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -167,32 +167,53 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-jvm调优总结 -Xms -Xmx -Xmn -Xss" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-抢购秒杀功能的并发设计" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      jvm调优总结 -Xms -Xmx -Xmn -Xss
+      抢购秒杀功能的并发设计
     </h1>
   
 
         
-        <a href="/2017/03/24/jvm调优总结 -Xms -Xmx -Xmn -Xss/" class="archive-article-date">
-  	<time datetime="2017-03-24T09:50:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-24</time>
+        <a href="/2017/04/20/抢购秒杀功能的并发设计/" class="archive-article-date">
+  	<time datetime="2017-04-20T06:54:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-04-20</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>堆大小设置<br>JVM 中最大堆大小有三方面限制：相关操作系统的数据模型（32-bt还是64-bit）限制；系统的可用虚拟内存限制；系统的可用物理内存限制。32位系统下，一般限制在1.5G~2G；64为操作系统对内存无限制。我在Windows Server 2003 系统，3.5G物理内存，JDK5.0下测试，最大可设置为1478m。<br><a id="more"></a><br>典型设置：<br>java -Xmx3550m -Xms3550m -Xmn2g -Xss128k<br>-Xmx3550m：设置JVM最大可用内存为3550M。<br>-Xms3550m：设置JVM促使内存为3550m。此值可以设置与-Xmx相同，以避免每次垃圾回收完成后JVM重新分配内存。<br>-Xmn2g：设置年轻代大小为2G。整个JVM内存大小=年轻代大小 + 年老代大小 + 持久代大小。持久代一般固定大小为64m，所以增大年轻代后，将会减小年老代大小。此值对系统性能影响较大，Sun官方推荐配置为整个堆的3/8。<br>-Xss128k：设置每个线程的堆栈大小。JDK5.0以后每个线程堆栈大小为1M，以前每个线程堆栈大小为256K。更具应用的线程所需内存大小进行调整。在相同物理内存下，减小这个值能生成更多的线程。但是操作系统对一个进程内的线程数还是有限制的，不能无限生成，经验值在3000~5000左右。<br>java -Xmx3550m -Xms3550m -Xss128k -XX:NewRatio=4 -XX:SurvivorRatio=4 -XX:MaxPermSize=16m -XX:MaxTenuringThreshold=0<br>-XX:NewRatio=4:设置年轻代（包括Eden和两个Survivor区）与年老代的比值（除去持久代）。设置为4，则年轻代与年老代所占比值为1：4，年轻代占整个堆栈的1/5<br>-XX:SurvivorRatio=4：设置年轻代中Eden区与Survivor区的大小比值。设置为4，则两个Survivor区与一个Eden区的比值为2:4，一个Survivor区占整个年轻代的1/6<br>-XX:MaxPermSize=16m:设置持久代大小为16m。<br>-XX:MaxTenuringThreshold=0：设置垃圾最大年龄。如果设置为0的话，则年轻代对象不经过Survivor区，直接进入年老代。对于年老代比较多的应用，可以提高效率。如果将此值设置为一个较大值，则年轻代对象会在Survivor区进行多次复制，这样可以增加对象再年轻代的存活时间，增加在年轻代即被回收的概论。</p>
-<p>回收器选择<br>JVM给了三种选择：串行收集器、并行收集器、并发收集器，但是串行收集器只适用于小数据量的情况，所以这里的选择主要针对并行收集器和并发收集器。默认情况下，JDK5.0以前都是使用串行收集器，如果想使用其他收集器需要在启动时加入相应参数。JDK5.0以后，JVM会根据当前系统配置进行判断。<br>吞吐量优先的并行收集器<br>如上文所述，并行收集器主要以到达一定的吞吐量为目标，适用于科学技术和后台处理等。<br>典型配置：<br>java -Xmx3800m -Xms3800m -Xmn2g -Xss128k -XX:+UseParallelGC -XX:ParallelGCThreads=20<br>-XX:+UseParallelGC：选择垃圾收集器为并行收集器。此配置仅对年轻代有效。即上述配置下，年轻代使用并发收集，而年老代仍旧使用串行收集。<br>-XX:ParallelGCThreads=20：配置并行收集器的线程数，即：同时多少个线程一起进行垃圾回收。此值最好配置与处理器数目相等。<br>java -Xmx3550m -Xms3550m -Xmn2g -Xss128k -XX:+UseParallelGC -XX:ParallelGCThreads=20 -XX:+UseParallelOldGC<br>-XX:+UseParallelOldGC：配置年老代垃圾收集方式为并行收集。JDK6.0支持对年老代并行收集。<br>java -Xmx3550m -Xms3550m -Xmn2g -Xss128k -XX:+UseParallelGC  -XX:MaxGCPauseMillis=100<br>-XX:MaxGCPauseMillis=100:设置每次年轻代垃圾回收的最长时间，如果无法满足此时间，JVM会自动调整年轻代大小，以满足此值。<br>java -Xmx3550m -Xms3550m -Xmn2g -Xss128k -XX:+UseParallelGC  -XX:MaxGCPauseMillis=100 -XX:+UseAdaptiveSizePolicy<br>-XX:+UseAdaptiveSizePolicy：设置此选项后，并行收集器会自动选择年轻代区大小和相应的Survivor区比例，以达到目标系统规定的最低相应时间或者收集频率等，此值建议使用并行收集器时，一直打开。<br>响应时间优先的并发收集器<br>如上文所述，并发收集器主要是保证系统的响应时间，减少垃圾收集时的停顿时间。适用于应用服务器、电信领域等。<br>典型配置：<br>java -Xmx3550m -Xms3550m -Xmn2g -Xss128k -XX:ParallelGCThreads=20 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC<br>-XX:+UseConcMarkSweepGC：设置年老代为并发收集。测试中配置这个以后，-XX:NewRatio=4的配置失效了，原因不明。所以，此时年轻代大小最好用-Xmn设置。<br>-XX:+UseParNewGC:设置年轻代为并行收集。可与CMS收集同时使用。JDK5.0以上，JVM会根据系统配置自行设置，所以无需再设置此值。<br>java -Xmx3550m -Xms3550m -Xmn2g -Xss128k -XX:+UseConcMarkSweepGC -XX:CMSFullGCsBeforeCompaction=5 -XX:+UseCMSCompactAtFullCollection<br>-XX:CMSFullGCsBeforeCompaction：由于并发收集器不对内存空间进行压缩、整理，所以运行一段时间以后会产生“碎片”，使得运行效率降低。此值设置运行多少次GC以后对内存空间进行压缩、整理。<br>-XX:+UseCMSCompactAtFullCollection：打开对年老代的压缩。可能会影响性能，但是可以消除碎片</p>
-<p>辅助信息<br>JVM提供了大量命令行参数，打印信息，供调试使用。主要有以下一些：<br>-XX:+PrintGC<br>输出形式：[GC 118250K-&gt;113543K(130112K), 0.0094143 secs]<br>                [Full GC 121376K-&gt;10414K(130112K), 0.0650971 secs]<br>-XX:+PrintGCDetails<br>输出形式：[GC [DefNew: 8614K-&gt;781K(9088K), 0.0123035 secs] 118250K-&gt;113543K(130112K), 0.0124633 secs]<br>                [GC [DefNew: 8614K-&gt;8614K(9088K), 0.0000665 secs][Tenured: 112761K-&gt;10414K(121024K), 0.0433488 secs] 121376K-&gt;10414K(130112K), 0.0436268 secs]<br>-XX:+PrintGCTimeStamps -XX:+PrintGC：PrintGCTimeStamps可与上面两个混合使用<br>输出形式：11.851: [GC 98328K-&gt;93620K(130112K), 0.0082960 secs]<br>-XX:+PrintGCApplicationConcurrentTime:打印每次垃圾回收前，程序未中断的执行时间。可与上面混合使用<br>输出形式：Application time: 0.5291524 seconds<br>-XX:+PrintGCApplicationStoppedTime：打印垃圾回收期间程序暂停的时间。可与上面混合使用<br>输出形式：Total time for which application threads were stopped: 0.0468229 seconds<br>-XX:PrintHeapAtGC:打印GC前后的详细堆栈信息<br>输出形式：<br>34.702: [GC {Heap before gc invocations=7:<br> def new generation   total 55296K, used 52568K [0x1ebd0000, 0x227d0000, 0x227d0000)<br>eden space 49152K,  99% used [0x1ebd0000, 0x21bce430, 0x21bd0000)<br>from space 6144K,  55% used [0x221d0000, 0x22527e10, 0x227d0000)<br>  to   space 6144K,   0% used [0x21bd0000, 0x21bd0000, 0x221d0000)<br> tenured generation   total 69632K, used 2696K [0x227d0000, 0x26bd0000, 0x26bd0000)<br>the space 69632K,   3% used [0x227d0000, 0x22a720f8, 0x22a72200, 0x26bd0000)<br> compacting perm gen  total 8192K, used 2898K [0x26bd0000, 0x273d0000, 0x2abd0000)<br>   the space 8192K,  35% used [0x26bd0000, 0x26ea4ba8, 0x26ea4c00, 0x273d0000)<br>    ro space 8192K,  66% used [0x2abd0000, 0x2b12bcc0, 0x2b12be00, 0x2b3d0000)<br>    rw space 12288K,  46% used [0x2b3d0000, 0x2b972060, 0x2b972200, 0x2bfd0000)<br>34.735: [DefNew: 52568K-&gt;3433K(55296K), 0.0072126 secs] 55264K-&gt;6615K(124928K)Heap after gc invocations=8:<br> def new generation   total 55296K, used 3433K [0x1ebd0000, 0x227d0000, 0x227d0000)<br>eden space 49152K,   0% used [0x1ebd0000, 0x1ebd0000, 0x21bd0000)<br>  from space 6144K,  55% used [0x21bd0000, 0x21f2a5e8, 0x221d0000)<br>  to   space 6144K,   0% used [0x221d0000, 0x221d0000, 0x227d0000)<br> tenured generation   total 69632K, used 3182K [0x227d0000, 0x26bd0000, 0x26bd0000)<br>the space 69632K,   4% used [0x227d0000, 0x22aeb958, 0x22aeba00, 0x26bd0000)<br> compacting perm gen  total 8192K, used 2898K [0x26bd0000, 0x273d0000, 0x2abd0000)<br>   the space 8192K,  35% used [0x26bd0000, 0x26ea4ba8, 0x26ea4c00, 0x273d0000)<br>    ro space 8192K,  66% used [0x2abd0000, 0x2b12bcc0, 0x2b12be00, 0x2b3d0000)<br>    rw space 12288K,  46% used [0x2b3d0000, 0x2b972060, 0x2b972200, 0x2bfd0000)<br>}<br>, 0.0757599 secs]<br>-Xloggc:filename:与上面几个配合使用，把相关日志信息记录到文件以便分析。</p>
-<p>常见配置汇总<br>堆设置<br>-Xms:初始堆大小<br>-Xmx:最大堆大小<br>-XX:NewSize=n:设置年轻代大小<br>-XX:NewRatio=n:设置年轻代和年老代的比值。如:为3，表示年轻代与年老代比值为1：3，年轻代占整个年轻代年老代和的1/4<br>-XX:SurvivorRatio=n:年轻代中Eden区与两个Survivor区的比值。注意Survivor区有两个。如：3，表示Eden：Survivor=3：2，一个Survivor区占整个年轻代的1/5<br>-XX:MaxPermSize=n:设置持久代大小<br>收集器设置<br>-XX:+UseSerialGC:设置串行收集器<br>-XX:+UseParallelGC:设置并行收集器<br>-XX:+UseParalledlOldGC:设置并行年老代收集器<br>-XX:+UseConcMarkSweepGC:设置并发收集器<br>垃圾回收统计信息<br>-XX:+PrintGC<br>-XX:+PrintGCDetails<br>-XX:+PrintGCTimeStamps<br>-Xloggc:filename<br>并行收集器设置<br>-XX:ParallelGCThreads=n:设置并行收集器收集时使用的CPU数。并行收集线程数。<br>-XX:MaxGCPauseMillis=n:设置并行收集最大暂停时间<br>-XX:GCTimeRatio=n:设置垃圾回收时间占程序运行时间的百分比。公式为1/(1+n)<br>并发收集器设置<br>-XX:+CMSIncrementalMode:设置为增量模式。适用于单CPU情况。<br>-XX:ParallelGCThreads=n:设置并发收集器年轻代收集方式为并行收集时，使用的CPU数。并行收集线程数。</p>
-<p>四、调优总结<br>年轻代大小选择<br>响应时间优先的应用：尽可能设大，直到接近系统的最低响应时间限制（根据实际情况选择）。在此种情况下，年轻代收集发生的频率也是最小的。同时，减少到达年老代的对象。<br>吞吐量优先的应用：尽可能的设置大，可能到达Gbit的程度。因为对响应时间没有要求，垃圾收集可以并行进行，一般适合8CPU以上的应用。<br>年老代大小选择<br>响应时间优先的应用：年老代使用并发收集器，所以其大小需要小心设置，一般要考虑并发会话率和会话持续时间等一些参数。如果堆设置小了，可以会造成内存碎片、高回收频率以及应用暂停而使用传统的标记清除方式；如果堆大了，则需要较长的收集时间。最优化的方案，一般需要参考以下数据获得：<br>并发垃圾收集信息<br>持久代并发收集次数<br>传统GC信息<br>花在年轻代和年老代回收上的时间比例<br>减少年轻代和年老代花费的时间，一般会提高应用的效率<br>吞吐量优先的应用：一般吞吐量优先的应用都有一个很大的年轻代和一个较小的年老代。原因是，这样可以尽可能回收掉大部分短期对象，减少中期的对象，而年老代尽存放长期存活对象。<br>较小堆引起的碎片问题<br>因为年老代的并发收集器使用标记、清除算法，所以不会对堆进行压缩。当收集器回收时，他会把相邻的空间进行合并，这样可以分配给较大的对象。但是，当堆空间较小时，运行一段时间以后，就会出现“碎片”，如果并发收集器找不到足够的空间，那么并发收集器将会停止，然后使用传统的标记、清除方式进行回收。如果出现“碎片”，可能需要进行如下配置：<br>-XX:+UseCMSCompactAtFullCollection：使用并发收集器时，开启对年老代的压缩。<br>-XX:CMSFullGCsBeforeCompaction=0：上面配置开启的情况下，这里设置多少次Full GC后，对年老代进行压缩</p>
+        <p>最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！<br><a id="more"></a><br>其实说到底就是多线程并发请求的数据一致性的问题，当然也有很多处理方法，最先想到的肯定是锁（synchronized），可以明确的是加锁是肯定可以解决该问题的，但是所谓互联网项目，若有朝一日并发请求量有的突破，这种线程阻塞的访问方式肯定是体验糟糕的，所以我想试试其他方式。</p>
+<p>首先想到的就是基于单线程，多路复用io（mutiplexing）模式的redis，结合我们的业务是关于众筹抢购的，用户占用众筹名额的记录用redis记录非常适用：<br>redis提供了 INCR key 方法，下面是该方法官方的解释：<br>    对存储在指定key的数值执行原子的加1操作。<br>    如果指定的key不存在，那么在执行incr操作之前，会先将它的值设定为0。<br>    如果指定的key中存储的值不是字符串类型（fix：）或者存储的字符串类型不能表示为一个整数，<br>    那么执行这个命令时服务器会返回一个错误(eq:(error) ERR value is not an integer or out of range)。<br>    这个操作仅限于64位的有符号整型数据。<br>注意看，是原子的加1操作，所以记录众筹的数量后，不管并发多少用户抢购众筹，众筹数都是原子加1，不会出现少加从而出现超卖的情况，加上我们业务控制到达限额数量后停止购买功能。<br>有个问题是用户抢占了名额后迟迟不付款，所以我利用了原先就有的检查未付款订单过期的任务，在检查到未支付的众筹订单过期后使用 DECRBY key decrement 做减操作，该方法官方的解释：<br>    将key对应的数字减decrement。如果key不存在，操作之前，key就会被置为0。如果key的value类型错误或者是个不能表示成数字的字符串，就返回错误。这个操作最多支持64位有符号的正型数字。<br>当热，值的添加和删除肯定也是要用到的，参考官方文档 <a href="http://www.redis.cn/" target="_blank" rel="external">http://www.redis.cn/</a><br>这样就释放的未支付抢占的名额，同样这是原子操作。这样整体就保持了高效和线程安全。</p>
+<p>一些想法（一些摘抄- -）：<br>    1.Redis为什么使用单进程单线程方式也这么快？<br>        Redis采用的是基于内存的采用的是单进程单线程模型的KV数据库，由C语言编写。官方提供的数据是可以达到100000+的qps。这个数据不比采用单进程多线程的同样基于内存的KV数据库Memcached差。<br>        Redis快的主要原因是：</p>
+<pre><code>        完全基于内存
+        数据结构简单，对数据操作也简单
+        使用多路 I/O 复用模型
 
+        多路 I/O 复用模型是利用select、poll、epoll可以同时监察多个流的 I/O 事件的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有I/O事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll是只轮询那些真正发出了事件的流），并且只依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。这里“多路”指的是多个网络连接，“复用”指的是复用同一个线程。采用多路 I/O 复用技术可以让单个线程高效的处理多个连接请求（尽量减少网络IO的时间消耗），且Redis在内存中操作数据的速度非常快（内存内的操作不会成为这里的性能瓶颈），主要以上两点造就了Redis具有很高的吞吐量。
+2.volatile 容易掉的坑
+    在众筹功能上，占用的众筹数是一个实体变量，我就想volatile关键字不是说是轻量级的synchronized吗，想直接用volatile修饰，其实不然，与 synchronized 块相比，volatile 变量所需的编码较少，并且运行时开销也较少，但是它所能实现的功能也仅是 synchronized的一部分
+
+    锁提供了两种主要特性：互斥（mutual exclusion） 和可见性（visibility）。互斥即一次只允许一个线程持有某个特定的锁，因此可使用该特性实现对共享数据的协调访问协议，这样，一次就只有一个线程能够使用该共享数据。可见性要更加复杂一些，它必须确保释放锁之前对共享数据做出的更改对于随后获得该锁的另一个线程是可见的 —— 如果没有同步机制提供的这种可见性保证，线程看到的共享变量可能是修改前的值或不一致的值，这将引发许多严重问题
+
+    Volatile 变量具有 synchronized 的可见性特性，但是不具备原子特性。这就是说线程能够自动发现 volatile 变量的最新值。Volatile 变量可用于提供线程安全，但是只能应用于非常有限的一组用例：多个变量之间或者某个变量的当前值与修改后值之间没有约束。因此，单独使用 volatile 还不足以实现计数器、互斥锁或任何具有与多个变量相关的不变式（Invariants）的类（例如 “start &lt;=end”）。
+
+    出于简易性或可伸缩性的考虑，您可能倾向于使用 volatile 变量而不是锁。当使用 volatile 变量而非锁时，某些习惯用法（idiom）更加易于编码和阅读。此外，volatile 变量不会像锁那样造成线程阻塞，因此也很少造成可伸缩性问题。在某些情况下，如果读操作远远大于写操作，volatile 变量还可以提供优于锁的性能优势。
+
+    要使 volatile 变量提供理想的线程安全，必须同时满足下面两个条件：
+    1.对变量的写操作不依赖于当前值。
+    2.该变量没有包含在具有其他变量的不变式中。
+
+    实际上，这些条件表明，可以被写入 volatile 变量的这些有效值独立于任何程序的状态，包括变量的当前状态。
+    第一个条件的限制使 volatile 变量不能用作线程安全计数器。虽然增量操作（x++）看上去类似一个单独操作，实际上它是一个由读取－修改－写入操作序列组成的组合操作，必须以原子方式执行，而 volatile 不能提供必须的原子特性。实现正确的操作需要使 x 的值在操作期间保持不变，而 volatile 变量无法实现这点。（然而，如果将值调整为只从单个线程写入，那么可以忽略第一个条件。）
+    大多数编程情形都会与这两个条件的其中之一冲突，使得 volatile 变量不能像 synchronized 那样普遍适用于实现线程安全。清单 1 显示了一个非线程安全的数值范围类。它包含了一个不变式 —— 下界总是小于或等于上界。
+
+    所以，还是离volatile远点吧，要始终牢记使用 volatile 的限制 —— 只有在状态真正独立于程序内其他内容时才能使用 volatile。
+</code></pre>
       
 
       
@@ -236,11 +257,11 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">jvm</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">redis</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">调优</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">线程安全</a>
         		</li>
       		
 		</ul>
@@ -307,7 +328,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACr0lEQVR42u3aQY7jMAwEQP//07vAXmdsdJNWNofyKUAShaWDpLR4XfHz599z9zp5fn735/h3Iz9/94UHDw8Pb1R6W1aOzCcuGbn+RTw8PLxjvGQzyBfuvMS2hvzzeHh4eN/Au4M9H46Ts+7zJtEezfHw8PC+hzeLFZIoYXaIx8PDw/u/vCSMaGOCfUT70awFDw8Pb56s1hdgn3/90fs9PDw8vHhLeF5wk3giP0bnoxXV4uHh4R3gJX/789aoWbD77sG97k3Aw8PDW/Dyy6d8id+MNjsh/zICHh4e3gFeHkBsDsHtOO120jYu4OHh4W14+TLdztmMnVOHYQQeHh7eS7z8SPpWOLsPMqKq8PDw8I7xNo0Cm+0hZwzfxcPDwzvAy8FtJJH/ZD4pbSiMh4eH90le24A1TIuD320jZjw8PLxzvBNF7Mdsp3s4KB4eHt6I91bp7Wf2we5wKvHw8PBe5W2uta7yyS/GZmw8PDy807zZtdbzoM8Tkbzbxse3VeHh4eG9ytsfXvPGgjZ0aNPoOsbFw8PDW/OSdoHNT87w7RZS9Bfg4eHhjXh56LDZBlpqXvQLPRF4eHh4JS+/pppdbrXhwuaTv1SIh4eHd4CXt0C9FRDkpWyiDTw8PLxzvH3QsC+6vq/L/yvg4eHhHePlS21+/G0bsDbB7u104+Hh4R3g5QfWzWKdF5dfgA17yvDw8PDWvNlS3l6G5eXWgWySUuPh4eEd420unNrDcd4QMNs8rvwODQ8PD2+7xtaLb07dTNn+SgwPDw/vXd5mM2gxm3aENrDAw8PDO80r/uSXwUR7zVZ0h+Hh4eF9PS9v1dpHurPj+23igoeHh/cFvDy8mEUexdKfhBF4eHh4B3hJcDALHfI4eL/B4OHh4X2G9+6SnWwtJ1oNrs2Dh4eHl9b2F7oHc6iZ6y8wAAAAAElFTkSuQmCC" alt="微信分享二维码">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACvElEQVR42u3awW7bQAwEUP//T7tAr66tGVLrpMDTKXAdad8GENnhPh7x9fx7vf6cf5J///lyJfdcXXh4eHijpb+72uUmS883It+C1zXj4eHhnea1i24XMSsY7Xrw8PDwfhvv3Ws9aYj3G4qHh4f3P/LaW9/VLuPh4eH9Tl4SRiQtb1ISPpeZ5PtHshY8PDy8mLcZgP3Uz1+a7+Hh4eGVU/XktZu3v0mk2xaVi3Xi4eHhHeDl7fLnh+VFZfb5ZqiGh4eHd46Xh6qbUjGMYuOB3D/ugIeHh3eY1z4yP0DQsvPDCsV8Dw8PD2/Ny6OB2ZCpLSqffyvZjuLvhoeHh3eMl4/22/ggiX03B7Pw8PDwTvBmsWnbcM++2cbHFwMwPDw8vJt4mxHUPrRtm/U6xsXDw8M7wGsb1uRf88cnjfVmbXh4eHinebMH5+x8I9rxWNGm4+Hh4a15SUPcFoC82Z0Fu8Xm4uHh4R3gzQ5XnYgb2likGIDh4eHh3crbH7pqQ4G27d7EGXh4eHgneEmz276s83KyKRJ1fIyHh4d3Ky+PITbxbt6mz5rsR/4APDw8vDVvP9RvR/vJQpPy024NHh4e3p7XRrGzmDU6DlW+yaNwGQ8PD+8A797b5YA2nsg3LvrfAx4eHt6atx9W5QWmLTl5OPJ2tXh4eHgHeO2oftXUxvesI9q8Q8fDw8Nb8/ImtTj3Gge1s4MF9XErPDw8vAO8vDDMhmRtE7yJffHw8PDO8Z7l1Q692kMAOTiKQvDw8PAO8GYv3Da0nb3i82Iza/fx8PDwNrxZMchb5zaqaI8IXKwWDw8P7xhvtvR2qJ/UpX0JKWZ6eHh4eF/hJa/jvGAk4UVeeC5Sajw8PLyv8/Kl7LdvU4Tw8PDwvsO7Nwhol55/nt8HDw8P7xxvMwC7eCmPYuI83p0VKjw8PLwF7w/VgvfdWWct7AAAAABJRU5ErkJggg==" alt="微信分享二维码">
     </div>
 </div>
 
@@ -321,18 +342,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/04/11/基于shiro拓展并发登录人数控制/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          基于shiro拓展并发登录人数控制
-        
-      </div>
-    </a>
   
-  
-    <a href="/2017/03/24/jvm内存分配/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">jvm内存分配</div>
+    <a href="/2017/04/18/redis启动错误/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">redis启动错误</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -352,7 +364,7 @@
  
   <section id="comments">
     <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-jvm调优总结 -Xms -Xmx -Xmn -Xss" data-title="jvm调优总结 -Xms -Xmx -Xmn -Xss" data-url="http://yzy755.github.io/2017/03/24/jvm调优总结 -Xms -Xmx -Xmn -Xss/"></div>
+    <div class="ds-thread" data-thread-key="post-抢购秒杀功能的并发设计" data-title="抢购秒杀功能的并发设计" data-url="http://yzy755.github.io/2017/04/20/抢购秒杀功能的并发设计/"></div>
     <!-- 多说评论框 end -->
     <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
     <script type="text/javascript">
