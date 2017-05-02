@@ -6,17 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>Tag: 四次挥手 | 易泽源的博客</title>
+  <title>使用开源软件快速搭建数据分析平台 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="记录学习点滴">
-<meta property="og:type" content="website">
-<meta property="og:title" content="易泽源的博客">
-<meta property="og:url" content="http://yzy755.github.io/tags/四次挥手/index.html">
+  <meta name="description" content="部门成立了大数据项目组，技术选型已经由其项目组长完成，但是后台开发人员不足，请求我帮助搭建一个大数据分析平台">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用开源软件快速搭建数据分析平台">
+<meta property="og:url" content="http://yzy755.github.io/2017/05/02/使用开源软件快速搭建数据分析平台/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="记录学习点滴">
+<meta property="og:description" content="部门成立了大数据项目组，技术选型已经由其项目组长完成，但是后台开发人员不足，请求我帮助搭建一个大数据分析平台">
+<meta property="og:updated_time" content="2017-05-02T08:47:06.550Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="易泽源的博客">
-<meta name="twitter:description" content="记录学习点滴">
+<meta name="twitter:title" content="使用开源软件快速搭建数据分析平台">
+<meta name="twitter:description" content="部门成立了大数据项目组，技术选型已经由其项目组长完成，但是后台开发人员不足，请求我帮助搭建一个大数据分析平台">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -166,56 +167,87 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-使用开源软件快速搭建数据分析平台" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/03/08/TCP的几个状态码/" class="archive-article-date">
-  	<time datetime="2017-03-08T03:48:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/03/08/TCP的几个状态码/">TCP的几个状态码</a>
+    <h1 class="article-title" itemprop="name">
+      使用开源软件快速搭建数据分析平台
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2017/05/02/使用开源软件快速搭建数据分析平台/" class="archive-article-date">
+  	<time datetime="2017-05-02T08:38:20.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>部门成立了大数据项目组，技术选型已经由其项目组长完成，但是后台开发人员不足，请求我帮助搭建一个大数据分析平台</p>
+<a id="more"></a>
+<p>整篇文章都是来源于 <a href="https://my.oschina.net/taogang/blog/630632" target="_blank" rel="external">https://my.oschina.net/taogang/blog/630632</a> ，感谢伟大的开源精神，也就是按照文章介绍的搭建步骤做一点总结，填了两个小坑</p>
+<p>1.安装Python环境，anaconda里面集成了很多关于python科学计算的第三方库，安装方便。下载地址：<a href="https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/" target="_blank" rel="external">https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/</a><br>2.进入源码解压后的目录，进入package\static文件夹，创建名为bower_components的文件夹<br>3.打开cmd使用babel进行jsf的编译，依次执行命令：<br>    a)npm install -g babel-cli<br>    b)npm install babel-preset-es2015 –save<br>    c)npm install babel-preset-react –save<br>    d)babel –presets es2015,react –watch js/ –out-dir lib/<br>4.使用bower安装客户端的所有依赖,命令如下：<br>    a)bower install<br>5.回到package文件夹，执行命令：python main.py</p>
+<p>Ps:拓展时若需要更多的开源js组件，可以打开bower.json，在dependency下增加相应的组件名和版本号，然后执行bower install即可。</p>
+<p>为以后的大数据方向积累一丁点- -！</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/22432/alipay.jpg">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/79227/wxpay.png">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tcp</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">数据分析</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">三次握手</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">四次挥手</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -228,19 +260,107 @@
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACvElEQVR42u3a0U7jQAwF0Pz/T5dXUNXm2h5DkU6eVts0zAnSjLn2dcXX4+n6/v/P9+Tffb7/1aev7jxw4eHh4Y2X/n4pyf1V2Pufldzz8mXh4eHhrfFe7aj5pt/bsfPDIDkk8PDw8P4XLymO82f2yms8PDy8z+RVy+je5v6ejYeHh/cJvHxZ0UPjsrt3YKxkLXh4eHgxrxocfMK/V/p7eHh4eOOu+qSArm7ieZBRWCceHh7eAi8PSZNPq6MA+aejwhoPDw9vgVcNc3ujAPNiutpgw8PDw9vgJV+bbPS9uDY/fm5eOh4eHt4CL//jvzcmlbe78lX1xg7w8PDwTvGqW20e0Vbr+t52fwPGw8PDW+PlS6+OWFWDhkn7LdLj4eHhHeJtBA15LZ833qq/Ejw8PLxtXrKJV2PZ3kjBZDDrx514eHh4C7zqhpsXwb1tfVKmR70+PDw8vKO8XjxRDW3zJebPv/ILDw8Pb4GXsKshQq/NVn1ZIyoeHh5ezMvj1zwOqIa81QI9eSk3Q1d4eHh4Y96k1E4wk0NidIzh4eHhLfA2Ctl8c58cOeWmHR4eHt5RXhLO5oVsfgzMA4ukEMfDw8Pb4yVNpsmLqD553pzDw8PD2+bli+4Bku8m9ydFOR4eHt4er7cd55FENcatDnVd+TvGw8PDO8SrbvqTcDZ/TfnwQRQH4+Hh4R3lTYaomvV7UCjnB8zN8/Hw8PAWeHnLP49TewFuQi2MWOUdMzw8PLwi71G8qsFrcmD0gozRbwwPDw9vwMuvSWhbLabn7DIeDw8Pr8hLDoPej+8FvvN2HR4eHt7v8KqhQ7XdVQUfY+Ph4eH9KS/aiFujBqeOkNHBgIeHh7fAy8PcYwVxHHDctMHw8PDwFnj5Nt0bOMjbZnnsG1Hx8PDwFnjVwaZe4dsLHarjX6PRATw8PLx73hfSjAMnNqTqtAAAAABJRU5ErkJggg==" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2017/04/20/抢购秒杀功能的并发设计/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">抢购秒杀功能的并发设计</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+  
+    <div class="duoshuo"></div>
   
 
-    
 
 
+ 
+  <section id="comments">
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="post-使用开源软件快速搭建数据分析平台" data-title="使用开源软件快速搭建数据分析平台" data-url="http://yzy755.github.io/2017/05/02/使用开源软件快速搭建数据分析平台/"></div>
+    <!-- 多说评论框 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'yzy755'};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+    <!-- 多说公共JS代码 end -->
+  </section>
+  
           </div>
         </div>
       </div>
@@ -261,9 +381,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		root: "/",
