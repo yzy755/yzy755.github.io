@@ -14,7 +14,7 @@
 <meta property="og:url" content="http://yzy755.github.io/2017/05/02/使用开源软件快速搭建数据分析平台/index.html">
 <meta property="og:site_name" content="易泽源的博客">
 <meta property="og:description" content="部门成立了大数据项目组，技术选型已经由其项目组长完成，但是后台开发人员不足，请求我帮助搭建一个大数据分析平台">
-<meta property="og:updated_time" content="2017-05-02T08:47:06.550Z">
+<meta property="og:updated_time" content="2017-05-02T10:08:32.131Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用开源软件快速搭建数据分析平台">
 <meta name="twitter:description" content="部门成立了大数据项目组，技术选型已经由其项目组长完成，但是后台开发人员不足，请求我帮助搭建一个大数据分析平台">
@@ -190,7 +190,7 @@
         <p>部门成立了大数据项目组，技术选型已经由其项目组长完成，但是后台开发人员不足，请求我帮助搭建一个大数据分析平台</p>
 <a id="more"></a>
 <p>整篇文章都是来源于 <a href="https://my.oschina.net/taogang/blog/630632" target="_blank" rel="external">https://my.oschina.net/taogang/blog/630632</a> ，感谢伟大的开源精神，也就是按照文章介绍的搭建步骤做一点总结，填了两个小坑</p>
-<p>1.安装Python环境，anaconda里面集成了很多关于python科学计算的第三方库，安装方便。下载地址：<a href="https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/" target="_blank" rel="external">https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/</a><br>2.进入源码解压后的目录，进入package\static文件夹，创建名为bower_components的文件夹<br>3.打开cmd使用babel进行jsf的编译，依次执行命令：<br>    a)npm install -g babel-cli<br>    b)npm install babel-preset-es2015 –save<br>    c)npm install babel-preset-react –save<br>    d)babel –presets es2015,react –watch js/ –out-dir lib/<br>4.使用bower安装客户端的所有依赖,命令如下：<br>    a)bower install<br>5.回到package文件夹，执行命令：python main.py</p>
+<p>1.安装nodejs<br>2.安装bower，命令：npm install -g bower<br>3.安装Python环境，anaconda里面集成了很多关于python科学计算的第三方库，安装方便。下载地址：<a href="https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/" target="_blank" rel="external">https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/</a><br>4.进入源码解压后的目录，进入package\static文件夹，创建名为bower_components的文件夹<br>5.打开cmd使用babel进行jsf的编译，依次执行命令：<br>    a)npm install -g babel-cli<br>    b)npm install babel-preset-es2015 –save<br>    c)npm install babel-preset-react –save<br>    d)babel –presets es2015,react –watch js/ –out-dir lib/<br>6.使用bower安装客户端的所有依赖,命令如下：<br>    a)bower install<br>7.回到package文件夹，执行命令：python main.py</p>
 <p>Ps:拓展时若需要更多的开源js组件，可以打开bower.json，在dependency下增加相应的组件名和版本号，然后执行bower install即可。</p>
 <p>为以后的大数据方向积累一丁点- -！</p>
 
