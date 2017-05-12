@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2017-05-12T09:03:40.281Z</updated>
+  <updated>2017-05-12T09:05:43.482Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yzy755.github.io/2017/05/12/%E5%9F%BA%E4%BA%8Epython+flask+mysql%E7%9A%84web%E5%BC%80%E5%8F%91%E5%88%9D%E6%8E%A2/"/>
     <id>http://yzy755.github.io/2017/05/12/基于python+flask+mysql的web开发初探/</id>
     <published>2017-05-12T07:40:53.000Z</published>
-    <updated>2017-05-12T09:03:40.281Z</updated>
+    <updated>2017-05-12T09:05:43.482Z</updated>
     
     <content type="html"><![CDATA[<p>由于用Python开发一个Web框架十分容易，所以Python有上百个开源的Web框架，当下流行的是Flask,Django等<br>Flask是一个使用 Python 编写的轻量级 Web 应用框架。其 WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。<br><a id="more"></a><br>搭建的大致步骤和常见的问题：</p>
 <p>1.安装anaconda，anaconda里面集成了很多关于python科学计算的第三方库，主要是安装方便，而python是一个编译器，如果不使用anaconda，那么安装起来会比较痛苦，各个库之间的依赖性就很难连接的很好</p>
@@ -28,8 +28,10 @@
 <p>3.安装mysql-python，命令:pip install MySql-python<br>    错误1：Microsoft Visual C++ 14.0 is required.<br>    升级.NET Framework 版本到4.5.1<br>    从错误提示的url下载，下载后安装visualcppbuildtools_full</p>
 <p>3.安装mysql connector, 下载地址：<a href="https://dev.mysql.com/downloads/connector/python/" target="_blank" rel="external">https://dev.mysql.com/downloads/connector/python/</a><br>我的系统为64， 下载的是mysql-connector-python-2.1.5-py3.4-winx64，还是报错，后来注意到寻找的目录是Program Files (x86)，又下了个32位的安装。错误过去了。但是又来新的错误：<br>    LINK : error LNK2001: unresolved external symbol _DllMainCRTStartup<br>    build\lib.win-amd64-3.5_mysql.cp35-win_amd64.pyd : fatal error LNK1120: 56 unresolved externalserror: command ‘C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\BIN\x86_amd64\link.exe’ failed with exit status 1120<br>5.安装第三方包pymysql。下载地址：<a href="https://pypi.python.org/pypi/PyMySQL#downloads" target="_blank" rel="external">https://pypi.python.org/pypi/PyMySQL#downloads</a><br>下载PyMySQL-0.7.11-py2.py3-none-any.whl，使用pip install PyMySQL-0.7.11-py2.py3-none-any.whl 即可，再执行pip install MySql-python就成功了</p>
 <p>python引入mysql方法：<br>import pymysql as MySQLdb</p>
-<p>首次尝试python的web开发：<br>源码：<br>    db.py:</p>
-<pre><code>    host=&quot;127.0.0.1&quot;
+<p>首次尝试python的web开发：<br>源码:</p>
+<pre><code>db.py:
+
+    host=&quot;127.0.0.1&quot;
     user=&quot;root&quot;
     password=&quot;123456&quot;
     charset=&quot;utf8&quot;
