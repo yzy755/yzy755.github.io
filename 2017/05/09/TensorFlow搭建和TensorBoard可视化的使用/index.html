@@ -6,43 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>TCP的几个状态码 | 易泽源的博客</title>
+  <title>TensorFlow搭建和TensorBoard可视化的使用 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
+  <meta name="description" content="TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Go">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TCP的几个状态码">
-<meta property="og:url" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/index.html">
+<meta property="og:title" content="TensorFlow搭建和TensorBoard可视化的使用">
+<meta property="og:url" content="http://yzy755.github.io/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect2.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/close.png">
-<meta property="og:updated_time" content="2017-03-09T09:55:25.371Z">
+<meta property="og:description" content="TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Go">
+<meta property="og:updated_time" content="2017-05-10T09:19:45.866Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="TCP的几个状态码">
-<meta name="twitter:description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
-<meta name="twitter:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect.png">
+<meta name="twitter:title" content="TensorFlow搭建和TensorBoard可视化的使用">
+<meta name="twitter:description" content="TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Go">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -192,52 +167,257 @@ RST表示连接重置。">
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-TCP的几个状态码" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-TensorFlow搭建和TensorBoard可视化的使用" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      TCP的几个状态码
+      TensorFlow搭建和TensorBoard可视化的使用
     </h1>
   
 
         
-        <a href="/2017/03/08/TCP的几个状态码/" class="archive-article-date">
-  	<time datetime="2017-03-08T03:48:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
+        <a href="/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/" class="archive-article-date">
+  	<time datetime="2017-05-09T10:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-09</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.</p>
-<p>其中，对于我们日常的分析有用的就是前面的五个字段。</p>
-<p>它们的含义是：</p>
-<p>SYN表示建立连接，</p>
-<p>FIN表示关闭连接，</p>
-<p>ACK表示响应，</p>
-<p>PSH表示有 DATA数据传输，</p>
-<p>RST表示连接重置。<br><a id="more"></a></p>
-<p>其中，ACK是可能与SYN，FIN等同时使用的，比如SYN和ACK可能同时为1，它表示的就是建立连接之后的响应，</p>
-<p>如果只是单个的一个SYN，它表示的只是建立连接。</p>
-<p>TCP的几次握手就是通过这样的ACK表现出来的。</p>
-<p>但SYN与FIN是不会同时为1的，因为前者表示的是建立连接，而后者表示的是断开连接。</p>
-<p>RST一般是在FIN之后才会出现为1的情况，表示的是连接重置。</p>
-<p>一般地，当出现FIN包或RST包时，我们便认为客户端与服务器端断开了连接；而当出现SYN和SYN＋ACK包时，我们认为客户端与服务器建立了一个连接。</p>
-<p>PSH为1的情况，一般只出现在 DATA内容不为0的包中，也就是说PSH为1表示的是有真正的TCP数据包内容被传递。</p>
-<p>TCP的连接建立和连接关闭，都是通过请求－响应的模式完成的。</p>
-<p>概念补充-TCP三次握手：<br>TCP(Transmission Control Protocol)传输控制协议<br>TCP是主机对主机层的传输控制协议，提供可靠的连接服务，采用三次握手确认建立一个连接：</p>
-<p>位码即tcp标志位，有6种标示：SYN(synchronous建立联机) ACK(acknowledgement 确认) PSH(push传送) FIN(finish结束) RST(reset重置) URG(urgent紧急)Sequence number(顺序号码) Acknowledge number(确认号码)<br>第一次握手：主机A发送位码为syn＝1，随机产生seq number=1234567的数据包到服务器，主机B由SYN=1知道，A要求建立联机；<br>第二次握手：主机B收到请求后要确认联机信息，向A发送ack number=(主机A的seq+1)，syn=1，ack=1，随机产生seq=7654321的包；<br>第三次握手：主机A收到后检查ack number是否正确，即第一次发送的seq number+1，以及位码ack是否为1，若正确，主机A会再发送ack number=(主机B的seq+1)，ack=1，主机B收到后确认seq值与ack=1则连接建立成功。<br>完成三次握手，主机A与主机B开始传送数据。<br>TCP采用三次握手建立连接如下图所示。<br><img src="/2017/03/08/TCP的几个状态码/connect.png" alt="logo"><br>用大白话就是这样：<br><img src="/2017/03/08/TCP的几个状态码/connect2.png" alt="logo"></p>
-<p>在TCP/IP协议中，TCP协议提供可靠的连接服务，采用三次握手建立一个连接。<br>第一次握手：建立连接时，客户端发送syn包(syn=j)到服务器，并进入SYN_SEND状态，等待服务器确认；<br>第二次握手：服务器收到syn包，必须确认客户的SYN（ack=j+1），同时自己也发送一个SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；<br>第三次握手：客户端收到服务器的SYN＋ACK包，向服务器发送确认包ACK(ack=k+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。完成三次握手，客户端与服务器开始传送数据.</p>
-<p>关闭连接：<br>由于TCP连接是全双工的，因此每个方向都必须单独进行关闭。这个原则是当一方完成它的数据发送任务后就能发送一个FIN来终止这个方向的连接。收到一个 FIN只意味着这一方向上没有数据流动，一个TCP连接在收到一个FIN后仍能发送数据。首先进行关闭的一方将执行主动关闭，而另一方执行被动关闭。</p>
-<p> CP的连接的拆除需要发送四个包，因此称为四次挥手(four-way handshake)。客户端或服务器均可主动发起挥手动作，在socket编程中，任何一方执行close()操作即可产生挥手操作。</p>
-<p>（1）客户端A发送一个FIN，用来关闭客户A到服务器B的数据传送。 </p>
-<p>（2）服务器B收到这个FIN，它发回一个ACK，确认序号为收到的序号加1。和SYN一样，一个FIN将占用一个序号。 </p>
-<p>（3）服务器B关闭与客户端A的连接，发送一个FIN给客户端A。 </p>
-<p>（4）客户端A发回ACK报文确认，并将确认序号设置为收到序号加1。 </p>
-<p>TCP采用四次挥手关闭连接如下图所示。<br><img src="/2017/03/08/TCP的几个状态码/close.png" alt="logo"></p>
+        <p>TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Google机器智能研究机构）的研究员和工程师们开发出来，用于机器学习和深度神经网络方面的研究，但这个系统的通用性使其也可广泛用于其他计算领域。<br><a id="more"></a><br>1.Centos6.x默认使用的Python版本为2.6.6，而TensorFlow需要的Python版本起步为2.7以上，首先升级Python版本，已2.7.3为例：</p>
+<h1 id="wget-https-www-python-org-ftp-python-2-7-3-Python-2-7-3-tgz"><a href="#wget-https-www-python-org-ftp-python-2-7-3-Python-2-7-3-tgz" class="headerlink" title="wget https://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz"></a>wget <a href="https://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz" target="_blank" rel="external">https://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz</a></h1><h1 id="tar-xvjf-Python-2-7-3-tar-bz2"><a href="#tar-xvjf-Python-2-7-3-tar-bz2" class="headerlink" title="tar -xvjf Python-2.7.3.tar.bz2"></a>tar -xvjf Python-2.7.3.tar.bz2</h1><h1 id="mkdir-usr-local-python27"><a href="#mkdir-usr-local-python27" class="headerlink" title="mkdir /usr/local/python27"></a>mkdir /usr/local/python27</h1><h1 id="configure-–prefix-usr-local-python27"><a href="#configure-–prefix-usr-local-python27" class="headerlink" title="./configure –prefix=/usr/local/python27"></a>./configure –prefix=/usr/local/python27</h1><h1 id="Make"><a href="#Make" class="headerlink" title="Make"></a>Make</h1><h1 id="make-install"><a href="#make-install" class="headerlink" title="make install"></a>make install</h1><p>以上安装好了2.7.3，但此时没有覆盖老版本，再将原来/usr/bin/python链接改为别的名字：</p>
+<h1 id="mv-usr-bin-python-usr-bin-python-old"><a href="#mv-usr-bin-python-usr-bin-python-old" class="headerlink" title="mv /usr/bin/python /usr/bin/python_old"></a>mv /usr/bin/python /usr/bin/python_old</h1><p>再建立新版本python的软链接：</p>
+<h1 id="ln-s-usr-local-python27-bin-python2-7-usr-bin-python"><a href="#ln-s-usr-local-python27-bin-python2-7-usr-bin-python" class="headerlink" title="ln -s /usr/local/python27/bin/python2.7 /usr/bin/python"></a>ln -s /usr/local/python27/bin/python2.7 /usr/bin/python</h1><p>再输入 </p>
+<h1 id="python-–version"><a href="#python-–version" class="headerlink" title="python –version"></a>python –version</h1><p>会出现2.7.3则说明成功</p>
+<p>但是，基于Python编写的yum不兼容2.7以上版本，所以修改yum命令指定的Python版本:</p>
+<h1 id="vi-usr-bin-yum"><a href="#vi-usr-bin-yum" class="headerlink" title="vi /usr/bin/yum"></a>vi /usr/bin/yum</h1><p>将第一句</p>
+<h1 id="usr-bin-python-改为-usr-bin-python2-6-即可"><a href="#usr-bin-python-改为-usr-bin-python2-6-即可" class="headerlink" title="!/usr/bin/python 改为 # !/usr/bin/python2.6 即可"></a>!/usr/bin/python 改为 # !/usr/bin/python2.6 即可</h1><p>安装setuptool,后续操作要运行很多py文件，没他不行</p>
+<pre><code># wget --no-check-certificate https://pypi.python.org/packages/source/s/setuptools/setuptools-1.4.2.tar.gz
+# tar -xvf setuptools-1.4.2.tar.gz
+# cd setuptools-1.4.2
+# python setup.py install
+</code></pre><p>2.升级pip，Python Index Package。类似linux下的yum，安装并管理python软件包，Python升级了版本pip也要升级相应版本，下载pip9.0.1</p>
+<h1 id="wget-https-pypi-python-org-packages-11-b6-abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447-pip-9-0-1-tar-gz-md5-35f01da33009719497f01a4ba69d63c9"><a href="#wget-https-pypi-python-org-packages-11-b6-abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447-pip-9-0-1-tar-gz-md5-35f01da33009719497f01a4ba69d63c9" class="headerlink" title="wget https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz# md5=35f01da33009719497f01a4ba69d63c9"></a>wget <a href="https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz#" target="_blank" rel="external">https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz#</a> md5=35f01da33009719497f01a4ba69d63c9</h1><pre><code># tar zxvf pip-9.0.1.tar.gz
+#  cd pip-9.0.1
+#  python setup.py install
+</code></pre><p>3.执行：</p>
+<h1 id="pip-install-–upgrade-https-storage-googleapis-com-tensorflow-linux-cpu-tensorflow-0-8-0-cp27-none-linux-x86-64-whl"><a href="#pip-install-–upgrade-https-storage-googleapis-com-tensorflow-linux-cpu-tensorflow-0-8-0-cp27-none-linux-x86-64-whl" class="headerlink" title="pip install –upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl"></a>pip install –upgrade <a href="https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl" target="_blank" rel="external">https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl</a></h1><p>正常情况下pip会自动下载依赖包并安装，但是也有可能会报依赖没有找到的情况，如果出现此情况见附录，在最后可能会报错，在执行一次就好了</p>
+<p>4.然后输入命令：</p>
+<h1 id="python"><a href="#python" class="headerlink" title="python"></a>python</h1><p>出现 &gt;&gt;&gt; 再输入：<br>improt ssl<br>再输入import tensorflow as tf 会出现/lib64/libc.so.6: version `GLIBC_2.15’ not found 的错误，这是由于tensorflow0.80版本编译的时候使用GLIBC_2.15，系统自带的是GLIBC_2.12，所以报错了。<br>安装gcc</p>
+<pre><code># yum install gcc
+</code></pre><p>下载c++库glibc</p>
+<pre><code># wget http://ftp.gnu.org/pub/gnu/glibc/glibc-2.17.tar.xz
+# xz -d glibc-2.17.tar.xz
+# tar -xvf glibc-2.17.tar
+# cd glibc-2.17
+# mkdir build
+# cd build
+# ../configure --prefix=/usr --disable-profile --enable-add-ons         --with-headers=/usr/include --with-binutils=/usr/bin  
+# make &amp;&amp; make install
+</code></pre><p>输入strings /lib64/libc.so.6|grep GLIBC发现有我们的2.15版本</p>
+<p>5.再执行第5步，发现报/usr/lib64/libstdc++.so.6: version `GLIBCXX_3.4.14’ not found的错误，输入命令strings /usr/lib64/libstdc++.so.6 | grep GLIBCXX 发现没有支持3.4.14版本，去csdn下载一个高版本的libstdc++.so.6，比如说libstdc++.so.6.0.20，网址：<a href="http://download.csdn.net/download/arackethis/8395651，将文件放到/usr/lib64/下，在该目录下执行命令：" target="_blank" rel="external">http://download.csdn.net/download/arackethis/8395651，将文件放到/usr/lib64/下，在该目录下执行命令：</a></p>
+<pre><code># chmod +x libstdc++.so.6.0.20
+# rm libstdc++.so.6
+# ln -s libstdc++.so.6.0.20 libstdc++.so.6
+# strings /usr/lib64/libstdc++.so.6 | grep GLIBCXX
+</code></pre><p>发现支持了3.4.14版本<br> 再执行第五步发现没有报错了，就此TensorFlow搭建成功</p>
+<p>Ps:第三步中依赖报错的解决方式<br>1.安装six</p>
+<h1 id="wget-https-pypi-python-org-packages-c8-0a-b6723e1bc4c516cb687841499455a8505b446-07ab535-be01091c0f24f079-six-1-10-0-py2-py3-none-any-whl-md5-3ab558cf5d4f7a72611d5-9a81a31-5dc8-下载指令"><a href="#wget-https-pypi-python-org-packages-c8-0a-b6723e1bc4c516cb687841499455a8505b446-07ab535-be01091c0f24f079-six-1-10-0-py2-py3-none-any-whl-md5-3ab558cf5d4f7a72611d5-9a81a31-5dc8-下载指令" class="headerlink" title="wget     https://pypi.python.org/packages/c8/0a/b6723e1bc4c516cb687841499455a8505b446    07ab535    be01091c0f24f079/six-1.10.0-py2.py3-none-any.whl#md5=3ab558cf5d4f7a72611d5        9a81a31    5dc8  #下载指令"></a>wget     <a href="https://pypi.python.org/packages/c8/0a/b6723e1bc4c516cb687841499455a8505b446" target="_blank" rel="external">https://pypi.python.org/packages/c8/0a/b6723e1bc4c516cb687841499455a8505b446</a>    07ab535    be01091c0f24f079/six-1.10.0-py2.py3-none-any.whl#md5=3ab558cf5d4f7a72611d5        9a81a31    5dc8  #下载指令</h1><h1 id="pip-install-six-1-10-0-py2-py3-none-any-whl-安装指令"><a href="#pip-install-six-1-10-0-py2-py3-none-any-whl-安装指令" class="headerlink" title="pip install six-1.10.0-py2.py3-none-any.whl  #安装指令"></a>pip install six-1.10.0-py2.py3-none-any.whl  #安装指令</h1><p>2.安装numpy，下载地址：<a href="http://jaist.dl.sourceforge.net/project/numpy/NumPy/1.11.2rc1/，解压使用python安装" target="_blank" rel="external">http://jaist.dl.sourceforge.net/project/numpy/NumPy/1.11.2rc1/，解压使用python安装</a><br>3.安装protobuf</p>
+<p>#wget             <a href="https://pypi.python.org/packages/0f/53/e43b226f83a5a542c16695e9624b7bd2bde4ad016776c" target="_blank" rel="external">https://pypi.python.org/packages/0f/53/e43b226f83a5a542c16695e9624b7bd2bde4ad016776c</a>    7c3233901bcf5b4/protobuf-3.2.0-cp27-cp27mu-manylinux1_x86_64.whl#md5=a1a807fee3a        7df784e171837853cc29d  #下载指令</p>
+<p>#[root@bogon tool]# pip install protobuf-3.2.0-cp27-cp27mu-manylinux1_x86_64.whl </p>
+<p>这一步可能会用pip安装　提示找不到ssl模块，参考<a href="http://blog.csdn.net/qq_25560423/article/details/62055497" target="_blank" rel="external">http://blog.csdn.net/qq_25560423/article/details/62055497</a></p>
+<p>Ps:正文中第二步pip另外的安装方式：pip安装命令：yum install  python-pip python-devel</p>
+<p>补充TensorFlow中TensorBorad可视化组件的使用：<br>如何更直观的观察数据在神经网络中的变化，或是已经构建的神经网络的结构，Tensorflow自带了可视化模块Tensorboard，并且能更直观的看见整个神经网络的结构。</p>
+<p>TensorBoard的输入是tensorflow保存summary data的日志文件。日志文件名的形式如：events.out.tfevents.1467809796.lei-All-Series 或 events.out.tfevents.1467809800.lei-All-Series。TensorBoard可读的summary data有scalar，images，audio，histogram和graph。那么怎么把这些summary data保存在日志文件中呢？<br>数值如学习率，损失函数用scalar_summary函数。tf.scalar_summary(节点名称，获取的数据)<br>    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))<br>    tf.scalar_summary(‘accuracy’, accuracy)  </p>
+<p>各层网络权重，偏置的分布，用histogram_summary函数<br>    preactivate = tf.matmul(input_tensor, weights) + biases<br>    tf.histogram_summary(layer_name + ‘/pre_activations’, preactivate) </p>
+<p>其他几种summary data也是同样的方式获取，只是对应的获取函数名称换一下。这些获取summary data函数节点和graph是独立的，调用的时候也需要运行session。当需要获取的数据较多的时候，我们一个一个去保存获取到的数据，以及一个一个去运行会显得比较麻烦。tensorflow提供了一个简单的方法，就是合并所有的summary data的获取函数，保存和运行只对一个对象进行操作。比如，写入默认路径中，比如/tmp/mnist_logs (by default)<br>    merged = tf.merge_all_summaries()<br>    train_writer = tf.train.SummaryWriter(FLAGS.summaries_dir + ‘/train’, sess.graph)<br>    test_writer = tf.train.SummaryWriter(FLAGS.summaries_dir + ‘/test’)  </p>
+<p>SummaryWriter从tensorflow获取summary data，然后保存到指定路径的日志文件中。以上是在建立graph的过程中，接下来执行，每隔一定step，写入网络参数到默认路径中，形成最开始的文件：events.out.tfevents.1467809796.lei-All-Series 或 events.out.tfevents.1467809800.lei-All-Series。<br>    for i in range(FLAGS.max_steps):<br>    if i % 10 == 0:  # Record summaries and test-set accuracy<br>    summary, acc = sess.run([merged, accuracy], feed_dict=feed_dict(False))<br>          test_writer.add<em>summary(summary, i)<br>          print(‘Accuracy at step %s: %s’ % (i, acc))<br>        else: # Record train set summarieis, and train<br>          summary, </em> = sess.run([merged, train_step], feed_dict=feed_dict(True))<br>          train_writer.add_summary(summary, i)  </p>
+<p>源码：<br>    ‘’’<br>    Created on May 9, 2017</p>
+<pre><code>@author: root
+&apos;&apos;&apos;
+# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the &apos;License&apos;);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an &apos;AS IS&apos; BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+&quot;&quot;&quot;A simple MNIST classifier which displays summaries in TensorBoard.
+ This is an unimpressive MNIST model, but it is a good example of using
+tf.name_scope to make a graph legible in the TensorBoard graph explorer, and of
+naming summary tags so that they are grouped meaningfully in TensorBoard.
+It demonstrates the functionality of every TensorBoard dashboard.
+&quot;&quot;&quot;
+
+
+import tensorflow as tf
+
+from tensorflow.examples.tutorials.mnist import input_data
+
+flags = tf.app.flags
+FLAGS = flags.FLAGS
+flags.DEFINE_boolean(&apos;fake_data&apos;, False, &apos;If true, uses fake data &apos;
+                     &apos;for unit testing.&apos;)
+flags.DEFINE_integer(&apos;max_steps&apos;, 1000, &apos;Number of steps to run trainer.&apos;)
+flags.DEFINE_float(&apos;learning_rate&apos;, 0.001, &apos;Initial learning rate.&apos;)
+flags.DEFINE_float(&apos;dropout&apos;, 0.9, &apos;Keep probability for training dropout.&apos;)
+flags.DEFINE_string(&apos;data_dir&apos;, &apos;/tmp/data&apos;, &apos;Directory for storing data&apos;)
+flags.DEFINE_string(&apos;summaries_dir&apos;, &apos;/tmp/mnist_logs&apos;, &apos;Summaries directory&apos;)
+
+
+def train():
+  # Import data
+  mnist = input_data.read_data_sets(FLAGS.data_dir,
+                                    one_hot=True,
+                                    fake_data=FLAGS.fake_data)
+
+  sess = tf.InteractiveSession()
+
+  # Create a multilayer model.
+
+  # Input placehoolders
+  with tf.name_scope(&apos;input&apos;):
+    x = tf.placeholder(tf.float32, [None, 784], name=&apos;x-input&apos;)
+    y_ = tf.placeholder(tf.float32, [None, 10], name=&apos;y-input&apos;)
+
+  with tf.name_scope(&apos;input_reshape&apos;):
+    image_shaped_input = tf.reshape(x, [-1, 28, 28, 1])
+    tf.image_summary(&apos;input&apos;, image_shaped_input, 10)
+
+  # We can&apos;t initialize these variables to 0 - the network will get stuck.
+  def weight_variable(shape):
+    &quot;&quot;&quot;Create a weight variable with appropriate initialization.&quot;&quot;&quot;
+    initial = tf.truncated_normal(shape, stddev=0.1)
+    return tf.Variable(initial)
+
+  def bias_variable(shape):
+    &quot;&quot;&quot;Create a bias variable with appropriate initialization.&quot;&quot;&quot;
+    initial = tf.constant(0.1, shape=shape)
+    return tf.Variable(initial)
+
+  def variable_summaries(var, name):
+    &quot;&quot;&quot;Attach a lot of summaries to a Tensor.&quot;&quot;&quot;
+    with tf.name_scope(&apos;summaries&apos;):
+      mean = tf.reduce_mean(var)
+      tf.scalar_summary(&apos;mean/&apos; + name, mean)
+      with tf.name_scope(&apos;stddev&apos;):
+        stddev = tf.sqrt(tf.reduce_sum(tf.square(var - mean)))
+      tf.scalar_summary(&apos;sttdev/&apos; + name, stddev)
+      tf.scalar_summary(&apos;max/&apos; + name, tf.reduce_max(var))
+      tf.scalar_summary(&apos;min/&apos; + name, tf.reduce_min(var))
+      tf.histogram_summary(name, var)
+
+  def nn_layer(input_tensor, input_dim, output_dim, layer_name, act=tf.nn.relu):
+    &quot;&quot;&quot;Reusable code for making a simple neural net layer.
+    It does a matrix multiply, bias add, and then uses relu to nonlinearize.
+    It also sets up name scoping so that the resultant graph is easy to read,
+    and adds a number of summary ops.
+    &quot;&quot;&quot;
+    # Adding a name scope ensures logical grouping of the layers in the graph.
+    with tf.name_scope(layer_name):
+      # This Variable will hold the state of the weights for the layer
+      with tf.name_scope(&apos;weights&apos;):
+        weights = weight_variable([input_dim, output_dim])
+        variable_summaries(weights, layer_name + &apos;/weights&apos;)
+      with tf.name_scope(&apos;biases&apos;):
+        biases = bias_variable([output_dim])
+        variable_summaries(biases, layer_name + &apos;/biases&apos;)
+      with tf.name_scope(&apos;Wx_plus_b&apos;):
+        preactivate = tf.matmul(input_tensor, weights) + biases
+        tf.histogram_summary(layer_name + &apos;/pre_activations&apos;, preactivate)
+      activations = act(preactivate, &apos;activation&apos;)
+      tf.histogram_summary(layer_name + &apos;/activations&apos;, activations)
+      return activations
+
+  hidden1 = nn_layer(x, 784, 500, &apos;layer1&apos;)
+
+  with tf.name_scope(&apos;dropout&apos;):
+    keep_prob = tf.placeholder(tf.float32)
+    tf.scalar_summary(&apos;dropout_keep_probability&apos;, keep_prob)
+    dropped = tf.nn.dropout(hidden1, keep_prob)
+
+  y = nn_layer(dropped, 500, 10, &apos;layer2&apos;, act=tf.nn.softmax)
+
+  with tf.name_scope(&apos;cross_entropy&apos;):
+    diff = y_ * tf.log(y)
+    with tf.name_scope(&apos;total&apos;):
+      cross_entropy = -tf.reduce_mean(diff)
+    tf.scalar_summary(&apos;cross entropy&apos;, cross_entropy)
+
+  with tf.name_scope(&apos;train&apos;):
+    train_step = tf.train.AdamOptimizer(FLAGS.learning_rate).minimize(
+        cross_entropy)
+
+  with tf.name_scope(&apos;accuracy&apos;):
+    with tf.name_scope(&apos;correct_prediction&apos;):
+      correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+    with tf.name_scope(&apos;accuracy&apos;):
+      accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    tf.scalar_summary(&apos;accuracy&apos;, accuracy)
+
+  # Merge all the summaries and write them out to /tmp/mnist_logs (by default)
+  merged = tf.merge_all_summaries()
+  train_writer = tf.train.SummaryWriter(FLAGS.summaries_dir + &apos;/train&apos;,
+                                        sess.graph)
+  test_writer = tf.train.SummaryWriter(FLAGS.summaries_dir + &apos;/test&apos;)
+  tf.initialize_all_variables().run()
+
+  # Train the model, and also write summaries.
+  # Every 10th step, measure test-set accuracy, and write test summaries
+  # All other steps, run train_step on training data, &amp; add training summaries
+
+  def feed_dict(train):
+    &quot;&quot;&quot;Make a TensorFlow feed_dict: maps data onto Tensor placeholders.&quot;&quot;&quot;
+    if train or FLAGS.fake_data:
+      xs, ys = mnist.train.next_batch(100, fake_data=FLAGS.fake_data)
+      k = FLAGS.dropout
+    else:
+      xs, ys = mnist.test.images, mnist.test.labels
+      k = 1.0
+    return {x: xs, y_: ys, keep_prob: k}
+
+  for i in range(FLAGS.max_steps):
+    if i % 10 == 0:  # Record summaries and test-set accuracy
+      summary, acc = sess.run([merged, accuracy], feed_dict=feed_dict(False))
+      test_writer.add_summary(summary, i)
+      print(&apos;Accuracy at step %s: %s&apos; % (i, acc))
+    else:  # Record train set summaries, and train
+      if i % 100 == 99:  # Record execution stats
+        run_options = tf.RunOptions(trace_level=1)
+        run_metadata = tf.RunMetadata()
+        summary, _ = sess.run([merged, train_step],
+                              feed_dict=feed_dict(True),
+                              options=run_options,
+                              run_metadata=run_metadata)
+        train_writer.add_run_metadata(run_metadata, &apos;step%d&apos; % i)
+        train_writer.add_summary(summary, i)
+        print(&apos;Adding run metadata for&apos;, i)
+      else:  # Record a summary
+        summary, _ = sess.run([merged, train_step], feed_dict=feed_dict(True))
+        train_writer.add_summary(summary, i)
+
+
+def main(_):
+  if tf.gfile.Exists(FLAGS.summaries_dir):
+    tf.gfile.DeleteRecursively(FLAGS.summaries_dir)
+  tf.gfile.MakeDirs(FLAGS.summaries_dir)
+  train()
+
+
+if __name__ == &apos;__main__&apos;:
+  tf.app.run()
+</code></pre><p>这段源码执行后会在/tmp目录下生成data目录和mnist_logs目录，data是需要分析的数据，mnist_logs是分析的日志，调用TensorBoard可视化运行结果<br>    tensorboard –logdir=/tmp/mnist_logs/train/ </p>
+<p>打开链接 <a href="http://127.0.0.0:6006即可看到效果。参考" target="_blank" rel="external">http://127.0.0.0:6006即可看到效果。参考</a> <a href="http://blog.csdn.net/helei001/article/details/51842531" target="_blank" rel="external">http://blog.csdn.net/helei001/article/details/51842531</a></p>
 
       
 
@@ -282,15 +462,11 @@ RST表示连接重置。">
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tcp</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">三次握手</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">四次挥手</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">AI</a>
         		</li>
       		
 		</ul>
@@ -357,7 +533,7 @@ RST表示连接重置。">
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACMUlEQVR42u3azW7qQAwGUN7/pal0V5VQwmc7VBfnZBVBOszJwh3/PB7x9fx3vX7y+/PX+9dn8pUfn7gwMDC+lvE8vc6Xzp+vrpnvDQMD4z6MfLmjbyfBdL4yBgYGxnkArYbs6pMYGBgYvSNa9ZiY/C0GBgbGOSMJgnmymqyfH0AvzsUxMDC+kFFtDPzl/Qf7GxgYGF/CeBavSatyHl4Pd4WBgbGaMSnfJ+nrBFNtfGJgYGxl5CnrPHHtsaNXg4GBsZpxVRLbG8vobfGD5TYMDIz/kpGPU1TTznzNfCeH9xgYGKsZ1cCXD0z0avjJOm/KbRgYGOsY1bGG/BjXG+DoHRMxMDDuwJiE2nyArNyvCNqlGBgYd2BUq1WTpLfX2szTaQwMjN2M6tDDZJyiefjL02kMDIx1jCS8JqlmL2Qn7zhqLWBgYNyAkRT6kwNiFVkt8B3+FgYGxmrGZGwr31DeHuiV9jAwMO7G6JXDesWySYp7mIVjYGAsZSSbqLYbewMZSavyDRgDA2MdY3Jcm4xoVH89CrIYGBirGZPGQG/8Ij8URm0GDAyM1YzozDgorvUOoKNcHAMDYx1jXsrPC3BXBeLD/xsYGBhLGaM4XRztqh4oqw0GDAyM3YxqslptJPSS4fK7x8DAuAGjmrjONz0ZsCjMjGBgYNyMkbQY8+GJalviTXEQAwMDY5IBFxuTvcQYAwPjDoxJMyBBVrdeHs7AwMBYzZiHyKvS4MmAGgYGxlLGD17YYL4vAWdlAAAAAElFTkSuQmCC" alt="微信分享二维码">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACqElEQVR42u3aQY7bMBAEQP//0wmQUw6x3c3hrB2gdDK8ksXSAhyqh49HfPz6c+TnPPt8du3fx2PjwMPDwzsa+rPjbIjJ0Cd/TcaMh4eHt807m6zbG7+e4lte9Ijx8PDwPsp7dvu9EoKHh4f3v/PuBgfJYhoPDw/vm3lJGPG6PCSDawedj+dC1oKHh4fX5QCPs0n8U58X+3t4eHh4g6563hK79VzbIvFmnHh4eHgLvNcRbTv35q2sybV1cIyHh4e3wLsbTNyKhtsgI7k7Hh4e3l1eMtx2s2neymqX7/W2Wjw8PLxLvKStlZSHduo/a3e1C3E8PDy8Pd6tTVEtOykkZ8tuPDw8vD1ecvuzAtCGF3eD4zdFAg8PD2/Aa4fSsvMGW/LLddMODw8Pb4H3qSl+Ehbni3I8PDy8PV7b0DorM23o8EORBB4eHl7Ja29cL2eDyb3dXlCUFjw8PLwf55190y6Xz1pxo/4eHh4e3oDXhhFnN5sMrg1z8fDw8D7FO9u6mgDyBXTbyYqqHx4eHt4ar558yzMnDbY21MDDw8O7y5svhdtpvd2wlUfDT/9veHh4eMu8djNBu7xu4+Ck2LzZB4GHh4d3lde+/Oc/3Q5oslXrzUPEw8PDW+a103Qb/s7Di5yKh4eHt8fLI9S7C+v8jmcvA3h4eHh7vLyhdWvKzgtGHka8KQl4eHh4y7w2nsiDg8kWgbYlhoeHh7fBm0/fk/D39Zl5AXh6LR4eHt4Cb1JPkiXv3fC33cSAh4eHt8dLikG+FSC/Kjk/eVhRfw8PDw9vgddunMqn/rxgTGrX06vw8PDwvoA3iQOSTQlnMQceHh7ed/Lm7a4khjhLEg53RuDh4eENePlPTAKIs/ZYWzbw8PDwtnmjV/2F0KENQVb6e3h4eHj//uY3yEdek1iowUYAAAAASUVORK5CYII=" alt="微信分享二维码">
     </div>
 </div>
 
@@ -371,18 +547,18 @@ RST表示连接重置。">
   
 <nav id="article-nav">
   
-    <a href="/2017/03/08/zookeeper浅读/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/05/12/基于python+flask+mysql的web开发初探/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          zookeeper浅读
+          基于python+flask+mysql的web开发初探
         
       </div>
     </a>
   
   
-    <a href="/2017/03/02/微信小程序对接支付/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">微信小程序对接支付</div>
+    <a href="/2017/05/09/superset搭建和简单使用/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">superset搭建和简单使用</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -402,7 +578,7 @@ RST表示连接重置。">
  
   <section id="comments">
     <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-TCP的几个状态码" data-title="TCP的几个状态码" data-url="http://yzy755.github.io/2017/03/08/TCP的几个状态码/"></div>
+    <div class="ds-thread" data-thread-key="post-TensorFlow搭建和TensorBoard可视化的使用" data-title="TensorFlow搭建和TensorBoard可视化的使用" data-url="http://yzy755.github.io/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/"></div>
     <!-- 多说评论框 end -->
     <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
     <script type="text/javascript">

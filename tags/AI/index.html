@@ -6,43 +6,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>TCP的几个状态码 | 易泽源的博客</title>
+  <title>Tag: AI | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
-<meta property="og:type" content="article">
-<meta property="og:title" content="TCP的几个状态码">
-<meta property="og:url" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/index.html">
+  <meta name="description" content="记录学习点滴">
+<meta property="og:type" content="website">
+<meta property="og:title" content="易泽源的博客">
+<meta property="og:url" content="http://yzy755.github.io/tags/AI/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect2.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/close.png">
-<meta property="og:updated_time" content="2017-03-09T09:55:25.371Z">
+<meta property="og:description" content="记录学习点滴">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="TCP的几个状态码">
-<meta name="twitter:description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
-<meta name="twitter:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect.png">
+<meta name="twitter:title" content="易泽源的博客">
+<meta name="twitter:description" content="记录学习点滴">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -192,111 +166,52 @@ RST表示连接重置。">
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-TCP的几个状态码" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      TCP的几个状态码
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2017" class="archive-year">2017</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/" class="archive-article-date">
+  	<time datetime="2017-05-09T10:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-09</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/">TensorFlow搭建和TensorBoard可视化的使用</a>
     </h1>
   
 
-        
-        <a href="/2017/03/08/TCP的几个状态码/" class="archive-article-date">
-  	<time datetime="2017-03-08T03:48:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.</p>
-<p>其中，对于我们日常的分析有用的就是前面的五个字段。</p>
-<p>它们的含义是：</p>
-<p>SYN表示建立连接，</p>
-<p>FIN表示关闭连接，</p>
-<p>ACK表示响应，</p>
-<p>PSH表示有 DATA数据传输，</p>
-<p>RST表示连接重置。<br><a id="more"></a></p>
-<p>其中，ACK是可能与SYN，FIN等同时使用的，比如SYN和ACK可能同时为1，它表示的就是建立连接之后的响应，</p>
-<p>如果只是单个的一个SYN，它表示的只是建立连接。</p>
-<p>TCP的几次握手就是通过这样的ACK表现出来的。</p>
-<p>但SYN与FIN是不会同时为1的，因为前者表示的是建立连接，而后者表示的是断开连接。</p>
-<p>RST一般是在FIN之后才会出现为1的情况，表示的是连接重置。</p>
-<p>一般地，当出现FIN包或RST包时，我们便认为客户端与服务器端断开了连接；而当出现SYN和SYN＋ACK包时，我们认为客户端与服务器建立了一个连接。</p>
-<p>PSH为1的情况，一般只出现在 DATA内容不为0的包中，也就是说PSH为1表示的是有真正的TCP数据包内容被传递。</p>
-<p>TCP的连接建立和连接关闭，都是通过请求－响应的模式完成的。</p>
-<p>概念补充-TCP三次握手：<br>TCP(Transmission Control Protocol)传输控制协议<br>TCP是主机对主机层的传输控制协议，提供可靠的连接服务，采用三次握手确认建立一个连接：</p>
-<p>位码即tcp标志位，有6种标示：SYN(synchronous建立联机) ACK(acknowledgement 确认) PSH(push传送) FIN(finish结束) RST(reset重置) URG(urgent紧急)Sequence number(顺序号码) Acknowledge number(确认号码)<br>第一次握手：主机A发送位码为syn＝1，随机产生seq number=1234567的数据包到服务器，主机B由SYN=1知道，A要求建立联机；<br>第二次握手：主机B收到请求后要确认联机信息，向A发送ack number=(主机A的seq+1)，syn=1，ack=1，随机产生seq=7654321的包；<br>第三次握手：主机A收到后检查ack number是否正确，即第一次发送的seq number+1，以及位码ack是否为1，若正确，主机A会再发送ack number=(主机B的seq+1)，ack=1，主机B收到后确认seq值与ack=1则连接建立成功。<br>完成三次握手，主机A与主机B开始传送数据。<br>TCP采用三次握手建立连接如下图所示。<br><img src="/2017/03/08/TCP的几个状态码/connect.png" alt="logo"><br>用大白话就是这样：<br><img src="/2017/03/08/TCP的几个状态码/connect2.png" alt="logo"></p>
-<p>在TCP/IP协议中，TCP协议提供可靠的连接服务，采用三次握手建立一个连接。<br>第一次握手：建立连接时，客户端发送syn包(syn=j)到服务器，并进入SYN_SEND状态，等待服务器确认；<br>第二次握手：服务器收到syn包，必须确认客户的SYN（ack=j+1），同时自己也发送一个SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；<br>第三次握手：客户端收到服务器的SYN＋ACK包，向服务器发送确认包ACK(ack=k+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。完成三次握手，客户端与服务器开始传送数据.</p>
-<p>关闭连接：<br>由于TCP连接是全双工的，因此每个方向都必须单独进行关闭。这个原则是当一方完成它的数据发送任务后就能发送一个FIN来终止这个方向的连接。收到一个 FIN只意味着这一方向上没有数据流动，一个TCP连接在收到一个FIN后仍能发送数据。首先进行关闭的一方将执行主动关闭，而另一方执行被动关闭。</p>
-<p> CP的连接的拆除需要发送四个包，因此称为四次挥手(four-way handshake)。客户端或服务器均可主动发起挥手动作，在socket编程中，任何一方执行close()操作即可产生挥手操作。</p>
-<p>（1）客户端A发送一个FIN，用来关闭客户A到服务器B的数据传送。 </p>
-<p>（2）服务器B收到这个FIN，它发回一个ACK，确认序号为收到的序号加1。和SYN一样，一个FIN将占用一个序号。 </p>
-<p>（3）服务器B关闭与客户端A的连接，发送一个FIN给客户端A。 </p>
-<p>（4）客户端A发回ACK报文确认，并将确认序号设置为收到序号加1。 </p>
-<p>TCP采用四次挥手关闭连接如下图所示。<br><img src="/2017/03/08/TCP的几个状态码/close.png" alt="logo"></p>
-
-      
-
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/22432/alipay.jpg">
-                      <span class="reward-type">支付宝</span>
-                    </div>
-                    
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/79227/wxpay.png">
-                      <span class="reward-type">微信</span>
-                    </div>
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tcp</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">三次握手</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">四次挥手</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">AI</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -309,116 +224,19 @@ RST表示连接重置。">
 	</div>
 
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACMUlEQVR42u3azW7qQAwGUN7/pal0V5VQwmc7VBfnZBVBOszJwh3/PB7x9fx3vX7y+/PX+9dn8pUfn7gwMDC+lvE8vc6Xzp+vrpnvDQMD4z6MfLmjbyfBdL4yBgYGxnkArYbs6pMYGBgYvSNa9ZiY/C0GBgbGOSMJgnmymqyfH0AvzsUxMDC+kFFtDPzl/Qf7GxgYGF/CeBavSatyHl4Pd4WBgbGaMSnfJ+nrBFNtfGJgYGxl5CnrPHHtsaNXg4GBsZpxVRLbG8vobfGD5TYMDIz/kpGPU1TTznzNfCeH9xgYGKsZ1cCXD0z0avjJOm/KbRgYGOsY1bGG/BjXG+DoHRMxMDDuwJiE2nyArNyvCNqlGBgYd2BUq1WTpLfX2szTaQwMjN2M6tDDZJyiefjL02kMDIx1jCS8JqlmL2Qn7zhqLWBgYNyAkRT6kwNiFVkt8B3+FgYGxmrGZGwr31DeHuiV9jAwMO7G6JXDesWySYp7mIVjYGAsZSSbqLYbewMZSavyDRgDA2MdY3Jcm4xoVH89CrIYGBirGZPGQG/8Ij8URm0GDAyM1YzozDgorvUOoKNcHAMDYx1jXsrPC3BXBeLD/xsYGBhLGaM4XRztqh4oqw0GDAyM3YxqslptJPSS4fK7x8DAuAGjmrjONz0ZsCjMjGBgYNyMkbQY8+GJalviTXEQAwMDY5IBFxuTvcQYAwPjDoxJMyBBVrdeHs7AwMBYzZiHyKvS4MmAGgYGxlLGD17YYL4vAWdlAAAAAElFTkSuQmCC" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2017/03/08/zookeeper浅读/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          zookeeper浅读
-        
-      </div>
-    </a>
   
   
-    <a href="/2017/03/02/微信小程序对接支付/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">微信小程序对接支付</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-
-
-
-
-  
-    <div class="duoshuo"></div>
+    </div></section>
   
 
+    
 
 
- 
-  <section id="comments">
-    <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-TCP的几个状态码" data-title="TCP的几个状态码" data-url="http://yzy755.github.io/2017/03/08/TCP的几个状态码/"></div>
-    <!-- 多说评论框 end -->
-    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-    <script type="text/javascript">
-    var duoshuoQuery = {short_name:'yzy755'};
-      (function() {
-        var ds = document.createElement('script');
-        ds.type = 'text/javascript';ds.async = true;
-        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-        ds.charset = 'UTF-8';
-        (document.getElementsByTagName('head')[0] 
-         || document.getElementsByTagName('body')[0]).appendChild(ds);
-      })();
-      </script>
-    <!-- 多说公共JS代码 end -->
-  </section>
-  
           </div>
         </div>
       </div>
@@ -439,9 +257,9 @@ RST表示连接重置。">
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
+		isPost: false,
 		isArchive: false,
-		isTag: false,
+		isTag: true,
 		isCategory: false,
 		open_in_new: false,
 		root: "/",

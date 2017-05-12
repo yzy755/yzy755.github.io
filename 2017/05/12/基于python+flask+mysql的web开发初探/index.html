@@ -6,43 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>TCP的几个状态码 | 易泽源的博客</title>
+  <title>基于python+flask+mysql的web开发初探 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
+  <meta name="description" content="由于用Python开发一个Web框架十分容易，所以Python有上百个开源的Web框架，当下流行的是Flask,Django等Flask是一个使用 Python 编写的轻量级 Web 应用框架。其 WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TCP的几个状态码">
-<meta property="og:url" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/index.html">
+<meta property="og:title" content="基于python+flask+mysql的web开发初探">
+<meta property="og:url" content="http://yzy755.github.io/2017/05/12/基于python+flask+mysql的web开发初探/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect2.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/close.png">
-<meta property="og:updated_time" content="2017-03-09T09:55:25.371Z">
+<meta property="og:description" content="由于用Python开发一个Web框架十分容易，所以Python有上百个开源的Web框架，当下流行的是Flask,Django等Flask是一个使用 Python 编写的轻量级 Web 应用框架。其 WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。">
+<meta property="og:updated_time" content="2017-05-12T08:00:52.157Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="TCP的几个状态码">
-<meta name="twitter:description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
-<meta name="twitter:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect.png">
+<meta name="twitter:title" content="基于python+flask+mysql的web开发初探">
+<meta name="twitter:description" content="由于用Python开发一个Web框架十分容易，所以Python有上百个开源的Web框架，当下流行的是Flask,Django等Flask是一个使用 Python 编写的轻量级 Web 应用框架。其 WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -192,52 +167,66 @@ RST表示连接重置。">
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-TCP的几个状态码" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-基于python+flask+mysql的web开发初探" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      TCP的几个状态码
+      基于python+flask+mysql的web开发初探
     </h1>
   
 
         
-        <a href="/2017/03/08/TCP的几个状态码/" class="archive-article-date">
-  	<time datetime="2017-03-08T03:48:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
+        <a href="/2017/05/12/基于python+flask+mysql的web开发初探/" class="archive-article-date">
+  	<time datetime="2017-05-12T07:40:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-12</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.</p>
-<p>其中，对于我们日常的分析有用的就是前面的五个字段。</p>
-<p>它们的含义是：</p>
-<p>SYN表示建立连接，</p>
-<p>FIN表示关闭连接，</p>
-<p>ACK表示响应，</p>
-<p>PSH表示有 DATA数据传输，</p>
-<p>RST表示连接重置。<br><a id="more"></a></p>
-<p>其中，ACK是可能与SYN，FIN等同时使用的，比如SYN和ACK可能同时为1，它表示的就是建立连接之后的响应，</p>
-<p>如果只是单个的一个SYN，它表示的只是建立连接。</p>
-<p>TCP的几次握手就是通过这样的ACK表现出来的。</p>
-<p>但SYN与FIN是不会同时为1的，因为前者表示的是建立连接，而后者表示的是断开连接。</p>
-<p>RST一般是在FIN之后才会出现为1的情况，表示的是连接重置。</p>
-<p>一般地，当出现FIN包或RST包时，我们便认为客户端与服务器端断开了连接；而当出现SYN和SYN＋ACK包时，我们认为客户端与服务器建立了一个连接。</p>
-<p>PSH为1的情况，一般只出现在 DATA内容不为0的包中，也就是说PSH为1表示的是有真正的TCP数据包内容被传递。</p>
-<p>TCP的连接建立和连接关闭，都是通过请求－响应的模式完成的。</p>
-<p>概念补充-TCP三次握手：<br>TCP(Transmission Control Protocol)传输控制协议<br>TCP是主机对主机层的传输控制协议，提供可靠的连接服务，采用三次握手确认建立一个连接：</p>
-<p>位码即tcp标志位，有6种标示：SYN(synchronous建立联机) ACK(acknowledgement 确认) PSH(push传送) FIN(finish结束) RST(reset重置) URG(urgent紧急)Sequence number(顺序号码) Acknowledge number(确认号码)<br>第一次握手：主机A发送位码为syn＝1，随机产生seq number=1234567的数据包到服务器，主机B由SYN=1知道，A要求建立联机；<br>第二次握手：主机B收到请求后要确认联机信息，向A发送ack number=(主机A的seq+1)，syn=1，ack=1，随机产生seq=7654321的包；<br>第三次握手：主机A收到后检查ack number是否正确，即第一次发送的seq number+1，以及位码ack是否为1，若正确，主机A会再发送ack number=(主机B的seq+1)，ack=1，主机B收到后确认seq值与ack=1则连接建立成功。<br>完成三次握手，主机A与主机B开始传送数据。<br>TCP采用三次握手建立连接如下图所示。<br><img src="/2017/03/08/TCP的几个状态码/connect.png" alt="logo"><br>用大白话就是这样：<br><img src="/2017/03/08/TCP的几个状态码/connect2.png" alt="logo"></p>
-<p>在TCP/IP协议中，TCP协议提供可靠的连接服务，采用三次握手建立一个连接。<br>第一次握手：建立连接时，客户端发送syn包(syn=j)到服务器，并进入SYN_SEND状态，等待服务器确认；<br>第二次握手：服务器收到syn包，必须确认客户的SYN（ack=j+1），同时自己也发送一个SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；<br>第三次握手：客户端收到服务器的SYN＋ACK包，向服务器发送确认包ACK(ack=k+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。完成三次握手，客户端与服务器开始传送数据.</p>
-<p>关闭连接：<br>由于TCP连接是全双工的，因此每个方向都必须单独进行关闭。这个原则是当一方完成它的数据发送任务后就能发送一个FIN来终止这个方向的连接。收到一个 FIN只意味着这一方向上没有数据流动，一个TCP连接在收到一个FIN后仍能发送数据。首先进行关闭的一方将执行主动关闭，而另一方执行被动关闭。</p>
-<p> CP的连接的拆除需要发送四个包，因此称为四次挥手(four-way handshake)。客户端或服务器均可主动发起挥手动作，在socket编程中，任何一方执行close()操作即可产生挥手操作。</p>
-<p>（1）客户端A发送一个FIN，用来关闭客户A到服务器B的数据传送。 </p>
-<p>（2）服务器B收到这个FIN，它发回一个ACK，确认序号为收到的序号加1。和SYN一样，一个FIN将占用一个序号。 </p>
-<p>（3）服务器B关闭与客户端A的连接，发送一个FIN给客户端A。 </p>
-<p>（4）客户端A发回ACK报文确认，并将确认序号设置为收到序号加1。 </p>
-<p>TCP采用四次挥手关闭连接如下图所示。<br><img src="/2017/03/08/TCP的几个状态码/close.png" alt="logo"></p>
+        <p>由于用Python开发一个Web框架十分容易，所以Python有上百个开源的Web框架，当下流行的是Flask,Django等<br>Flask是一个使用 Python 编写的轻量级 Web 应用框架。其 WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。<br><a id="more"></a><br>搭建的大致步骤和常见的问题：</p>
+<p>1.安装anaconda，anaconda里面集成了很多关于python科学计算的第三方库，主要是安装方便，而python是一个编译器，如果不使用anaconda，那么安装起来会比较痛苦，各个库之间的依赖性就很难连接的很好</p>
+<p>2.安装mysql</p>
+<p>3.安装mysql-python，命令:pip install MySql-python<br>    错误1：Microsoft Visual C++ 14.0 is required.<br>    升级.NET Framework 版本到4.5.1<br>    从错误提示的url下载，下载后安装visualcppbuildtools_full</p>
+<p>3.安装mysql connector, 下载地址：<a href="https://dev.mysql.com/downloads/connector/python/" target="_blank" rel="external">https://dev.mysql.com/downloads/connector/python/</a><br>我的系统为64， 下载的是mysql-connector-python-2.1.5-py3.4-winx64，还是报错，后来注意到寻找的目录是Program Files (x86)，又下了个32位的安装。错误过去了。但是又来新的错误：<br>    LINK : error LNK2001: unresolved external symbol _DllMainCRTStartup<br>    build\lib.win-amd64-3.5_mysql.cp35-win_amd64.pyd : fatal error LNK1120: 56 unresolved externalserror: command ‘C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\BIN\x86_amd64\link.exe’ failed with exit status 1120<br>5.安装第三方包pymysql。下载地址：<a href="https://pypi.python.org/pypi/PyMySQL#downloads" target="_blank" rel="external">https://pypi.python.org/pypi/PyMySQL#downloads</a><br>下载PyMySQL-0.7.11-py2.py3-none-any.whl，使用pip install PyMySQL-0.7.11-py2.py3-none-any.whl 即可，再执行pip install MySql-python就成功了</p>
+<p>python引入mysql方法：<br>import pymysql as MySQLdb</p>
+<p>首次尝试python的web开发：<br>源码：<br>db.py:<br>    host=”127.0.0.1”<br>    user=”root”<br>    password=”123456”<br>    charset=”utf8”<br>    database=”test”<br>    port=3306</p>
+<p>service.py<br>    import pymysql as MySQLdb<br>    import sys<br>    import db<br>    class AService(object):<br>        def getA(self,id):<br>            conn = MySQLdb.connect(host=db.host,user=db.user,passwd=db.password,port=db.port,db=db.database,charset=db.charset)<br>            result=[]<br>            try:<br>                cursor = conn.cursor()<br>                cursor.execute(“select id,sname from student where id=’%d’”%(id))<br>                result = cursor.fetchone()</p>
+<pre><code>finally:
+    cursor.close()
+    conn.close()
+return result
+</code></pre><p>hello.py<br>    from flask import Flask, jsonify<br>    import service<br>    import sys</p>
+<pre><code>app = Flask(__name__)
+
+@app.route(&apos;/service&apos;, methods=[&apos;GET&apos;])
+def getSerivice():
+        mservice=service.AService()
+        result = mservice.getA(1)
+        json = &quot;&quot;
+        json +=&quot;{&quot;
+        json +=&quot;&apos;id&apos;:&quot;+str(result[0])+&quot;,&quot;
+        json +=&quot;&apos;sname&apos;:&apos;&quot;+result[1]+&quot;&apos;&quot;
+        json +=&quot;}&quot;
+        return json;
+if __name__==&quot;__main__&quot;:
+    app.run()
+</code></pre><p>在cmd中执行 python hello.py<br>打开浏览器 <a href="http://localhost:5000" target="_blank" rel="external">http://localhost:5000</a><br>出现 {‘id’:1,’sname’:’yizeyuan’}<br>成功！</p>
+<p>这个例子太简单，实际上可以像平时javaweb开发一样使用MVC模式，上面的hello.py是控制器，service.py是model,而view我们同样可以使用html，Flask使用jinja2渲染<br>使用方式：<br>    from flask import Flask, request, render_template #加上render_template<br>当请求处理完成返回一个模板以及变量<br>    return render_template(‘index.html’, message=’欢迎使用flask’, username=’yizeyuan’)<br>首页的html代码为：</p>
+<pre><code>&lt;html&gt;
+    &lt;head&gt;
+      &lt;title&gt;index&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+      &lt;h1 style=&quot;font-style:italic&quot;&gt;Home&lt;/h1&gt;
+      {{message}}
+      欢迎你，{{username}}
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>很像angularjs有木有！</p>
 
       
 
@@ -282,15 +271,11 @@ RST表示连接重置。">
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tcp</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">三次握手</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">四次挥手</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">web开发</a>
         		</li>
       		
 		</ul>
@@ -357,7 +342,7 @@ RST表示连接重置。">
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACMUlEQVR42u3azW7qQAwGUN7/pal0V5VQwmc7VBfnZBVBOszJwh3/PB7x9fx3vX7y+/PX+9dn8pUfn7gwMDC+lvE8vc6Xzp+vrpnvDQMD4z6MfLmjbyfBdL4yBgYGxnkArYbs6pMYGBgYvSNa9ZiY/C0GBgbGOSMJgnmymqyfH0AvzsUxMDC+kFFtDPzl/Qf7GxgYGF/CeBavSatyHl4Pd4WBgbGaMSnfJ+nrBFNtfGJgYGxl5CnrPHHtsaNXg4GBsZpxVRLbG8vobfGD5TYMDIz/kpGPU1TTznzNfCeH9xgYGKsZ1cCXD0z0avjJOm/KbRgYGOsY1bGG/BjXG+DoHRMxMDDuwJiE2nyArNyvCNqlGBgYd2BUq1WTpLfX2szTaQwMjN2M6tDDZJyiefjL02kMDIx1jCS8JqlmL2Qn7zhqLWBgYNyAkRT6kwNiFVkt8B3+FgYGxmrGZGwr31DeHuiV9jAwMO7G6JXDesWySYp7mIVjYGAsZSSbqLYbewMZSavyDRgDA2MdY3Jcm4xoVH89CrIYGBirGZPGQG/8Ij8URm0GDAyM1YzozDgorvUOoKNcHAMDYx1jXsrPC3BXBeLD/xsYGBhLGaM4XRztqh4oqw0GDAyM3YxqslptJPSS4fK7x8DAuAGjmrjONz0ZsCjMjGBgYNyMkbQY8+GJalviTXEQAwMDY5IBFxuTvcQYAwPjDoxJMyBBVrdeHs7AwMBYzZiHyKvS4MmAGgYGxlLGD17YYL4vAWdlAAAAAElFTkSuQmCC" alt="微信分享二维码">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACpUlEQVR42u3aSVLEMBAEQP//0/AAGFO9yPiQcyJYLOUQ0eqp1nXFr68Pr0+/c/+cZK1P614nXnh4eHhLW/+5zP0mesj7tylZ5Y+3AA8PD+8YL9/ECWr1yEn2jIeHh/dOXmGZ1ooL6+Lh4eH9Ky9vapNCnycJeHh4eO/kJWHEfYucMKqBwqNZCx4eHl7M2yrQT359ZL6Hh4eHN56qV4t1L9ithsWF3eLh4eEd4G1dHai23VshRdTc4+Hh4R3jJZtIvt87MKoRRuFiAR4eHt4qr9rsJrB5nJEcKtGbhYeHh3eA13tEr2nuhQu9ER0eHh7eOd6kBE8uHFQPgOolMDw8PLxzvKQZzR9aba+rvOo1LDw8PLxneHmjnBTl+WFQfX4hBcHDw8Nr8apbzIf6eTDR+zraLR4eHt4BXnXMXx329wp6HhZH/wA8PDy8VV5vKJUHuJOwePL7v1y6wsPDw1viVctxfgdhclRUj4Fo53h4eHirvPyPewW9V9bXhmp4eHh4q7xqEzz5jN8DjJB4eHh4B3hJXNtrr/OmuRdhFL6Dh4eHd5iXMJLQttqIJ29rdQiHh4eHd4LXG1PlFwt6x0PvmXh4eHjP8PJDYje0nQzAkqiifAbi4eHhtXjJVqLiG5T1+U/XzkA8PDy8Fi+JEiZD/Tx6qA66rsnCeHh4eEu8BNwLHRJScvmgHIvg4eHhHePll5+aOUccJTQPgPurA3h4eHhLvElp3rpGMGno/zgq8PDw8A7wqqV2ctWgV9yrI7Tmunh4eHit0Vf1MEha7Wr4O98DHh4e3pO83mBsK8LYeuHh4eG9k1cdX+Wtdj5mS1bEw8PDew+vyt69hpU36Hh4eHineb2y3iv9SRQ7b9/x8PDwzvF6H/ITah71Vp/Ta9nx8PDwxrxvnufpFuD0ShYAAAAASUVORK5CYII=" alt="微信分享二维码">
     </div>
 </div>
 
@@ -371,18 +356,9 @@ RST表示连接重置。">
   
 <nav id="article-nav">
   
-    <a href="/2017/03/08/zookeeper浅读/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          zookeeper浅读
-        
-      </div>
-    </a>
   
-  
-    <a href="/2017/03/02/微信小程序对接支付/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">微信小程序对接支付</div>
+    <a href="/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">TensorFlow搭建和TensorBoard可视化的使用</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -402,7 +378,7 @@ RST表示连接重置。">
  
   <section id="comments">
     <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-TCP的几个状态码" data-title="TCP的几个状态码" data-url="http://yzy755.github.io/2017/03/08/TCP的几个状态码/"></div>
+    <div class="ds-thread" data-thread-key="post-基于python+flask+mysql的web开发初探" data-title="基于python+flask+mysql的web开发初探" data-url="http://yzy755.github.io/2017/05/12/基于python+flask+mysql的web开发初探/"></div>
     <!-- 多说评论框 end -->
     <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
     <script type="text/javascript">

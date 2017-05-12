@@ -6,43 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>TCP的几个状态码 | 易泽源的博客</title>
+  <title>superset搭建和简单使用 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
+  <meta name="description" content="Superset 是 Airbnb （知名在线房屋短租公司）开源的数据探查与可视化平台（曾用名 Panoramix、Caravel ），该工具在可视化、易用性和交互性上非常有特色，用户可以轻松对数据进行可视化分析。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TCP的几个状态码">
-<meta property="og:url" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/index.html">
+<meta property="og:title" content="superset搭建和简单使用">
+<meta property="og:url" content="http://yzy755.github.io/2017/05/09/superset搭建和简单使用/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect2.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/close.png">
-<meta property="og:updated_time" content="2017-03-09T09:55:25.371Z">
+<meta property="og:description" content="Superset 是 Airbnb （知名在线房屋短租公司）开源的数据探查与可视化平台（曾用名 Panoramix、Caravel ），该工具在可视化、易用性和交互性上非常有特色，用户可以轻松对数据进行可视化分析。">
+<meta property="og:updated_time" content="2017-05-10T09:25:15.697Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="TCP的几个状态码">
-<meta name="twitter:description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
-其中，对于我们日常的分析有用的就是前面的五个字段。
-它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。">
-<meta name="twitter:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect.png">
+<meta name="twitter:title" content="superset搭建和简单使用">
+<meta name="twitter:description" content="Superset 是 Airbnb （知名在线房屋短租公司）开源的数据探查与可视化平台（曾用名 Panoramix、Caravel ），该工具在可视化、易用性和交互性上非常有特色，用户可以轻松对数据进行可视化分析。">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -192,52 +167,51 @@ RST表示连接重置。">
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-TCP的几个状态码" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-superset搭建和简单使用" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      TCP的几个状态码
+      superset搭建和简单使用
     </h1>
   
 
         
-        <a href="/2017/03/08/TCP的几个状态码/" class="archive-article-date">
-  	<time datetime="2017-03-08T03:48:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
+        <a href="/2017/05/09/superset搭建和简单使用/" class="archive-article-date">
+  	<time datetime="2017-05-09T09:25:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-09</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.</p>
-<p>其中，对于我们日常的分析有用的就是前面的五个字段。</p>
-<p>它们的含义是：</p>
-<p>SYN表示建立连接，</p>
-<p>FIN表示关闭连接，</p>
-<p>ACK表示响应，</p>
-<p>PSH表示有 DATA数据传输，</p>
-<p>RST表示连接重置。<br><a id="more"></a></p>
-<p>其中，ACK是可能与SYN，FIN等同时使用的，比如SYN和ACK可能同时为1，它表示的就是建立连接之后的响应，</p>
-<p>如果只是单个的一个SYN，它表示的只是建立连接。</p>
-<p>TCP的几次握手就是通过这样的ACK表现出来的。</p>
-<p>但SYN与FIN是不会同时为1的，因为前者表示的是建立连接，而后者表示的是断开连接。</p>
-<p>RST一般是在FIN之后才会出现为1的情况，表示的是连接重置。</p>
-<p>一般地，当出现FIN包或RST包时，我们便认为客户端与服务器端断开了连接；而当出现SYN和SYN＋ACK包时，我们认为客户端与服务器建立了一个连接。</p>
-<p>PSH为1的情况，一般只出现在 DATA内容不为0的包中，也就是说PSH为1表示的是有真正的TCP数据包内容被传递。</p>
-<p>TCP的连接建立和连接关闭，都是通过请求－响应的模式完成的。</p>
-<p>概念补充-TCP三次握手：<br>TCP(Transmission Control Protocol)传输控制协议<br>TCP是主机对主机层的传输控制协议，提供可靠的连接服务，采用三次握手确认建立一个连接：</p>
-<p>位码即tcp标志位，有6种标示：SYN(synchronous建立联机) ACK(acknowledgement 确认) PSH(push传送) FIN(finish结束) RST(reset重置) URG(urgent紧急)Sequence number(顺序号码) Acknowledge number(确认号码)<br>第一次握手：主机A发送位码为syn＝1，随机产生seq number=1234567的数据包到服务器，主机B由SYN=1知道，A要求建立联机；<br>第二次握手：主机B收到请求后要确认联机信息，向A发送ack number=(主机A的seq+1)，syn=1，ack=1，随机产生seq=7654321的包；<br>第三次握手：主机A收到后检查ack number是否正确，即第一次发送的seq number+1，以及位码ack是否为1，若正确，主机A会再发送ack number=(主机B的seq+1)，ack=1，主机B收到后确认seq值与ack=1则连接建立成功。<br>完成三次握手，主机A与主机B开始传送数据。<br>TCP采用三次握手建立连接如下图所示。<br><img src="/2017/03/08/TCP的几个状态码/connect.png" alt="logo"><br>用大白话就是这样：<br><img src="/2017/03/08/TCP的几个状态码/connect2.png" alt="logo"></p>
-<p>在TCP/IP协议中，TCP协议提供可靠的连接服务，采用三次握手建立一个连接。<br>第一次握手：建立连接时，客户端发送syn包(syn=j)到服务器，并进入SYN_SEND状态，等待服务器确认；<br>第二次握手：服务器收到syn包，必须确认客户的SYN（ack=j+1），同时自己也发送一个SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；<br>第三次握手：客户端收到服务器的SYN＋ACK包，向服务器发送确认包ACK(ack=k+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。完成三次握手，客户端与服务器开始传送数据.</p>
-<p>关闭连接：<br>由于TCP连接是全双工的，因此每个方向都必须单独进行关闭。这个原则是当一方完成它的数据发送任务后就能发送一个FIN来终止这个方向的连接。收到一个 FIN只意味着这一方向上没有数据流动，一个TCP连接在收到一个FIN后仍能发送数据。首先进行关闭的一方将执行主动关闭，而另一方执行被动关闭。</p>
-<p> CP的连接的拆除需要发送四个包，因此称为四次挥手(four-way handshake)。客户端或服务器均可主动发起挥手动作，在socket编程中，任何一方执行close()操作即可产生挥手操作。</p>
-<p>（1）客户端A发送一个FIN，用来关闭客户A到服务器B的数据传送。 </p>
-<p>（2）服务器B收到这个FIN，它发回一个ACK，确认序号为收到的序号加1。和SYN一样，一个FIN将占用一个序号。 </p>
-<p>（3）服务器B关闭与客户端A的连接，发送一个FIN给客户端A。 </p>
-<p>（4）客户端A发回ACK报文确认，并将确认序号设置为收到序号加1。 </p>
-<p>TCP采用四次挥手关闭连接如下图所示。<br><img src="/2017/03/08/TCP的几个状态码/close.png" alt="logo"></p>
+        <p>Superset 是 Airbnb （知名在线房屋短租公司）开源的数据探查与可视化平台（曾用名 Panoramix、Caravel ），该工具在可视化、易用性和交互性上非常有特色，用户可以轻松对数据进行可视化分析。<br><a id="more"></a><br>可先直接执行第二步<br>1./usr/local/python27/bin/pip install –upgrade virtualenv<br>pip install –upgrade distribute<br>virtualenv myenv –distribute</p>
+<p>2./usr/local/python27/bin/pip install –upgrade superset<br>提示command ‘gcc’ failed with exit status 1的错误</p>
+<pre><code># yum install gcc-c++
+# yum install postgresql-devel
+# yum -y install gcc gcc-c++ kernel-devel
+# yum -y install python-devel libxslt-devel libffi-devel openssl-devel
+# yum install openssl-devel python-devel python-sphinx
+</code></pre><p>3.安装MySQL-python-1.2.3.tar.gz<br>安装过程中会出现mysql config not found</p>
+<pre><code># yum install mysql-devel
+</code></pre><p>执行find / -name mysql_config在/usr/bin下就出现了这个配置文件，将这个文件复制到MySQL-python-1.2.3解压目录中，再安装即可,报错就执行</p>
+<pre><code># yum install gcc-c++ python-devel.x86_64 cyrus-sasl-devel.x86_64
+# pip install thrift_sasl
+# pip install sasl
+</code></pre><p>再安装即可</p>
+<p>4.成功之后将Python的bin目录下的fabmanager、superset、gunicorn文件放到/usr/bin目录下或者建立软连接</p>
+<pre><code># fabmanager create-admin --app superset
+</code></pre><p>报错No module named _sqlite3或者No module named pysqlite2或者其他，需要安装sqlite-devel之后，<br>执行yum install sqlite-devel，重新编译安装Python即可。</p>
+<pre><code># superset db upgrade
+
+# superset load_examples
+
+# superset init
+
+# superset runserver -p 8088 -a 0.0.0.0
+</code></pre><p>会报bash: gunicorn: command not found，执行find / -name gunicorn 查找一下这个命令放哪儿了，然后将它放到/usr/bin中去</p>
 
       
 
@@ -282,15 +256,11 @@ RST表示连接重置。">
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">tcp</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">三次握手</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">四次挥手</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">数据库分析</a>
         		</li>
       		
 		</ul>
@@ -357,7 +327,7 @@ RST表示连接重置。">
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACMUlEQVR42u3azW7qQAwGUN7/pal0V5VQwmc7VBfnZBVBOszJwh3/PB7x9fx3vX7y+/PX+9dn8pUfn7gwMDC+lvE8vc6Xzp+vrpnvDQMD4z6MfLmjbyfBdL4yBgYGxnkArYbs6pMYGBgYvSNa9ZiY/C0GBgbGOSMJgnmymqyfH0AvzsUxMDC+kFFtDPzl/Qf7GxgYGF/CeBavSatyHl4Pd4WBgbGaMSnfJ+nrBFNtfGJgYGxl5CnrPHHtsaNXg4GBsZpxVRLbG8vobfGD5TYMDIz/kpGPU1TTznzNfCeH9xgYGKsZ1cCXD0z0avjJOm/KbRgYGOsY1bGG/BjXG+DoHRMxMDDuwJiE2nyArNyvCNqlGBgYd2BUq1WTpLfX2szTaQwMjN2M6tDDZJyiefjL02kMDIx1jCS8JqlmL2Qn7zhqLWBgYNyAkRT6kwNiFVkt8B3+FgYGxmrGZGwr31DeHuiV9jAwMO7G6JXDesWySYp7mIVjYGAsZSSbqLYbewMZSavyDRgDA2MdY3Jcm4xoVH89CrIYGBirGZPGQG/8Ij8URm0GDAyM1YzozDgorvUOoKNcHAMDYx1jXsrPC3BXBeLD/xsYGBhLGaM4XRztqh4oqw0GDAyM3YxqslptJPSS4fK7x8DAuAGjmrjONz0ZsCjMjGBgYNyMkbQY8+GJalviTXEQAwMDY5IBFxuTvcQYAwPjDoxJMyBBVrdeHs7AwMBYzZiHyKvS4MmAGgYGxlLGD17YYL4vAWdlAAAAAElFTkSuQmCC" alt="微信分享二维码">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACrUlEQVR42u3a0U7DMAwF0P3/Tw+JNwQt13Y8hnT6NG2jyQlSnV3n8Yiv5+f1/XXy/atPr+559bfJuM0LDw8PrzX1q+tqQvcTvb/P/ej5Et+PhYeHh7fNy2/Xe9xXn+G9O+Ph4eG9Gy8pJ8mnEzweHh7ef+RVh+mVivvlwMPDw3sHXh4i3L/uFYAk/ljPWvDw8PBi3mQ7+1evX9Tfw8PDwyt21edFIhmxGnYUZouHh4e3wKsOmR8XqDa0qqFD3jzDw8PD2+NV21rVAGKvhfbLPwYPDw/vKC/Z1E6OSZ3aaudz++EXAx4eHt4ar1cYqu2ofDnyqOJyEfHw8PDWeL1YoRol5KWiF/KWzyPg4eHhtXg9ZBU8WaDeJh4PDw9vm5dvUnutrGpDK2fn7TE8PDy8s7xeCyoJHXpLkBetcknAw8PDG/N6YUSvkX/q2EEUQODh4eEt8wrns+JIotoGS+5QjjPw8PDwFnh547/XjqpOK1+gfMONh4eH9xpessEdZcatuKG5fHh4eHhrvGoLv9fary7fgYADDw8Pb4E3CSOqsOpm+lT8gYeHh7fBmxSA5HaFh/hgrAMwPDw8vIDXa1NNgtdTJSdC4uHh4S3wki/1NrXVYOLU0YFHdQ3w8PDwDvGSx3cvPpg87qvBLh4eHt5ZXq8Zn7Sy8i118k5zbnh4eHjLvN6EkvZ/HnDMgww8PDy8bV4effYmkUcbk9ZapMDDw8M7xHsWr/zR3zs6MD+S9eUdPDw8vAXepBnWC2qrReU15QQPDw+vysub9PlgkztXC8Mv5QoPDw9vjTePTauABJazyx/j4eHhvYSXH3hKgozJJr4QZ+Dh4eG9DW/S7D+1iY8WFA8PD2+N1xssb2JVo9tqObmcAx4eHt4Cr9cAm7S+egFxsllvXnh4eHgp7wOW2OQpaPu7KwAAAABJRU5ErkJggg==" alt="微信分享二维码">
     </div>
 </div>
 
@@ -371,18 +341,18 @@ RST表示连接重置。">
   
 <nav id="article-nav">
   
-    <a href="/2017/03/08/zookeeper浅读/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          zookeeper浅读
+          TensorFlow搭建和TensorBoard可视化的使用
         
       </div>
     </a>
   
   
-    <a href="/2017/03/02/微信小程序对接支付/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">微信小程序对接支付</div>
+    <a href="/2017/05/02/使用开源软件快速搭建数据分析平台/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">使用开源软件快速搭建数据分析平台</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -402,7 +372,7 @@ RST表示连接重置。">
  
   <section id="comments">
     <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-TCP的几个状态码" data-title="TCP的几个状态码" data-url="http://yzy755.github.io/2017/03/08/TCP的几个状态码/"></div>
+    <div class="ds-thread" data-thread-key="post-superset搭建和简单使用" data-title="superset搭建和简单使用" data-url="http://yzy755.github.io/2017/05/09/superset搭建和简单使用/"></div>
     <!-- 多说评论框 end -->
     <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
     <script type="text/javascript">

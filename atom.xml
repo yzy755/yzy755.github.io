@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2017-05-03T03:22:07.958Z</updated>
+  <updated>2017-05-12T08:00:52.157Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -14,6 +14,374 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>基于python+flask+mysql的web开发初探</title>
+    <link href="http://yzy755.github.io/2017/05/12/%E5%9F%BA%E4%BA%8Epython+flask+mysql%E7%9A%84web%E5%BC%80%E5%8F%91%E5%88%9D%E6%8E%A2/"/>
+    <id>http://yzy755.github.io/2017/05/12/基于python+flask+mysql的web开发初探/</id>
+    <published>2017-05-12T07:40:53.000Z</published>
+    <updated>2017-05-12T08:00:52.157Z</updated>
+    
+    <content type="html"><![CDATA[<p>由于用Python开发一个Web框架十分容易，所以Python有上百个开源的Web框架，当下流行的是Flask,Django等<br>Flask是一个使用 Python 编写的轻量级 Web 应用框架。其 WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。<br><a id="more"></a><br>搭建的大致步骤和常见的问题：</p>
+<p>1.安装anaconda，anaconda里面集成了很多关于python科学计算的第三方库，主要是安装方便，而python是一个编译器，如果不使用anaconda，那么安装起来会比较痛苦，各个库之间的依赖性就很难连接的很好</p>
+<p>2.安装mysql</p>
+<p>3.安装mysql-python，命令:pip install MySql-python<br>    错误1：Microsoft Visual C++ 14.0 is required.<br>    升级.NET Framework 版本到4.5.1<br>    从错误提示的url下载，下载后安装visualcppbuildtools_full</p>
+<p>3.安装mysql connector, 下载地址：<a href="https://dev.mysql.com/downloads/connector/python/" target="_blank" rel="external">https://dev.mysql.com/downloads/connector/python/</a><br>我的系统为64， 下载的是mysql-connector-python-2.1.5-py3.4-winx64，还是报错，后来注意到寻找的目录是Program Files (x86)，又下了个32位的安装。错误过去了。但是又来新的错误：<br>    LINK : error LNK2001: unresolved external symbol _DllMainCRTStartup<br>    build\lib.win-amd64-3.5_mysql.cp35-win_amd64.pyd : fatal error LNK1120: 56 unresolved externalserror: command ‘C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\BIN\x86_amd64\link.exe’ failed with exit status 1120<br>5.安装第三方包pymysql。下载地址：<a href="https://pypi.python.org/pypi/PyMySQL#downloads" target="_blank" rel="external">https://pypi.python.org/pypi/PyMySQL#downloads</a><br>下载PyMySQL-0.7.11-py2.py3-none-any.whl，使用pip install PyMySQL-0.7.11-py2.py3-none-any.whl 即可，再执行pip install MySql-python就成功了</p>
+<p>python引入mysql方法：<br>import pymysql as MySQLdb</p>
+<p>首次尝试python的web开发：<br>源码：<br>db.py:<br>    host=”127.0.0.1”<br>    user=”root”<br>    password=”123456”<br>    charset=”utf8”<br>    database=”test”<br>    port=3306</p>
+<p>service.py<br>    import pymysql as MySQLdb<br>    import sys<br>    import db<br>    class AService(object):<br>        def getA(self,id):<br>            conn = MySQLdb.connect(host=db.host,user=db.user,passwd=db.password,port=db.port,db=db.database,charset=db.charset)<br>            result=[]<br>            try:<br>                cursor = conn.cursor()<br>                cursor.execute(“select id,sname from student where id=’%d’”%(id))<br>                result = cursor.fetchone()</p>
+<pre><code>finally:
+    cursor.close()
+    conn.close()
+return result
+</code></pre><p>hello.py<br>    from flask import Flask, jsonify<br>    import service<br>    import sys</p>
+<pre><code>app = Flask(__name__)
+
+@app.route(&apos;/service&apos;, methods=[&apos;GET&apos;])
+def getSerivice():
+        mservice=service.AService()
+        result = mservice.getA(1)
+        json = &quot;&quot;
+        json +=&quot;{&quot;
+        json +=&quot;&apos;id&apos;:&quot;+str(result[0])+&quot;,&quot;
+        json +=&quot;&apos;sname&apos;:&apos;&quot;+result[1]+&quot;&apos;&quot;
+        json +=&quot;}&quot;
+        return json;
+if __name__==&quot;__main__&quot;:
+    app.run()
+</code></pre><p>在cmd中执行 python hello.py<br>打开浏览器 <a href="http://localhost:5000" target="_blank" rel="external">http://localhost:5000</a><br>出现 {‘id’:1,’sname’:’yizeyuan’}<br>成功！</p>
+<p>这个例子太简单，实际上可以像平时javaweb开发一样使用MVC模式，上面的hello.py是控制器，service.py是model,而view我们同样可以使用html，Flask使用jinja2渲染<br>使用方式：<br>    from flask import Flask, request, render_template #加上render_template<br>当请求处理完成返回一个模板以及变量<br>    return render_template(‘index.html’, message=’欢迎使用flask’, username=’yizeyuan’)<br>首页的html代码为：</p>
+<pre><code>&lt;html&gt;
+    &lt;head&gt;
+      &lt;title&gt;index&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+      &lt;h1 style=&quot;font-style:italic&quot;&gt;Home&lt;/h1&gt;
+      {{message}}
+      欢迎你，{{username}}
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>很像angularjs有木有！</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;由于用Python开发一个Web框架十分容易，所以Python有上百个开源的Web框架，当下流行的是Flask,Django等&lt;br&gt;Flask是一个使用 Python 编写的轻量级 Web 应用框架。其 WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。&lt;br&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="python" scheme="http://yzy755.github.io/tags/python/"/>
+    
+      <category term="web开发" scheme="http://yzy755.github.io/tags/web%E5%BC%80%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>TensorFlow搭建和TensorBoard可视化的使用</title>
+    <link href="http://yzy755.github.io/2017/05/09/TensorFlow%E6%90%AD%E5%BB%BA%E5%92%8CTensorBoard%E5%8F%AF%E8%A7%86%E5%8C%96%E7%9A%84%E4%BD%BF%E7%94%A8/"/>
+    <id>http://yzy755.github.io/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/</id>
+    <published>2017-05-09T10:17:53.000Z</published>
+    <updated>2017-05-10T09:19:45.866Z</updated>
+    
+    <content type="html"><![CDATA[<p>TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Google机器智能研究机构）的研究员和工程师们开发出来，用于机器学习和深度神经网络方面的研究，但这个系统的通用性使其也可广泛用于其他计算领域。<br><a id="more"></a><br>1.Centos6.x默认使用的Python版本为2.6.6，而TensorFlow需要的Python版本起步为2.7以上，首先升级Python版本，已2.7.3为例：</p>
+<h1 id="wget-https-www-python-org-ftp-python-2-7-3-Python-2-7-3-tgz"><a href="#wget-https-www-python-org-ftp-python-2-7-3-Python-2-7-3-tgz" class="headerlink" title="wget https://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz"></a>wget <a href="https://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz" target="_blank" rel="external">https://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz</a></h1><h1 id="tar-xvjf-Python-2-7-3-tar-bz2"><a href="#tar-xvjf-Python-2-7-3-tar-bz2" class="headerlink" title="tar -xvjf Python-2.7.3.tar.bz2"></a>tar -xvjf Python-2.7.3.tar.bz2</h1><h1 id="mkdir-usr-local-python27"><a href="#mkdir-usr-local-python27" class="headerlink" title="mkdir /usr/local/python27"></a>mkdir /usr/local/python27</h1><h1 id="configure-–prefix-usr-local-python27"><a href="#configure-–prefix-usr-local-python27" class="headerlink" title="./configure –prefix=/usr/local/python27"></a>./configure –prefix=/usr/local/python27</h1><h1 id="Make"><a href="#Make" class="headerlink" title="Make"></a>Make</h1><h1 id="make-install"><a href="#make-install" class="headerlink" title="make install"></a>make install</h1><p>以上安装好了2.7.3，但此时没有覆盖老版本，再将原来/usr/bin/python链接改为别的名字：</p>
+<h1 id="mv-usr-bin-python-usr-bin-python-old"><a href="#mv-usr-bin-python-usr-bin-python-old" class="headerlink" title="mv /usr/bin/python /usr/bin/python_old"></a>mv /usr/bin/python /usr/bin/python_old</h1><p>再建立新版本python的软链接：</p>
+<h1 id="ln-s-usr-local-python27-bin-python2-7-usr-bin-python"><a href="#ln-s-usr-local-python27-bin-python2-7-usr-bin-python" class="headerlink" title="ln -s /usr/local/python27/bin/python2.7 /usr/bin/python"></a>ln -s /usr/local/python27/bin/python2.7 /usr/bin/python</h1><p>再输入 </p>
+<h1 id="python-–version"><a href="#python-–version" class="headerlink" title="python –version"></a>python –version</h1><p>会出现2.7.3则说明成功</p>
+<p>但是，基于Python编写的yum不兼容2.7以上版本，所以修改yum命令指定的Python版本:</p>
+<h1 id="vi-usr-bin-yum"><a href="#vi-usr-bin-yum" class="headerlink" title="vi /usr/bin/yum"></a>vi /usr/bin/yum</h1><p>将第一句</p>
+<h1 id="usr-bin-python-改为-usr-bin-python2-6-即可"><a href="#usr-bin-python-改为-usr-bin-python2-6-即可" class="headerlink" title="!/usr/bin/python 改为 # !/usr/bin/python2.6 即可"></a>!/usr/bin/python 改为 # !/usr/bin/python2.6 即可</h1><p>安装setuptool,后续操作要运行很多py文件，没他不行</p>
+<pre><code># wget --no-check-certificate https://pypi.python.org/packages/source/s/setuptools/setuptools-1.4.2.tar.gz
+# tar -xvf setuptools-1.4.2.tar.gz
+# cd setuptools-1.4.2
+# python setup.py install
+</code></pre><p>2.升级pip，Python Index Package。类似linux下的yum，安装并管理python软件包，Python升级了版本pip也要升级相应版本，下载pip9.0.1</p>
+<h1 id="wget-https-pypi-python-org-packages-11-b6-abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447-pip-9-0-1-tar-gz-md5-35f01da33009719497f01a4ba69d63c9"><a href="#wget-https-pypi-python-org-packages-11-b6-abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447-pip-9-0-1-tar-gz-md5-35f01da33009719497f01a4ba69d63c9" class="headerlink" title="wget https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz# md5=35f01da33009719497f01a4ba69d63c9"></a>wget <a href="https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz#" target="_blank" rel="external">https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz#</a> md5=35f01da33009719497f01a4ba69d63c9</h1><pre><code># tar zxvf pip-9.0.1.tar.gz
+#  cd pip-9.0.1
+#  python setup.py install
+</code></pre><p>3.执行：</p>
+<h1 id="pip-install-–upgrade-https-storage-googleapis-com-tensorflow-linux-cpu-tensorflow-0-8-0-cp27-none-linux-x86-64-whl"><a href="#pip-install-–upgrade-https-storage-googleapis-com-tensorflow-linux-cpu-tensorflow-0-8-0-cp27-none-linux-x86-64-whl" class="headerlink" title="pip install –upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl"></a>pip install –upgrade <a href="https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl" target="_blank" rel="external">https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl</a></h1><p>正常情况下pip会自动下载依赖包并安装，但是也有可能会报依赖没有找到的情况，如果出现此情况见附录，在最后可能会报错，在执行一次就好了</p>
+<p>4.然后输入命令：</p>
+<h1 id="python"><a href="#python" class="headerlink" title="python"></a>python</h1><p>出现 &gt;&gt;&gt; 再输入：<br>improt ssl<br>再输入import tensorflow as tf 会出现/lib64/libc.so.6: version `GLIBC_2.15’ not found 的错误，这是由于tensorflow0.80版本编译的时候使用GLIBC_2.15，系统自带的是GLIBC_2.12，所以报错了。<br>安装gcc</p>
+<pre><code># yum install gcc
+</code></pre><p>下载c++库glibc</p>
+<pre><code># wget http://ftp.gnu.org/pub/gnu/glibc/glibc-2.17.tar.xz
+# xz -d glibc-2.17.tar.xz
+# tar -xvf glibc-2.17.tar
+# cd glibc-2.17
+# mkdir build
+# cd build
+# ../configure --prefix=/usr --disable-profile --enable-add-ons         --with-headers=/usr/include --with-binutils=/usr/bin  
+# make &amp;&amp; make install
+</code></pre><p>输入strings /lib64/libc.so.6|grep GLIBC发现有我们的2.15版本</p>
+<p>5.再执行第5步，发现报/usr/lib64/libstdc++.so.6: version `GLIBCXX_3.4.14’ not found的错误，输入命令strings /usr/lib64/libstdc++.so.6 | grep GLIBCXX 发现没有支持3.4.14版本，去csdn下载一个高版本的libstdc++.so.6，比如说libstdc++.so.6.0.20，网址：<a href="http://download.csdn.net/download/arackethis/8395651，将文件放到/usr/lib64/下，在该目录下执行命令：" target="_blank" rel="external">http://download.csdn.net/download/arackethis/8395651，将文件放到/usr/lib64/下，在该目录下执行命令：</a></p>
+<pre><code># chmod +x libstdc++.so.6.0.20
+# rm libstdc++.so.6
+# ln -s libstdc++.so.6.0.20 libstdc++.so.6
+# strings /usr/lib64/libstdc++.so.6 | grep GLIBCXX
+</code></pre><p>发现支持了3.4.14版本<br> 再执行第五步发现没有报错了，就此TensorFlow搭建成功</p>
+<p>Ps:第三步中依赖报错的解决方式<br>1.安装six</p>
+<h1 id="wget-https-pypi-python-org-packages-c8-0a-b6723e1bc4c516cb687841499455a8505b446-07ab535-be01091c0f24f079-six-1-10-0-py2-py3-none-any-whl-md5-3ab558cf5d4f7a72611d5-9a81a31-5dc8-下载指令"><a href="#wget-https-pypi-python-org-packages-c8-0a-b6723e1bc4c516cb687841499455a8505b446-07ab535-be01091c0f24f079-six-1-10-0-py2-py3-none-any-whl-md5-3ab558cf5d4f7a72611d5-9a81a31-5dc8-下载指令" class="headerlink" title="wget     https://pypi.python.org/packages/c8/0a/b6723e1bc4c516cb687841499455a8505b446    07ab535    be01091c0f24f079/six-1.10.0-py2.py3-none-any.whl#md5=3ab558cf5d4f7a72611d5        9a81a31    5dc8  #下载指令"></a>wget     <a href="https://pypi.python.org/packages/c8/0a/b6723e1bc4c516cb687841499455a8505b446" target="_blank" rel="external">https://pypi.python.org/packages/c8/0a/b6723e1bc4c516cb687841499455a8505b446</a>    07ab535    be01091c0f24f079/six-1.10.0-py2.py3-none-any.whl#md5=3ab558cf5d4f7a72611d5        9a81a31    5dc8  #下载指令</h1><h1 id="pip-install-six-1-10-0-py2-py3-none-any-whl-安装指令"><a href="#pip-install-six-1-10-0-py2-py3-none-any-whl-安装指令" class="headerlink" title="pip install six-1.10.0-py2.py3-none-any.whl  #安装指令"></a>pip install six-1.10.0-py2.py3-none-any.whl  #安装指令</h1><p>2.安装numpy，下载地址：<a href="http://jaist.dl.sourceforge.net/project/numpy/NumPy/1.11.2rc1/，解压使用python安装" target="_blank" rel="external">http://jaist.dl.sourceforge.net/project/numpy/NumPy/1.11.2rc1/，解压使用python安装</a><br>3.安装protobuf</p>
+<p>#wget             <a href="https://pypi.python.org/packages/0f/53/e43b226f83a5a542c16695e9624b7bd2bde4ad016776c" target="_blank" rel="external">https://pypi.python.org/packages/0f/53/e43b226f83a5a542c16695e9624b7bd2bde4ad016776c</a>    7c3233901bcf5b4/protobuf-3.2.0-cp27-cp27mu-manylinux1_x86_64.whl#md5=a1a807fee3a        7df784e171837853cc29d  #下载指令</p>
+<p>#[root@bogon tool]# pip install protobuf-3.2.0-cp27-cp27mu-manylinux1_x86_64.whl </p>
+<p>这一步可能会用pip安装　提示找不到ssl模块，参考<a href="http://blog.csdn.net/qq_25560423/article/details/62055497" target="_blank" rel="external">http://blog.csdn.net/qq_25560423/article/details/62055497</a></p>
+<p>Ps:正文中第二步pip另外的安装方式：pip安装命令：yum install  python-pip python-devel</p>
+<p>补充TensorFlow中TensorBorad可视化组件的使用：<br>如何更直观的观察数据在神经网络中的变化，或是已经构建的神经网络的结构，Tensorflow自带了可视化模块Tensorboard，并且能更直观的看见整个神经网络的结构。</p>
+<p>TensorBoard的输入是tensorflow保存summary data的日志文件。日志文件名的形式如：events.out.tfevents.1467809796.lei-All-Series 或 events.out.tfevents.1467809800.lei-All-Series。TensorBoard可读的summary data有scalar，images，audio，histogram和graph。那么怎么把这些summary data保存在日志文件中呢？<br>数值如学习率，损失函数用scalar_summary函数。tf.scalar_summary(节点名称，获取的数据)<br>    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))<br>    tf.scalar_summary(‘accuracy’, accuracy)  </p>
+<p>各层网络权重，偏置的分布，用histogram_summary函数<br>    preactivate = tf.matmul(input_tensor, weights) + biases<br>    tf.histogram_summary(layer_name + ‘/pre_activations’, preactivate) </p>
+<p>其他几种summary data也是同样的方式获取，只是对应的获取函数名称换一下。这些获取summary data函数节点和graph是独立的，调用的时候也需要运行session。当需要获取的数据较多的时候，我们一个一个去保存获取到的数据，以及一个一个去运行会显得比较麻烦。tensorflow提供了一个简单的方法，就是合并所有的summary data的获取函数，保存和运行只对一个对象进行操作。比如，写入默认路径中，比如/tmp/mnist_logs (by default)<br>    merged = tf.merge_all_summaries()<br>    train_writer = tf.train.SummaryWriter(FLAGS.summaries_dir + ‘/train’, sess.graph)<br>    test_writer = tf.train.SummaryWriter(FLAGS.summaries_dir + ‘/test’)  </p>
+<p>SummaryWriter从tensorflow获取summary data，然后保存到指定路径的日志文件中。以上是在建立graph的过程中，接下来执行，每隔一定step，写入网络参数到默认路径中，形成最开始的文件：events.out.tfevents.1467809796.lei-All-Series 或 events.out.tfevents.1467809800.lei-All-Series。<br>    for i in range(FLAGS.max_steps):<br>    if i % 10 == 0:  # Record summaries and test-set accuracy<br>    summary, acc = sess.run([merged, accuracy], feed_dict=feed_dict(False))<br>          test_writer.add<em>summary(summary, i)<br>          print(‘Accuracy at step %s: %s’ % (i, acc))<br>        else: # Record train set summarieis, and train<br>          summary, </em> = sess.run([merged, train_step], feed_dict=feed_dict(True))<br>          train_writer.add_summary(summary, i)  </p>
+<p>源码：<br>    ‘’’<br>    Created on May 9, 2017</p>
+<pre><code>@author: root
+&apos;&apos;&apos;
+# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the &apos;License&apos;);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an &apos;AS IS&apos; BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+&quot;&quot;&quot;A simple MNIST classifier which displays summaries in TensorBoard.
+ This is an unimpressive MNIST model, but it is a good example of using
+tf.name_scope to make a graph legible in the TensorBoard graph explorer, and of
+naming summary tags so that they are grouped meaningfully in TensorBoard.
+It demonstrates the functionality of every TensorBoard dashboard.
+&quot;&quot;&quot;
+
+
+import tensorflow as tf
+
+from tensorflow.examples.tutorials.mnist import input_data
+
+flags = tf.app.flags
+FLAGS = flags.FLAGS
+flags.DEFINE_boolean(&apos;fake_data&apos;, False, &apos;If true, uses fake data &apos;
+                     &apos;for unit testing.&apos;)
+flags.DEFINE_integer(&apos;max_steps&apos;, 1000, &apos;Number of steps to run trainer.&apos;)
+flags.DEFINE_float(&apos;learning_rate&apos;, 0.001, &apos;Initial learning rate.&apos;)
+flags.DEFINE_float(&apos;dropout&apos;, 0.9, &apos;Keep probability for training dropout.&apos;)
+flags.DEFINE_string(&apos;data_dir&apos;, &apos;/tmp/data&apos;, &apos;Directory for storing data&apos;)
+flags.DEFINE_string(&apos;summaries_dir&apos;, &apos;/tmp/mnist_logs&apos;, &apos;Summaries directory&apos;)
+
+
+def train():
+  # Import data
+  mnist = input_data.read_data_sets(FLAGS.data_dir,
+                                    one_hot=True,
+                                    fake_data=FLAGS.fake_data)
+
+  sess = tf.InteractiveSession()
+
+  # Create a multilayer model.
+
+  # Input placehoolders
+  with tf.name_scope(&apos;input&apos;):
+    x = tf.placeholder(tf.float32, [None, 784], name=&apos;x-input&apos;)
+    y_ = tf.placeholder(tf.float32, [None, 10], name=&apos;y-input&apos;)
+
+  with tf.name_scope(&apos;input_reshape&apos;):
+    image_shaped_input = tf.reshape(x, [-1, 28, 28, 1])
+    tf.image_summary(&apos;input&apos;, image_shaped_input, 10)
+
+  # We can&apos;t initialize these variables to 0 - the network will get stuck.
+  def weight_variable(shape):
+    &quot;&quot;&quot;Create a weight variable with appropriate initialization.&quot;&quot;&quot;
+    initial = tf.truncated_normal(shape, stddev=0.1)
+    return tf.Variable(initial)
+
+  def bias_variable(shape):
+    &quot;&quot;&quot;Create a bias variable with appropriate initialization.&quot;&quot;&quot;
+    initial = tf.constant(0.1, shape=shape)
+    return tf.Variable(initial)
+
+  def variable_summaries(var, name):
+    &quot;&quot;&quot;Attach a lot of summaries to a Tensor.&quot;&quot;&quot;
+    with tf.name_scope(&apos;summaries&apos;):
+      mean = tf.reduce_mean(var)
+      tf.scalar_summary(&apos;mean/&apos; + name, mean)
+      with tf.name_scope(&apos;stddev&apos;):
+        stddev = tf.sqrt(tf.reduce_sum(tf.square(var - mean)))
+      tf.scalar_summary(&apos;sttdev/&apos; + name, stddev)
+      tf.scalar_summary(&apos;max/&apos; + name, tf.reduce_max(var))
+      tf.scalar_summary(&apos;min/&apos; + name, tf.reduce_min(var))
+      tf.histogram_summary(name, var)
+
+  def nn_layer(input_tensor, input_dim, output_dim, layer_name, act=tf.nn.relu):
+    &quot;&quot;&quot;Reusable code for making a simple neural net layer.
+    It does a matrix multiply, bias add, and then uses relu to nonlinearize.
+    It also sets up name scoping so that the resultant graph is easy to read,
+    and adds a number of summary ops.
+    &quot;&quot;&quot;
+    # Adding a name scope ensures logical grouping of the layers in the graph.
+    with tf.name_scope(layer_name):
+      # This Variable will hold the state of the weights for the layer
+      with tf.name_scope(&apos;weights&apos;):
+        weights = weight_variable([input_dim, output_dim])
+        variable_summaries(weights, layer_name + &apos;/weights&apos;)
+      with tf.name_scope(&apos;biases&apos;):
+        biases = bias_variable([output_dim])
+        variable_summaries(biases, layer_name + &apos;/biases&apos;)
+      with tf.name_scope(&apos;Wx_plus_b&apos;):
+        preactivate = tf.matmul(input_tensor, weights) + biases
+        tf.histogram_summary(layer_name + &apos;/pre_activations&apos;, preactivate)
+      activations = act(preactivate, &apos;activation&apos;)
+      tf.histogram_summary(layer_name + &apos;/activations&apos;, activations)
+      return activations
+
+  hidden1 = nn_layer(x, 784, 500, &apos;layer1&apos;)
+
+  with tf.name_scope(&apos;dropout&apos;):
+    keep_prob = tf.placeholder(tf.float32)
+    tf.scalar_summary(&apos;dropout_keep_probability&apos;, keep_prob)
+    dropped = tf.nn.dropout(hidden1, keep_prob)
+
+  y = nn_layer(dropped, 500, 10, &apos;layer2&apos;, act=tf.nn.softmax)
+
+  with tf.name_scope(&apos;cross_entropy&apos;):
+    diff = y_ * tf.log(y)
+    with tf.name_scope(&apos;total&apos;):
+      cross_entropy = -tf.reduce_mean(diff)
+    tf.scalar_summary(&apos;cross entropy&apos;, cross_entropy)
+
+  with tf.name_scope(&apos;train&apos;):
+    train_step = tf.train.AdamOptimizer(FLAGS.learning_rate).minimize(
+        cross_entropy)
+
+  with tf.name_scope(&apos;accuracy&apos;):
+    with tf.name_scope(&apos;correct_prediction&apos;):
+      correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+    with tf.name_scope(&apos;accuracy&apos;):
+      accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    tf.scalar_summary(&apos;accuracy&apos;, accuracy)
+
+  # Merge all the summaries and write them out to /tmp/mnist_logs (by default)
+  merged = tf.merge_all_summaries()
+  train_writer = tf.train.SummaryWriter(FLAGS.summaries_dir + &apos;/train&apos;,
+                                        sess.graph)
+  test_writer = tf.train.SummaryWriter(FLAGS.summaries_dir + &apos;/test&apos;)
+  tf.initialize_all_variables().run()
+
+  # Train the model, and also write summaries.
+  # Every 10th step, measure test-set accuracy, and write test summaries
+  # All other steps, run train_step on training data, &amp; add training summaries
+
+  def feed_dict(train):
+    &quot;&quot;&quot;Make a TensorFlow feed_dict: maps data onto Tensor placeholders.&quot;&quot;&quot;
+    if train or FLAGS.fake_data:
+      xs, ys = mnist.train.next_batch(100, fake_data=FLAGS.fake_data)
+      k = FLAGS.dropout
+    else:
+      xs, ys = mnist.test.images, mnist.test.labels
+      k = 1.0
+    return {x: xs, y_: ys, keep_prob: k}
+
+  for i in range(FLAGS.max_steps):
+    if i % 10 == 0:  # Record summaries and test-set accuracy
+      summary, acc = sess.run([merged, accuracy], feed_dict=feed_dict(False))
+      test_writer.add_summary(summary, i)
+      print(&apos;Accuracy at step %s: %s&apos; % (i, acc))
+    else:  # Record train set summaries, and train
+      if i % 100 == 99:  # Record execution stats
+        run_options = tf.RunOptions(trace_level=1)
+        run_metadata = tf.RunMetadata()
+        summary, _ = sess.run([merged, train_step],
+                              feed_dict=feed_dict(True),
+                              options=run_options,
+                              run_metadata=run_metadata)
+        train_writer.add_run_metadata(run_metadata, &apos;step%d&apos; % i)
+        train_writer.add_summary(summary, i)
+        print(&apos;Adding run metadata for&apos;, i)
+      else:  # Record a summary
+        summary, _ = sess.run([merged, train_step], feed_dict=feed_dict(True))
+        train_writer.add_summary(summary, i)
+
+
+def main(_):
+  if tf.gfile.Exists(FLAGS.summaries_dir):
+    tf.gfile.DeleteRecursively(FLAGS.summaries_dir)
+  tf.gfile.MakeDirs(FLAGS.summaries_dir)
+  train()
+
+
+if __name__ == &apos;__main__&apos;:
+  tf.app.run()
+</code></pre><p>这段源码执行后会在/tmp目录下生成data目录和mnist_logs目录，data是需要分析的数据，mnist_logs是分析的日志，调用TensorBoard可视化运行结果<br>    tensorboard –logdir=/tmp/mnist_logs/train/ </p>
+<p>打开链接 <a href="http://127.0.0.0:6006即可看到效果。参考" target="_blank" rel="external">http://127.0.0.0:6006即可看到效果。参考</a> <a href="http://blog.csdn.net/helei001/article/details/51842531" target="_blank" rel="external">http://blog.csdn.net/helei001/article/details/51842531</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Google机器智能研究机构）的研究员和工程师们开发出来，用于机器学习和深度神经网络方面的研究，但这个系统的通用性使其也可广泛用于其他计算领域。&lt;br&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="python" scheme="http://yzy755.github.io/tags/python/"/>
+    
+      <category term="AI" scheme="http://yzy755.github.io/tags/AI/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>superset搭建和简单使用</title>
+    <link href="http://yzy755.github.io/2017/05/09/superset%E6%90%AD%E5%BB%BA%E5%92%8C%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/"/>
+    <id>http://yzy755.github.io/2017/05/09/superset搭建和简单使用/</id>
+    <published>2017-05-09T09:25:53.000Z</published>
+    <updated>2017-05-10T09:25:15.697Z</updated>
+    
+    <content type="html"><![CDATA[<p>Superset 是 Airbnb （知名在线房屋短租公司）开源的数据探查与可视化平台（曾用名 Panoramix、Caravel ），该工具在可视化、易用性和交互性上非常有特色，用户可以轻松对数据进行可视化分析。<br><a id="more"></a><br>可先直接执行第二步<br>1./usr/local/python27/bin/pip install –upgrade virtualenv<br>pip install –upgrade distribute<br>virtualenv myenv –distribute</p>
+<p>2./usr/local/python27/bin/pip install –upgrade superset<br>提示command ‘gcc’ failed with exit status 1的错误</p>
+<pre><code># yum install gcc-c++
+# yum install postgresql-devel
+# yum -y install gcc gcc-c++ kernel-devel
+# yum -y install python-devel libxslt-devel libffi-devel openssl-devel
+# yum install openssl-devel python-devel python-sphinx
+</code></pre><p>3.安装MySQL-python-1.2.3.tar.gz<br>安装过程中会出现mysql config not found</p>
+<pre><code># yum install mysql-devel
+</code></pre><p>执行find / -name mysql_config在/usr/bin下就出现了这个配置文件，将这个文件复制到MySQL-python-1.2.3解压目录中，再安装即可,报错就执行</p>
+<pre><code># yum install gcc-c++ python-devel.x86_64 cyrus-sasl-devel.x86_64
+# pip install thrift_sasl
+# pip install sasl
+</code></pre><p>再安装即可</p>
+<p>4.成功之后将Python的bin目录下的fabmanager、superset、gunicorn文件放到/usr/bin目录下或者建立软连接</p>
+<pre><code># fabmanager create-admin --app superset
+</code></pre><p>报错No module named _sqlite3或者No module named pysqlite2或者其他，需要安装sqlite-devel之后，<br>执行yum install sqlite-devel，重新编译安装Python即可。</p>
+<pre><code># superset db upgrade
+
+# superset load_examples
+
+# superset init
+
+# superset runserver -p 8088 -a 0.0.0.0
+</code></pre><p>会报bash: gunicorn: command not found，执行find / -name gunicorn 查找一下这个命令放哪儿了，然后将它放到/usr/bin中去</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Superset 是 Airbnb （知名在线房屋短租公司）开源的数据探查与可视化平台（曾用名 Panoramix、Caravel ），该工具在可视化、易用性和交互性上非常有特色，用户可以轻松对数据进行可视化分析。&lt;br&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="python" scheme="http://yzy755.github.io/tags/python/"/>
+    
+      <category term="数据库分析" scheme="http://yzy755.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%88%86%E6%9E%90/"/>
+    
+  </entry>
   
   <entry>
     <title>使用开源软件快速搭建数据分析平台</title>
