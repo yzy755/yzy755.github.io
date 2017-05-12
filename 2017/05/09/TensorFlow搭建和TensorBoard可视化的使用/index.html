@@ -14,7 +14,7 @@
 <meta property="og:url" content="http://yzy755.github.io/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/index.html">
 <meta property="og:site_name" content="易泽源的博客">
 <meta property="og:description" content="TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Go">
-<meta property="og:updated_time" content="2017-05-10T09:19:45.866Z">
+<meta property="og:updated_time" content="2017-05-12T09:11:04.216Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TensorFlow搭建和TensorBoard可视化的使用">
 <meta name="twitter:description" content="TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Go">
@@ -188,25 +188,39 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Google机器智能研究机构）的研究员和工程师们开发出来，用于机器学习和深度神经网络方面的研究，但这个系统的通用性使其也可广泛用于其他计算领域。<br><a id="more"></a><br>1.Centos6.x默认使用的Python版本为2.6.6，而TensorFlow需要的Python版本起步为2.7以上，首先升级Python版本，已2.7.3为例：</p>
-<h1 id="wget-https-www-python-org-ftp-python-2-7-3-Python-2-7-3-tgz"><a href="#wget-https-www-python-org-ftp-python-2-7-3-Python-2-7-3-tgz" class="headerlink" title="wget https://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz"></a>wget <a href="https://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz" target="_blank" rel="external">https://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz</a></h1><h1 id="tar-xvjf-Python-2-7-3-tar-bz2"><a href="#tar-xvjf-Python-2-7-3-tar-bz2" class="headerlink" title="tar -xvjf Python-2.7.3.tar.bz2"></a>tar -xvjf Python-2.7.3.tar.bz2</h1><h1 id="mkdir-usr-local-python27"><a href="#mkdir-usr-local-python27" class="headerlink" title="mkdir /usr/local/python27"></a>mkdir /usr/local/python27</h1><h1 id="configure-–prefix-usr-local-python27"><a href="#configure-–prefix-usr-local-python27" class="headerlink" title="./configure –prefix=/usr/local/python27"></a>./configure –prefix=/usr/local/python27</h1><h1 id="Make"><a href="#Make" class="headerlink" title="Make"></a>Make</h1><h1 id="make-install"><a href="#make-install" class="headerlink" title="make install"></a>make install</h1><p>以上安装好了2.7.3，但此时没有覆盖老版本，再将原来/usr/bin/python链接改为别的名字：</p>
-<h1 id="mv-usr-bin-python-usr-bin-python-old"><a href="#mv-usr-bin-python-usr-bin-python-old" class="headerlink" title="mv /usr/bin/python /usr/bin/python_old"></a>mv /usr/bin/python /usr/bin/python_old</h1><p>再建立新版本python的软链接：</p>
-<h1 id="ln-s-usr-local-python27-bin-python2-7-usr-bin-python"><a href="#ln-s-usr-local-python27-bin-python2-7-usr-bin-python" class="headerlink" title="ln -s /usr/local/python27/bin/python2.7 /usr/bin/python"></a>ln -s /usr/local/python27/bin/python2.7 /usr/bin/python</h1><p>再输入 </p>
-<h1 id="python-–version"><a href="#python-–version" class="headerlink" title="python –version"></a>python –version</h1><p>会出现2.7.3则说明成功</p>
+<pre><code>#  wget https://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz
+#  tar -xvjf Python-2.7.3.tar.bz2
+#  mkdir /usr/local/python27
+#  ./configure --prefix=/usr/local/python27
+#  Make
+#  make install
+</code></pre><p>以上安装好了2.7.3，但此时没有覆盖老版本，再将原来/usr/bin/python链接改为别的名字：</p>
+<pre><code># mv /usr/bin/python /usr/bin/python_old
+</code></pre><p>再建立新版本python的软链接：</p>
+<pre><code># ln -s /usr/local/python27/bin/python2.7 /usr/bin/python
+</code></pre><p>再输入 </p>
+<pre><code># python --version
+</code></pre><p>会出现2.7.3则说明成功</p>
 <p>但是，基于Python编写的yum不兼容2.7以上版本，所以修改yum命令指定的Python版本:</p>
-<h1 id="vi-usr-bin-yum"><a href="#vi-usr-bin-yum" class="headerlink" title="vi /usr/bin/yum"></a>vi /usr/bin/yum</h1><p>将第一句</p>
-<h1 id="usr-bin-python-改为-usr-bin-python2-6-即可"><a href="#usr-bin-python-改为-usr-bin-python2-6-即可" class="headerlink" title="!/usr/bin/python 改为 # !/usr/bin/python2.6 即可"></a>!/usr/bin/python 改为 # !/usr/bin/python2.6 即可</h1><p>安装setuptool,后续操作要运行很多py文件，没他不行</p>
+<pre><code># vi /usr/bin/yum
+</code></pre><p>将第一句</p>
+<pre><code># !/usr/bin/python 改为 # !/usr/bin/python2.6 即可
+</code></pre><p>安装setuptool,后续操作要运行很多py文件，没他不行</p>
 <pre><code># wget --no-check-certificate https://pypi.python.org/packages/source/s/setuptools/setuptools-1.4.2.tar.gz
 # tar -xvf setuptools-1.4.2.tar.gz
 # cd setuptools-1.4.2
 # python setup.py install
 </code></pre><p>2.升级pip，Python Index Package。类似linux下的yum，安装并管理python软件包，Python升级了版本pip也要升级相应版本，下载pip9.0.1</p>
-<h1 id="wget-https-pypi-python-org-packages-11-b6-abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447-pip-9-0-1-tar-gz-md5-35f01da33009719497f01a4ba69d63c9"><a href="#wget-https-pypi-python-org-packages-11-b6-abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447-pip-9-0-1-tar-gz-md5-35f01da33009719497f01a4ba69d63c9" class="headerlink" title="wget https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz# md5=35f01da33009719497f01a4ba69d63c9"></a>wget <a href="https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz#" target="_blank" rel="external">https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz#</a> md5=35f01da33009719497f01a4ba69d63c9</h1><pre><code># tar zxvf pip-9.0.1.tar.gz
+<pre><code>#  wget https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz# md5=35f01da33009719497f01a4ba69d63c9
+# tar zxvf pip-9.0.1.tar.gz
 #  cd pip-9.0.1
 #  python setup.py install
 </code></pre><p>3.执行：</p>
-<h1 id="pip-install-–upgrade-https-storage-googleapis-com-tensorflow-linux-cpu-tensorflow-0-8-0-cp27-none-linux-x86-64-whl"><a href="#pip-install-–upgrade-https-storage-googleapis-com-tensorflow-linux-cpu-tensorflow-0-8-0-cp27-none-linux-x86-64-whl" class="headerlink" title="pip install –upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl"></a>pip install –upgrade <a href="https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl" target="_blank" rel="external">https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl</a></h1><p>正常情况下pip会自动下载依赖包并安装，但是也有可能会报依赖没有找到的情况，如果出现此情况见附录，在最后可能会报错，在执行一次就好了</p>
+<pre><code># pip install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl
+</code></pre><p>正常情况下pip会自动下载依赖包并安装，但是也有可能会报依赖没有找到的情况，如果出现此情况见附录，在最后可能会报错，在执行一次就好了</p>
 <p>4.然后输入命令：</p>
-<h1 id="python"><a href="#python" class="headerlink" title="python"></a>python</h1><p>出现 &gt;&gt;&gt; 再输入：<br>improt ssl<br>再输入import tensorflow as tf 会出现/lib64/libc.so.6: version `GLIBC_2.15’ not found 的错误，这是由于tensorflow0.80版本编译的时候使用GLIBC_2.15，系统自带的是GLIBC_2.12，所以报错了。<br>安装gcc</p>
+<pre><code># python
+</code></pre><p>出现 &gt;&gt;&gt; 再输入：<br>improt ssl<br>再输入import tensorflow as tf 会出现/lib64/libc.so.6: version `GLIBC_2.15’ not found 的错误，这是由于tensorflow0.80版本编译的时候使用GLIBC_2.15，系统自带的是GLIBC_2.12，所以报错了。<br>安装gcc</p>
 <pre><code># yum install gcc
 </code></pre><p>下载c++库glibc</p>
 <pre><code># wget http://ftp.gnu.org/pub/gnu/glibc/glibc-2.17.tar.xz
@@ -225,10 +239,13 @@
 # strings /usr/lib64/libstdc++.so.6 | grep GLIBCXX
 </code></pre><p>发现支持了3.4.14版本<br> 再执行第五步发现没有报错了，就此TensorFlow搭建成功</p>
 <p>Ps:第三步中依赖报错的解决方式<br>1.安装six</p>
-<h1 id="wget-https-pypi-python-org-packages-c8-0a-b6723e1bc4c516cb687841499455a8505b446-07ab535-be01091c0f24f079-six-1-10-0-py2-py3-none-any-whl-md5-3ab558cf5d4f7a72611d5-9a81a31-5dc8-下载指令"><a href="#wget-https-pypi-python-org-packages-c8-0a-b6723e1bc4c516cb687841499455a8505b446-07ab535-be01091c0f24f079-six-1-10-0-py2-py3-none-any-whl-md5-3ab558cf5d4f7a72611d5-9a81a31-5dc8-下载指令" class="headerlink" title="wget     https://pypi.python.org/packages/c8/0a/b6723e1bc4c516cb687841499455a8505b446    07ab535    be01091c0f24f079/six-1.10.0-py2.py3-none-any.whl#md5=3ab558cf5d4f7a72611d5        9a81a31    5dc8  #下载指令"></a>wget     <a href="https://pypi.python.org/packages/c8/0a/b6723e1bc4c516cb687841499455a8505b446" target="_blank" rel="external">https://pypi.python.org/packages/c8/0a/b6723e1bc4c516cb687841499455a8505b446</a>    07ab535    be01091c0f24f079/six-1.10.0-py2.py3-none-any.whl#md5=3ab558cf5d4f7a72611d5        9a81a31    5dc8  #下载指令</h1><h1 id="pip-install-six-1-10-0-py2-py3-none-any-whl-安装指令"><a href="#pip-install-six-1-10-0-py2-py3-none-any-whl-安装指令" class="headerlink" title="pip install six-1.10.0-py2.py3-none-any.whl  #安装指令"></a>pip install six-1.10.0-py2.py3-none-any.whl  #安装指令</h1><p>2.安装numpy，下载地址：<a href="http://jaist.dl.sourceforge.net/project/numpy/NumPy/1.11.2rc1/，解压使用python安装" target="_blank" rel="external">http://jaist.dl.sourceforge.net/project/numpy/NumPy/1.11.2rc1/，解压使用python安装</a><br>3.安装protobuf</p>
-<p>#wget             <a href="https://pypi.python.org/packages/0f/53/e43b226f83a5a542c16695e9624b7bd2bde4ad016776c" target="_blank" rel="external">https://pypi.python.org/packages/0f/53/e43b226f83a5a542c16695e9624b7bd2bde4ad016776c</a>    7c3233901bcf5b4/protobuf-3.2.0-cp27-cp27mu-manylinux1_x86_64.whl#md5=a1a807fee3a        7df784e171837853cc29d  #下载指令</p>
-<p>#[root@bogon tool]# pip install protobuf-3.2.0-cp27-cp27mu-manylinux1_x86_64.whl </p>
-<p>这一步可能会用pip安装　提示找不到ssl模块，参考<a href="http://blog.csdn.net/qq_25560423/article/details/62055497" target="_blank" rel="external">http://blog.csdn.net/qq_25560423/article/details/62055497</a></p>
+<pre><code># wget     https://pypi.python.org/packages/c8/0a/b6723e1bc4c516cb687841499455a8505b446    07ab535    be01091c0f24f079/six-1.10.0-py2.py3-none-any.whl#md5=3ab558cf5d4f7a72611d5        9a81a31    5dc8  #下载指令
+# pip install six-1.10.0-py2.py3-none-any.whl  #安装指令
+</code></pre><p>2.安装numpy，下载地址：<a href="http://jaist.dl.sourceforge.net/project/numpy/NumPy/1.11.2rc1/，解压使用python安装" target="_blank" rel="external">http://jaist.dl.sourceforge.net/project/numpy/NumPy/1.11.2rc1/，解压使用python安装</a><br>3.安装protobuf</p>
+<pre><code>#wget             https://pypi.python.org/packages/0f/53/e43b226f83a5a542c16695e9624b7bd2bde4ad016776c    7c3233901bcf5b4/protobuf-3.2.0-cp27-cp27mu-manylinux1_x86_64.whl#md5=a1a807fee3a        7df784e171837853cc29d  #下载指令
+
+# pip install protobuf-3.2.0-cp27-cp27mu-manylinux1_x86_64.whl 
+</code></pre><p>这一步可能会用pip安装　提示找不到ssl模块，参考<a href="http://blog.csdn.net/qq_25560423/article/details/62055497" target="_blank" rel="external">http://blog.csdn.net/qq_25560423/article/details/62055497</a></p>
 <p>Ps:正文中第二步pip另外的安装方式：pip安装命令：yum install  python-pip python-devel</p>
 <p>补充TensorFlow中TensorBorad可视化组件的使用：<br>如何更直观的观察数据在神经网络中的变化，或是已经构建的神经网络的结构，Tensorflow自带了可视化模块Tensorboard，并且能更直观的看见整个神经网络的结构。</p>
 <p>TensorBoard的输入是tensorflow保存summary data的日志文件。日志文件名的形式如：events.out.tfevents.1467809796.lei-All-Series 或 events.out.tfevents.1467809800.lei-All-Series。TensorBoard可读的summary data有scalar，images，audio，histogram和graph。那么怎么把这些summary data保存在日志文件中呢？<br>数值如学习率，损失函数用scalar_summary函数。tf.scalar_summary(节点名称，获取的数据)<br>    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))<br>    tf.scalar_summary(‘accuracy’, accuracy)  </p>
@@ -417,7 +434,7 @@ def main(_):
 if __name__ == &apos;__main__&apos;:
   tf.app.run()
 </code></pre><p>这段源码执行后会在/tmp目录下生成data目录和mnist_logs目录，data是需要分析的数据，mnist_logs是分析的日志，调用TensorBoard可视化运行结果<br>    tensorboard –logdir=/tmp/mnist_logs/train/ </p>
-<p>打开链接 <a href="http://127.0.0.0:6006即可看到效果。参考" target="_blank" rel="external">http://127.0.0.0:6006即可看到效果。参考</a> <a href="http://blog.csdn.net/helei001/article/details/51842531" target="_blank" rel="external">http://blog.csdn.net/helei001/article/details/51842531</a></p>
+<p>打开链接 <a href="http://127.0.0.0:6006" target="_blank" rel="external">http://127.0.0.0:6006</a> 即可看到效果。参考 <a href="http://blog.csdn.net/helei001/article/details/51842531" target="_blank" rel="external">http://blog.csdn.net/helei001/article/details/51842531</a></p>
 
       
 
@@ -547,11 +564,11 @@ if __name__ == &apos;__main__&apos;:
   
 <nav id="article-nav">
   
-    <a href="/2017/05/09/TensorFlow搭建/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/05/12/基于python+flask+mysql的web开发初探/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          TensorFlow搭建和TensorBoard可视化的使用
+          基于python+flask+mysql的web开发初探
         
       </div>
     </a>
