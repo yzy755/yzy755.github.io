@@ -11,10 +11,10 @@
   <meta name="description" content="TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Go">
 <meta property="og:type" content="article">
 <meta property="og:title" content="TensorFlow搭建和TensorBoard可视化的使用">
-<meta property="og:url" content="http://yzy755.github.io/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/index.html">
+<meta property="og:url" content="http://yzy755.github.io/2017/05/09/TensorFlow搭建/index.html">
 <meta property="og:site_name" content="易泽源的博客">
 <meta property="og:description" content="TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Go">
-<meta property="og:updated_time" content="2017-05-10T09:19:45.866Z">
+<meta property="og:updated_time" content="2017-05-12T09:02:10.816Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TensorFlow搭建和TensorBoard可视化的使用">
 <meta name="twitter:description" content="TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组（隶属于Go">
@@ -167,7 +167,7 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-TensorFlow搭建和TensorBoard可视化的使用" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-TensorFlow搭建" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
@@ -179,7 +179,7 @@
   
 
         
-        <a href="/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/" class="archive-article-date">
+        <a href="/2017/05/09/TensorFlow搭建/" class="archive-article-date">
   	<time datetime="2017-05-09T10:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-09</time>
 </a>
         
@@ -417,7 +417,7 @@ def main(_):
 if __name__ == &apos;__main__&apos;:
   tf.app.run()
 </code></pre><p>这段源码执行后会在/tmp目录下生成data目录和mnist_logs目录，data是需要分析的数据，mnist_logs是分析的日志，调用TensorBoard可视化运行结果<br>    tensorboard –logdir=/tmp/mnist_logs/train/ </p>
-<p>打开链接 <a href="http://127.0.0.0:6006即可看到效果。参考" target="_blank" rel="external">http://127.0.0.0:6006即可看到效果。参考</a> <a href="http://blog.csdn.net/helei001/article/details/51842531" target="_blank" rel="external">http://blog.csdn.net/helei001/article/details/51842531</a></p>
+<p>打开链接 <a href="http://127.0.0.0:6006" target="_blank" rel="external">http://127.0.0.0:6006</a> 即可看到效果。参考 <a href="http://blog.csdn.net/helei001/article/details/51842531" target="_blank" rel="external">http://blog.csdn.net/helei001/article/details/51842531</a></p>
 
       
 
@@ -533,7 +533,7 @@ if __name__ == &apos;__main__&apos;:
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACqElEQVR42u3aQY7bMBAEQP//0wmQUw6x3c3hrB2gdDK8ksXSAhyqh49HfPz6c+TnPPt8du3fx2PjwMPDwzsa+rPjbIjJ0Cd/TcaMh4eHt807m6zbG7+e4lte9Ijx8PDwPsp7dvu9EoKHh4f3v/PuBgfJYhoPDw/vm3lJGPG6PCSDawedj+dC1oKHh4fX5QCPs0n8U58X+3t4eHh4g6563hK79VzbIvFmnHh4eHgLvNcRbTv35q2sybV1cIyHh4e3wLsbTNyKhtsgI7k7Hh4e3l1eMtx2s2neymqX7/W2Wjw8PLxLvKStlZSHduo/a3e1C3E8PDy8Pd6tTVEtOykkZ8tuPDw8vD1ecvuzAtCGF3eD4zdFAg8PD2/Aa4fSsvMGW/LLddMODw8Pb4H3qSl+Ehbni3I8PDy8PV7b0DorM23o8EORBB4eHl7Ja29cL2eDyb3dXlCUFjw8PLwf55190y6Xz1pxo/4eHh4e3oDXhhFnN5sMrg1z8fDw8D7FO9u6mgDyBXTbyYqqHx4eHt4ar558yzMnDbY21MDDw8O7y5svhdtpvd2wlUfDT/9veHh4eMu8djNBu7xu4+Ck2LzZB4GHh4d3lde+/Oc/3Q5oslXrzUPEw8PDW+a103Qb/s7Di5yKh4eHt8fLI9S7C+v8jmcvA3h4eHh7vLyhdWvKzgtGHka8KQl4eHh4y7w2nsiDg8kWgbYlhoeHh7fBm0/fk/D39Zl5AXh6LR4eHt4Cb1JPkiXv3fC33cSAh4eHt8dLikG+FSC/Kjk/eVhRfw8PDw9vgddunMqn/rxgTGrX06vw8PDwvoA3iQOSTQlnMQceHh7ed/Lm7a4khjhLEg53RuDh4eENePlPTAKIs/ZYWzbw8PDwtnmjV/2F0KENQVb6e3h4eHj//uY3yEdek1iowUYAAAAASUVORK5CYII=" alt="微信分享二维码">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACK0lEQVR42u3ay27DMAxE0fz/T7ub7GIJM0O7gMirVZA4sY4LsOLj85HX9bN+P11dr/zy/p3HFgwYMI5lXNu12tbqtXuX/WNS9gYDBow5jH0o3JPqoXbPUMI0DBgwYCiHP53tBlwYMGDAyBj6drMDIgwYMGBkSaxy/b58pv/mi7k4DBgwDmToVff/f/1KfwMGDBhHMS5zZSmoUp7L9vP9LgwYMFozsgakXiBzWwtuUwEGDBhzGG5qmoVOt5DnwmDAgNGVoR/+KkfAp8pqyx3CgAFjGMMNjvVhC/3uy0AMAwaM8Qwl4GbjX1lCa1QNYcCA0YKRBcpKgcwIo8IYmdFlhQEDxrEM96jnbkXfkF6Au9ktDBgwBjCyAplyfSVwh+U2GDBgtGPsN6Qc8rJrKqU9o6kJAwaMAQw3UBoB8YUHBwMGjK6MysBWthU3jBonXBgwYAxguOmiHo7rAd3+LwEDBox2DH141Egjo1aBAli2MGHAgNGUoRe53ChXaXO6DQMYMGDMZGRjpkozQElu3UYmDBgwpjGeOnG5gdUNrzfvw4ABYxhDT2KzRkKlCbF8iDBgwGjKuMylHweV8lwlxb35O8CAAaMpww1t7vhXNi5WaazCgAGjK+ONY1/WIs3aBjBgwJjDyAKf8i3398PUFwYMGDAKI2JZOhqeXmHAgAHDDLLZkGuYDMOAAWMAQ28GuDd4bER1z4YBA0ZrRn0wImsVuIfCB4qAMGDAOI/xB8Pg2xlpSh4lAAAAAElFTkSuQmCC" alt="微信分享二维码">
     </div>
 </div>
 
@@ -547,18 +547,18 @@ if __name__ == &apos;__main__&apos;:
   
 <nav id="article-nav">
   
-    <a href="/2017/05/09/TensorFlow搭建/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/05/12/基于python+flask+mysql的web开发初探/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          TensorFlow搭建和TensorBoard可视化的使用
+          基于python+flask+mysql的web开发初探
         
       </div>
     </a>
   
   
-    <a href="/2017/05/09/superset搭建和简单使用/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">superset搭建和简单使用</div>
+    <a href="/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">TensorFlow搭建和TensorBoard可视化的使用</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -578,7 +578,7 @@ if __name__ == &apos;__main__&apos;:
  
   <section id="comments">
     <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-TensorFlow搭建和TensorBoard可视化的使用" data-title="TensorFlow搭建和TensorBoard可视化的使用" data-url="http://yzy755.github.io/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/"></div>
+    <div class="ds-thread" data-thread-key="post-TensorFlow搭建" data-title="TensorFlow搭建和TensorBoard可视化的使用" data-url="http://yzy755.github.io/2017/05/09/TensorFlow搭建/"></div>
     <!-- 多说评论框 end -->
     <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
     <script type="text/javascript">

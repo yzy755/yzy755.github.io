@@ -14,7 +14,7 @@
 <meta property="og:url" content="http://yzy755.github.io/2017/05/12/基于python+flask+mysql的web开发初探/index.html">
 <meta property="og:site_name" content="易泽源的博客">
 <meta property="og:description" content="由于用Python开发一个Web框架十分容易，所以Python有上百个开源的Web框架，当下流行的是Flask,Django等Flask是一个使用 Python 编写的轻量级 Web 应用框架。其 WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。">
-<meta property="og:updated_time" content="2017-05-12T08:00:52.157Z">
+<meta property="og:updated_time" content="2017-05-12T09:03:40.281Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于python+flask+mysql的web开发初探">
 <meta name="twitter:description" content="由于用Python开发一个Web框架十分容易，所以Python有上百个开源的Web框架，当下流行的是Flask,Django等Flask是一个使用 Python 编写的轻量级 Web 应用框架。其 WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。">
@@ -193,27 +193,53 @@
 <p>3.安装mysql-python，命令:pip install MySql-python<br>    错误1：Microsoft Visual C++ 14.0 is required.<br>    升级.NET Framework 版本到4.5.1<br>    从错误提示的url下载，下载后安装visualcppbuildtools_full</p>
 <p>3.安装mysql connector, 下载地址：<a href="https://dev.mysql.com/downloads/connector/python/" target="_blank" rel="external">https://dev.mysql.com/downloads/connector/python/</a><br>我的系统为64， 下载的是mysql-connector-python-2.1.5-py3.4-winx64，还是报错，后来注意到寻找的目录是Program Files (x86)，又下了个32位的安装。错误过去了。但是又来新的错误：<br>    LINK : error LNK2001: unresolved external symbol _DllMainCRTStartup<br>    build\lib.win-amd64-3.5_mysql.cp35-win_amd64.pyd : fatal error LNK1120: 56 unresolved externalserror: command ‘C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\BIN\x86_amd64\link.exe’ failed with exit status 1120<br>5.安装第三方包pymysql。下载地址：<a href="https://pypi.python.org/pypi/PyMySQL#downloads" target="_blank" rel="external">https://pypi.python.org/pypi/PyMySQL#downloads</a><br>下载PyMySQL-0.7.11-py2.py3-none-any.whl，使用pip install PyMySQL-0.7.11-py2.py3-none-any.whl 即可，再执行pip install MySql-python就成功了</p>
 <p>python引入mysql方法：<br>import pymysql as MySQLdb</p>
-<p>首次尝试python的web开发：<br>源码：<br>db.py:<br>    host=”127.0.0.1”<br>    user=”root”<br>    password=”123456”<br>    charset=”utf8”<br>    database=”test”<br>    port=3306</p>
-<p>service.py<br>    import pymysql as MySQLdb<br>    import sys<br>    import db<br>    class AService(object):<br>        def getA(self,id):<br>            conn = MySQLdb.connect(host=db.host,user=db.user,passwd=db.password,port=db.port,db=db.database,charset=db.charset)<br>            result=[]<br>            try:<br>                cursor = conn.cursor()<br>                cursor.execute(“select id,sname from student where id=’%d’”%(id))<br>                result = cursor.fetchone()</p>
-<pre><code>finally:
-    cursor.close()
-    conn.close()
-return result
-</code></pre><p>hello.py<br>    from flask import Flask, jsonify<br>    import service<br>    import sys</p>
-<pre><code>app = Flask(__name__)
+<p>首次尝试python的web开发：<br>源码：<br>    db.py:</p>
+<pre><code>    host=&quot;127.0.0.1&quot;
+    user=&quot;root&quot;
+    password=&quot;123456&quot;
+    charset=&quot;utf8&quot;
+    database=&quot;test&quot;
+    port=3306
 
-@app.route(&apos;/service&apos;, methods=[&apos;GET&apos;])
-def getSerivice():
-        mservice=service.AService()
-        result = mservice.getA(1)
-        json = &quot;&quot;
-        json +=&quot;{&quot;
-        json +=&quot;&apos;id&apos;:&quot;+str(result[0])+&quot;,&quot;
-        json +=&quot;&apos;sname&apos;:&apos;&quot;+result[1]+&quot;&apos;&quot;
-        json +=&quot;}&quot;
-        return json;
-if __name__==&quot;__main__&quot;:
-    app.run()
+service.py:
+
+    import pymysql as MySQLdb
+    import sys
+    import db
+    class AService(object):
+        def getA(self,id):
+            conn = MySQLdb.connect(host=db.host,user=db.user,passwd=db.password,port=db.port,db=db.database,charset=db.charset)
+            result=[]
+            try:
+                cursor = conn.cursor()
+                cursor.execute(&quot;select id,sname from student where id=&apos;%d&apos;&quot;%(id))
+                result = cursor.fetchone()
+
+            finally:
+                cursor.close()
+                conn.close()
+            return result
+
+hello.py:
+
+    from flask import Flask, jsonify
+    import service
+    import sys
+
+    app = Flask(__name__)
+
+    @app.route(&apos;/service&apos;, methods=[&apos;GET&apos;])
+    def getSerivice():
+            mservice=service.AService()
+            result = mservice.getA(1)
+            json = &quot;&quot;
+            json +=&quot;{&quot;
+            json +=&quot;&apos;id&apos;:&quot;+str(result[0])+&quot;,&quot;
+            json +=&quot;&apos;sname&apos;:&apos;&quot;+result[1]+&quot;&apos;&quot;
+            json +=&quot;}&quot;
+            return json;
+    if __name__==&quot;__main__&quot;:
+        app.run()
 </code></pre><p>在cmd中执行 python hello.py<br>打开浏览器 <a href="http://localhost:5000" target="_blank" rel="external">http://localhost:5000</a><br>出现 {‘id’:1,’sname’:’yizeyuan’}<br>成功！</p>
 <p>这个例子太简单，实际上可以像平时javaweb开发一样使用MVC模式，上面的hello.py是控制器，service.py是model,而view我们同样可以使用html，Flask使用jinja2渲染<br>使用方式：<br>    from flask import Flask, request, render_template #加上render_template<br>当请求处理完成返回一个模板以及变量<br>    return render_template(‘index.html’, message=’欢迎使用flask’, username=’yizeyuan’)<br>首页的html代码为：</p>
 <pre><code>&lt;html&gt;
@@ -357,7 +383,7 @@ if __name__==&quot;__main__&quot;:
 <nav id="article-nav">
   
   
-    <a href="/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2017/05/09/TensorFlow搭建/" id="article-nav-older" class="article-nav-link-wrap">
       <div class="article-nav-title">TensorFlow搭建和TensorBoard可视化的使用</div>
       <i class="icon-circle-right"></i>
     </a>
