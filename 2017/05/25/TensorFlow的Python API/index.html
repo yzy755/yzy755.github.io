@@ -6,23 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>zookeeper浅读 | 易泽源的博客</title>
+  <title>TensorFlow的Python API | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。zookeeper注册中心Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例">
+  <meta name="description" content="tensorflow的java api极限性还是很大，至今也是能找到linux和mac的库文件，再加上决定使用superset作为olap系统，正好可以在superset上集成Python版本的TensorFlow">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zookeeper浅读">
-<meta property="og:url" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/index.html">
+<meta property="og:title" content="TensorFlow的Python API">
+<meta property="og:url" content="http://yzy755.github.io/2017/05/25/TensorFlow的Python API/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。zookeeper注册中心Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/1.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/2.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/3.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/4.png">
-<meta property="og:updated_time" content="2017-03-09T09:12:33.717Z">
+<meta property="og:description" content="tensorflow的java api极限性还是很大，至今也是能找到linux和mac的库文件，再加上决定使用superset作为olap系统，正好可以在superset上集成Python版本的TensorFlow">
+<meta property="og:updated_time" content="2017-05-25T02:04:39.899Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zookeeper浅读">
-<meta name="twitter:description" content="下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。zookeeper注册中心Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例">
-<meta name="twitter:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/1.png">
+<meta name="twitter:title" content="TensorFlow的Python API">
+<meta name="twitter:description" content="tensorflow的java api极限性还是很大，至今也是能找到linux和mac的库文件，再加上决定使用superset作为olap系统，正好可以在superset上集成Python版本的TensorFlow">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -172,44 +167,240 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-zookeeper浅读" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-TensorFlow的Python API" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      zookeeper浅读
+      TensorFlow的Python API
     </h1>
   
 
         
-        <a href="/2017/03/08/zookeeper浅读/" class="archive-article-date">
-  	<time datetime="2017-03-08T07:44:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
+        <a href="/2017/05/25/TensorFlow的Python API/" class="archive-article-date">
+  	<time datetime="2017-05-25T02:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-25</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。<br>zookeeper注册中心<br>Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例<br><a id="more"></a><br><img src="/2017/03/08/zookeeper浅读/1.png" alt="logo"></p>
-<p>假设读者对zookeeper有所了解，能够搭建zookeeper服务，其实不了解也没关系，谷歌百度下分分钟搞起。<br>作为测试调试dubbo，我是在本地起的zookeeper<br><img src="/2017/03/08/zookeeper浅读/2.png" alt="logo"></p>
-<p>指定zookeeper配置文件地址<br><img src="/2017/03/08/zookeeper浅读/3.png" alt="logo"></p>
-<p>配置文件中两个关键参数：<br>dataDir zookeeper存储文件的地址<br>clientPort 客户端链接的端口号<br>Dubbo服务提供者配置</p>
-<p><dubbo:registry protocol="”" zookeeper="" ”="" address="127.0.0. 1: 2181 "></dubbo:registry></p>
-<p><beanid="demoservice" class="com.alibaba.dubbo.demo.provi der.DemoServiceImpl"></beanid="demoservice"></p>
-<p><dubbo:serviceinterface="com.alibaba.dubbo.demo.demoservi ce"="" ref="demoService"><br>除了配置注册中心的，其他都一样<br>Dubbo服务消费者配置</dubbo:serviceinterface="com.alibaba.dubbo.demo.demoservi></p>
-<p><dubbo:registry protocol="”" zookeeper="" ”="" address="127.0.0. 1: 2181 "></dubbo:registry></p>
-<p><dubbo:reference id="demoService" interface="com.alibaba.dubbo.demo.DemoService"><br>除了配置注册中心的，其他都一样<br>客户端获取注册器<br>服务的提供者和消费者在RegistryProtocol利用注册中心暴露(export)和引用(refer)服务的时候会根据配置利用Dubbo的SPI机制获取具体注册中心注册器<br>Registry registry = registryFactory .getRegistry(url);<br>这里的RegistryFactory是ZookeeperRegistryFactory看如下工厂代码<br>public class ZookeeperRegistryFactory extends AbstractRegistryFactory {<br>    public Registry createRegistry(URL url) {<br>        return new ZookeeperRegistry(url, zookeeperTransporter );<br>    }<br>}<br>这里创建zookeepr注册器ZookeeperRegistry<br>ZookeeperTransporter是操作zookeepr的客户端的工厂类，用来创建zookeeper客户端，这里客户端并不是zookeeper源代码的自带的，而是采用第三方工具包，主要来简化对zookeeper的操作，例如用zookeeper做注册中心需要对zookeeper节点添加watcher做反向推送，但是每次回调后节点的watcher都会被删除，这些客户会自动维护了这些watcher，在自动添加到节点上去。<br>接口定义：<br>@SPI ( “zkclient” )<br>public interface ZookeeperTransporter {<br>    @Adaptive ({Constants. CLIENT_KEY , Constants. TRANSPORTER_KEY })<br>    ZookeeperClient connect(URL url);<br>}<br>默认采用zkClient， dubbo源码集成两种zookeeper客户端，除了zkClient还有一个是curator<br><img src="/2017/03/08/zookeeper浅读/4.png" alt="logo"></dubbo:reference></p>
-<p>ZookeeperRegistry注册器的实现<br>1.构造器利用客户端创建了对zookeeper的连接，并且添加了自动回复连接的监听器。<br>zkClient = zookeeperTransporter.connect(url);<br>zkClient .addStateListener( new StateListener() {<br>    public void stateChanged( int state) {<br>    if (state == RECONNECTED )<br>        recover();<br>    }<br>});</p>
-<p>2.注册url就是利用客户端在服务器端创建url的节点，默认为临时节点，客户端与服务端断开，几点自动删除<br>zkClient .create(toUrlPath(url),url.getParameter(Constants. DYNAMIC_KEY , true));      </p>
-<p>3.取消注册的url，就是利用zookeeper客户端删除url节点<br>zkClient .delete(toUrlPath(url));</p>
-<ol>
-<li><p>订阅url， 功能是服务消费端订阅服务提供方在zookeeper上注册地址，这个功能流程跟DubboRegister不一样， DubboRegister是通过Dubbo注册中心实现SimpleResgiter在注册中心端，对url变换、过滤筛选然后将获取的provierUrl(提供者ulr)利用服务消费者暴露的服务回调在refer。<br>由于这里注册中心采用的是zookeeper，zookeeper不可能具有dubbo的业务逻辑，这里对订阅的逻辑处理都在消费服务端订阅的时候处理。<br> 1) 对传入url的serviceInterface是*代表订阅url目录下所有节点即所有服务，这个注册中心需要订阅所有<br> 2) 如果指定了订阅接口通过toCategoriesPath(url)转换需要订阅的url<br>  如传入url consumer://10.33.37.8/com.alibaba.dubbo.demo.DemoService?application=demo-consumer&amp;category=providers,configurators,routers&amp;dubbo=2.5.4-SNAPSHOT&amp;interface=com.alibaba.dubbo.demo.DemoService&amp;methods=sayHello&amp;pid=4088&amp;side=consumer&amp;timestamp=1417405597808<br>  转换成urls<br>  /dubbo/com.alibaba.dubbo.demo.DemoService/providers,/dubbo/com.alibaba.dubbo.demo.DemoService/configurators, /dubbo/com.alibaba.dubbo.demo.DemoService/routers<br> 3) 设配传入的回调接口NotifyListener,转换成dubbo对zookeeper操作的ChildListener<br> 4) 以/dubbo/com.alibaba.dubbo.demo.DemoService/providers为例创建节点zkClient.create(path, false);<br>  但是一般情况下如果服务提供者已经提供服务，那么这个目录节点应该已经存在，Dubbo在Client层屏蔽掉了创建异常。<br> 5) 以/dubbo/com.alibaba.dubbo.demo.DemoService/providers为例给节点添加监听器，返回所有子目录<br>  List<string> children = zkClient .addChildListener(path, zkListener);<br>  if (children != null ) {urls.addAll(toUrlsWithEmpty(url, path,hildren));}<br>  toUrlsWtihEmpty用来配置是不是需要订阅的url，是加入集合<br> 6） 主动根据得到服务提供者urls回调NotifyListener,引用服务提供者生成invoker可执行对象</string></p>
-</li>
-<li><p>取消订阅url， 只是去掉url上的注册的监听器</p>
-</li>
-</ol>
+        <p>tensorflow的java api极限性还是很大，至今也是能找到linux和mac的库文件，再加上决定使用superset作为olap系统，正好可以在superset上集成Python版本的TensorFlow<br><a id="more"></a><br>继续想使用现成的图像识别模型做一个简单的demo，网上有现成的训练完的模型<br>源码：</p>
+<pre><code># Copyright 2015 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
+&quot;&quot;&quot;Simple image classification with Inception.
+
+Run image classification with Inception trained on ImageNet 2012 Challenge data
+set.
+
+This program creates a graph from a saved GraphDef protocol buffer,
+and runs inference on an input JPEG image. It outputs human readable
+strings of the top 5 predictions along with their probabilities.
+
+Change the --image_file argument to any jpg image to compute a
+classification of that image.
+
+Please see the tutorial and website for a detailed description of how
+to use this script to perform image recognition.
+
+https://tensorflow.org/tutorials/image_recognition/
+&quot;&quot;&quot;
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import os.path
+import re
+import sys
+import tarfile
+
+import numpy as np
+from six.moves import urllib
+import tensorflow as tf
+
+FLAGS = tf.app.flags.FLAGS
+
+# classify_image_graph_def.pb:
+#   Binary representation of the GraphDef protocol buffer.
+# imagenet_synset_to_human_label_map.txt:
+#   Map from synset ID to a human readable string.
+# imagenet_2012_challenge_label_map_proto.pbtxt:
+#   Text representation of a protocol buffer mapping a label to synset ID.
+tf.app.flags.DEFINE_string(
+    &apos;model_dir&apos;, &apos;/tmp/imagenet&apos;,
+    &quot;&quot;&quot;Path to classify_image_graph_def.pb, &quot;&quot;&quot;
+    &quot;&quot;&quot;imagenet_synset_to_human_label_map.txt, and &quot;&quot;&quot;
+    &quot;&quot;&quot;imagenet_2012_challenge_label_map_proto.pbtxt.&quot;&quot;&quot;)
+tf.app.flags.DEFINE_string(&apos;image_file&apos;, &apos;&apos;,
+                           &quot;&quot;&quot;Absolute path to image file.&quot;&quot;&quot;)
+tf.app.flags.DEFINE_integer(&apos;num_top_predictions&apos;, 5,
+                            &quot;&quot;&quot;Display this many predictions.&quot;&quot;&quot;)
+
+# pylint: disable=line-too-long
+DATA_URL = &apos;http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz&apos;
+# pylint: enable=line-too-long
+
+
+class NodeLookup(object):
+  &quot;&quot;&quot;Converts integer node ID&apos;s to human readable labels.&quot;&quot;&quot;
+
+  def __init__(self,
+               label_lookup_path=None,
+               uid_lookup_path=None):
+    if not label_lookup_path:
+      label_lookup_path = os.path.join(
+          FLAGS.model_dir, &apos;imagenet_2012_challenge_label_map_proto.pbtxt&apos;)
+    if not uid_lookup_path:
+      uid_lookup_path = os.path.join(
+          FLAGS.model_dir, &apos;imagenet_synset_to_human_label_map.txt&apos;)
+    self.node_lookup = self.load(label_lookup_path, uid_lookup_path)
+
+  def load(self, label_lookup_path, uid_lookup_path):
+    &quot;&quot;&quot;Loads a human readable English name for each softmax node.
+
+    Args:
+      label_lookup_path: string UID to integer node ID.
+      uid_lookup_path: string UID to human-readable string.
+
+    Returns:
+      dict from integer node ID to human-readable string.
+    &quot;&quot;&quot;
+    if not tf.gfile.Exists(uid_lookup_path):
+      tf.logging.fatal(&apos;File does not exist %s&apos;, uid_lookup_path)
+    if not tf.gfile.Exists(label_lookup_path):
+      tf.logging.fatal(&apos;File does not exist %s&apos;, label_lookup_path)
+
+    # Loads mapping from string UID to human-readable string
+    proto_as_ascii_lines = tf.gfile.GFile(uid_lookup_path).readlines()
+    uid_to_human = {}
+    p = re.compile(r&apos;[n\d]*[ \S,]*&apos;)
+    for line in proto_as_ascii_lines:
+      parsed_items = p.findall(line)
+      uid = parsed_items[0]
+      human_string = parsed_items[2]
+      uid_to_human[uid] = human_string
+
+    # Loads mapping from string UID to integer node ID.
+    node_id_to_uid = {}
+    proto_as_ascii = tf.gfile.GFile(label_lookup_path).readlines()
+    for line in proto_as_ascii:
+      if line.startswith(&apos;  target_class:&apos;):
+        target_class = int(line.split(&apos;: &apos;)[1])
+      if line.startswith(&apos;  target_class_string:&apos;):
+        target_class_string = line.split(&apos;: &apos;)[1]
+        node_id_to_uid[target_class] = target_class_string[1:-2]
+
+    # Loads the final mapping of integer node ID to human-readable string
+    node_id_to_name = {}
+    for key, val in node_id_to_uid.items():
+      if val not in uid_to_human:
+        tf.logging.fatal(&apos;Failed to locate: %s&apos;, val)
+      name = uid_to_human[val]
+      node_id_to_name[key] = name
+
+    return node_id_to_name
+
+  def id_to_string(self, node_id):
+    if node_id not in self.node_lookup:
+      return &apos;&apos;
+    return self.node_lookup[node_id]
+
+
+def create_graph():
+  &quot;&quot;&quot;Creates a graph from saved GraphDef file and returns a saver.&quot;&quot;&quot;
+  # Creates graph from saved graph_def.pb.
+  with tf.gfile.FastGFile(os.path.join(
+      FLAGS.model_dir, &apos;classify_image_graph_def.pb&apos;), &apos;rb&apos;) as f:
+    graph_def = tf.GraphDef()
+    graph_def.ParseFromString(f.read())
+    _ = tf.import_graph_def(graph_def, name=&apos;&apos;)
+
+
+def run_inference_on_image(image):
+  &quot;&quot;&quot;Runs inference on an image.
+
+  Args:
+    image: Image file name.
+
+  Returns:
+    Nothing
+  &quot;&quot;&quot;
+  if not tf.gfile.Exists(image):
+    tf.logging.fatal(&apos;File does not exist %s&apos;, image)
+  image_data = tf.gfile.FastGFile(image, &apos;rb&apos;).read()
+
+  # Creates graph from saved GraphDef.
+  create_graph()
+
+  with tf.Session() as sess:
+    # Some useful tensors:
+    # &apos;softmax:0&apos;: A tensor containing the normalized prediction across
+    #   1000 labels.
+    # &apos;pool_3:0&apos;: A tensor containing the next-to-last layer containing 2048
+    #   float description of the image.
+    # &apos;DecodeJpeg/contents:0&apos;: A tensor containing a string providing JPEG
+    #   encoding of the image.
+    # Runs the softmax tensor by feeding the image_data as input to the graph.
+    softmax_tensor = sess.graph.get_tensor_by_name(&apos;softmax:0&apos;)
+    predictions = sess.run(softmax_tensor,
+                           {&apos;DecodeJpeg/contents:0&apos;: image_data})
+    predictions = np.squeeze(predictions)
+
+    # Creates node ID --&gt; English string lookup.
+    node_lookup = NodeLookup()
+
+    top_k = predictions.argsort()[-FLAGS.num_top_predictions:][::-1]
+    for node_id in top_k:
+      human_string = node_lookup.id_to_string(node_id)
+      score = predictions[node_id]
+      print(&apos;%s (score = %.5f)&apos; % (human_string, score))
+
+
+def maybe_download_and_extract():
+  &quot;&quot;&quot;Download and extract model tar file.&quot;&quot;&quot;
+  dest_directory = FLAGS.model_dir
+  if not os.path.exists(dest_directory):
+    os.makedirs(dest_directory)
+  filename = DATA_URL.split(&apos;/&apos;)[-1]
+  filepath = os.path.join(dest_directory, filename)
+  if not os.path.exists(filepath):
+    def _progress(count, block_size, total_size):
+      sys.stdout.write(&apos;\r&gt;&gt; Downloading %s %.1f%%&apos; % (
+          filename, float(count * block_size) / float(total_size) * 100.0))
+      sys.stdout.flush()
+    filepath, _ = urllib.request.urlretrieve(DATA_URL, filepath, _progress)
+    print()
+    statinfo = os.stat(filepath)
+    print(&apos;Succesfully downloaded&apos;, filename, statinfo.st_size, &apos;bytes.&apos;)
+  tarfile.open(filepath, &apos;r:gz&apos;).extractall(dest_directory)
+
+
+def main(_):
+  maybe_download_and_extract()
+  image = (FLAGS.image_file if FLAGS.image_file else
+           os.path.join(FLAGS.model_dir, &apos;cropped_panda.jpg&apos;))
+  run_inference_on_image(image)
+
+
+if __name__ == &apos;__main__&apos;:
+  tf.app.run()
+</code></pre><p>这是个可以直接运行py文件：python classify_image.py 就可以识别cropped_panda.jpg为大熊猫，程序会下载训练好的pb模型文件和物品分类大全txt文件，然后在 <a href="https://github.com/airbnb/superset" target="_blank" rel="external">https://github.com/airbnb/superset</a> 下载superset源码，在view包的core.py中拓展一个文件上传功能，将上传的文件条用上面的识别方法，就可以做到简单的图形识别，整个流程下来问题主要还是算法模型的生成。。。<br>在部署superset过程中也遇到很多坑，官方文档上是说修改完源码后要重新对前端打包，基本可以参照 <a href="https://fangyeqing.github.io/2017/03/04/superset%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" target="_blank" rel="external">https://fangyeqing.github.io/2017/03/04/superset%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</a> 这上面的教程，后台编译就比较简单了，在superset根目录下执行 python setup.py install 就行，然后参照前面写的superset搭建启动的方式即可</p>
 
       
 
@@ -254,7 +445,15 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">zookeeper</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">AI</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">TensorFlow</a>
         		</li>
       		
 		</ul>
@@ -266,7 +465,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/原理研究/" class="article-tag-list-link color5">原理研究</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
@@ -321,7 +520,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACKUlEQVR42u3aS47CMBAFwLn/pRlpVmxC3nMDmjiVFULBSXnR9Mc/P/H1+LueP+ffPH//euWjb952YWBgXJbxeHkljKN7jp6ytmUnW4OBgXEDxlqQTVbI72xXxsDAwEgC7lpwbIM7BgYGxlrAbXlraSUGBgZGW8Qmpek8vH68FsfAwLggY20w8J3PH59vYGBg/HvGo7zyFPC9zz15KwwMjK0Z7XGHvH2WAPKRQ7RZGBgYt2G0ZWoLbhPBomTFwMDYmtG+7lpIfe8WnIRdDAyMTRlJmtg+oD2ikb/DKNvFwMC4IGPeJssD6Lx5V7TbMDAwNmW0ATd/ubXfFofDMDAwNmXkS0/GkG1/rH0WBgbG3ozPJYLfH21iYGDcgdGGszaxK8aQg2MfGBgY+zHmjf72uMbkYMfhpmBgYGzNmLfG1hp2H0kNMTAwNmXkhWhbpr4Gv16zPnCGgYFxS8akATcJnfkAYPG0CAYGxgUZaw2vtYbaBPyG5h0GBsZlGXkCNylok/DarhwNOzAwMDZi5OVl3rhvGcmI4iTgYmBgbMpoR4xJAZlnoMmz8kMeGBgYuzIe5dU299s78wQRAwPjPoxJ023eemsHqPlfAgYGxn6MPMgWByCCELw2Cq3nqxgYGBsx1oaOa0nbpHw9/BUGBgbG0pGIPMi2YwMMDAyMPMmbBNC2rD3ZCAwMjBsw2sKyDan5aovpKQYGxtaMyWAg2Y68iTYfo2JgYGzH+AVODX+tNDtCtQAAAABJRU5ErkJggg==" alt="微信分享二维码">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACPklEQVR42u3awY6DMAxFUf7/pxlpVjOqCPc5tFWcm1VVKvBh4Tp2jgOv83ddfUM+//3mdY2f9diSIUPGsoxzuF5/Qx6WBkeeO8bLkCFjB8Y4lBOvK/Y4dJLKb2KWIUOGDHxrkpp5aShDhgwZNcY4aY5T7RjJC1AZMmTsySClHnkwKf6+vBeXIUPGgox0MPDJz2+cb8iQIWMRxhmuWkuu1mILopIhQ0ZrRtomS4eUtVEBz67Fbp8MGTIWZPA0SpImGQk8dZ8bjAwZMtox0kfWjlOk5SO5gwwZMnoziPKTv0k7acfnQ5QhQ8aXGHwTm/4mDbG2eZYhQ0ZvRm1gObPJJEUhGWoW9+IyZMhYllFr8adBpxvUODXLkCGjNYMXbbz1RlLqOJRi11CGDBntGLwUSw91HaXFm3T/rsqQIaM1I711bfOZhpKOOWXIkNGbMTalqe0d6TIoDWXIkNGUQVr/KZWXlWkxevNfIUOGjKYMfqyBY9IBQMq7abfJkCGjHaM2huRjxfRgWXpPGTJk7MBIm2i8WVbbuNZeigwZMvZhPHUgrBYoT6/ov0KGDBmNGGT7yq/WGv0zRzTQ6TYZMmQszjjDVUvWtWFD8GcgQ4aM1oxahuaP4cE9NhiQIUNGUwZJiFPvAJSG/H1fImXIkLEBgyRZcrVWbvJXEx8OkyFDxmYMnoI5LH19lxgZMmTIwA0yUurVUi3axMqQIaM1I93EpoPM+ZHATQwyZMhozZgZDKSpeaYx90DLT4YMGesxfgATSh3zuriruAAAAABJRU5ErkJggg==" alt="微信分享二维码">
     </div>
 </div>
 
@@ -335,18 +534,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/03/08/hexo编辑博客整理/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          hexo编辑博客整理
-        
-      </div>
-    </a>
   
-  
-    <a href="/2017/03/08/TCP的几个状态码/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">TCP的几个状态码</div>
+    <a href="/2017/05/17/TensorFlow的java API/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">TensorFlow的java API</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -366,7 +556,7 @@
  
   <section id="comments">
     <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-zookeeper浅读" data-title="zookeeper浅读" data-url="http://yzy755.github.io/2017/03/08/zookeeper浅读/"></div>
+    <div class="ds-thread" data-thread-key="post-TensorFlow的Python API" data-title="TensorFlow的Python API" data-url="http://yzy755.github.io/2017/05/25/TensorFlow的Python API/"></div>
     <!-- 多说评论框 end -->
     <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
     <script type="text/javascript">

@@ -6,23 +6,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>zookeeper浅读 | 易泽源的博客</title>
+  <title>Tag: TensorFlow | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。zookeeper注册中心Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例">
-<meta property="og:type" content="article">
-<meta property="og:title" content="zookeeper浅读">
-<meta property="og:url" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/index.html">
+  <meta name="description" content="记录学习点滴">
+<meta property="og:type" content="website">
+<meta property="og:title" content="易泽源的博客">
+<meta property="og:url" content="http://yzy755.github.io/tags/TensorFlow/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。zookeeper注册中心Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/1.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/2.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/3.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/4.png">
-<meta property="og:updated_time" content="2017-03-09T09:12:33.717Z">
+<meta property="og:description" content="记录学习点滴">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zookeeper浅读">
-<meta name="twitter:description" content="下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。zookeeper注册中心Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例">
-<meta name="twitter:image" content="http://yzy755.github.io/2017/03/08/zookeeper浅读/1.png">
+<meta name="twitter:title" content="易泽源的博客">
+<meta name="twitter:description" content="记录学习点滴">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -172,217 +166,195 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-zookeeper浅读" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      zookeeper浅读
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2017" class="archive-year">2017</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2017/05/25/TensorFlow的Python API/" class="archive-article-date">
+  	<time datetime="2017-05-25T02:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-25</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2017/05/25/TensorFlow的Python API/">TensorFlow的Python API</a>
     </h1>
   
 
-        
-        <a href="/2017/03/08/zookeeper浅读/" class="archive-article-date">
-  	<time datetime="2017-03-08T07:44:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>下面我们来看下开源dubbo推荐的业界成熟的zookeeper做为注册中心， zookeeper是hadoop的一个子项目是分布式系统的可靠协调者，他提供了配置维护，名字服务，分布式同步等服务。对于zookeeper的原理本文档不分析，后面有时间在做专题。<br>zookeeper注册中心<br>Zookeeper对数据存储类似linux的目录结构，下面给出官方文档对dubbo注册数据的存储示例<br><a id="more"></a><br><img src="/2017/03/08/zookeeper浅读/1.png" alt="logo"></p>
-<p>假设读者对zookeeper有所了解，能够搭建zookeeper服务，其实不了解也没关系，谷歌百度下分分钟搞起。<br>作为测试调试dubbo，我是在本地起的zookeeper<br><img src="/2017/03/08/zookeeper浅读/2.png" alt="logo"></p>
-<p>指定zookeeper配置文件地址<br><img src="/2017/03/08/zookeeper浅读/3.png" alt="logo"></p>
-<p>配置文件中两个关键参数：<br>dataDir zookeeper存储文件的地址<br>clientPort 客户端链接的端口号<br>Dubbo服务提供者配置</p>
-<p><dubbo:registry protocol="”" zookeeper="" ”="" address="127.0.0. 1: 2181 "></dubbo:registry></p>
-<p><beanid="demoservice" class="com.alibaba.dubbo.demo.provi der.DemoServiceImpl"></beanid="demoservice"></p>
-<p><dubbo:serviceinterface="com.alibaba.dubbo.demo.demoservi ce"="" ref="demoService"><br>除了配置注册中心的，其他都一样<br>Dubbo服务消费者配置</dubbo:serviceinterface="com.alibaba.dubbo.demo.demoservi></p>
-<p><dubbo:registry protocol="”" zookeeper="" ”="" address="127.0.0. 1: 2181 "></dubbo:registry></p>
-<p><dubbo:reference id="demoService" interface="com.alibaba.dubbo.demo.DemoService"><br>除了配置注册中心的，其他都一样<br>客户端获取注册器<br>服务的提供者和消费者在RegistryProtocol利用注册中心暴露(export)和引用(refer)服务的时候会根据配置利用Dubbo的SPI机制获取具体注册中心注册器<br>Registry registry = registryFactory .getRegistry(url);<br>这里的RegistryFactory是ZookeeperRegistryFactory看如下工厂代码<br>public class ZookeeperRegistryFactory extends AbstractRegistryFactory {<br>    public Registry createRegistry(URL url) {<br>        return new ZookeeperRegistry(url, zookeeperTransporter );<br>    }<br>}<br>这里创建zookeepr注册器ZookeeperRegistry<br>ZookeeperTransporter是操作zookeepr的客户端的工厂类，用来创建zookeeper客户端，这里客户端并不是zookeeper源代码的自带的，而是采用第三方工具包，主要来简化对zookeeper的操作，例如用zookeeper做注册中心需要对zookeeper节点添加watcher做反向推送，但是每次回调后节点的watcher都会被删除，这些客户会自动维护了这些watcher，在自动添加到节点上去。<br>接口定义：<br>@SPI ( “zkclient” )<br>public interface ZookeeperTransporter {<br>    @Adaptive ({Constants. CLIENT_KEY , Constants. TRANSPORTER_KEY })<br>    ZookeeperClient connect(URL url);<br>}<br>默认采用zkClient， dubbo源码集成两种zookeeper客户端，除了zkClient还有一个是curator<br><img src="/2017/03/08/zookeeper浅读/4.png" alt="logo"></dubbo:reference></p>
-<p>ZookeeperRegistry注册器的实现<br>1.构造器利用客户端创建了对zookeeper的连接，并且添加了自动回复连接的监听器。<br>zkClient = zookeeperTransporter.connect(url);<br>zkClient .addStateListener( new StateListener() {<br>    public void stateChanged( int state) {<br>    if (state == RECONNECTED )<br>        recover();<br>    }<br>});</p>
-<p>2.注册url就是利用客户端在服务器端创建url的节点，默认为临时节点，客户端与服务端断开，几点自动删除<br>zkClient .create(toUrlPath(url),url.getParameter(Constants. DYNAMIC_KEY , true));      </p>
-<p>3.取消注册的url，就是利用zookeeper客户端删除url节点<br>zkClient .delete(toUrlPath(url));</p>
-<ol>
-<li><p>订阅url， 功能是服务消费端订阅服务提供方在zookeeper上注册地址，这个功能流程跟DubboRegister不一样， DubboRegister是通过Dubbo注册中心实现SimpleResgiter在注册中心端，对url变换、过滤筛选然后将获取的provierUrl(提供者ulr)利用服务消费者暴露的服务回调在refer。<br>由于这里注册中心采用的是zookeeper，zookeeper不可能具有dubbo的业务逻辑，这里对订阅的逻辑处理都在消费服务端订阅的时候处理。<br> 1) 对传入url的serviceInterface是*代表订阅url目录下所有节点即所有服务，这个注册中心需要订阅所有<br> 2) 如果指定了订阅接口通过toCategoriesPath(url)转换需要订阅的url<br>  如传入url consumer://10.33.37.8/com.alibaba.dubbo.demo.DemoService?application=demo-consumer&amp;category=providers,configurators,routers&amp;dubbo=2.5.4-SNAPSHOT&amp;interface=com.alibaba.dubbo.demo.DemoService&amp;methods=sayHello&amp;pid=4088&amp;side=consumer&amp;timestamp=1417405597808<br>  转换成urls<br>  /dubbo/com.alibaba.dubbo.demo.DemoService/providers,/dubbo/com.alibaba.dubbo.demo.DemoService/configurators, /dubbo/com.alibaba.dubbo.demo.DemoService/routers<br> 3) 设配传入的回调接口NotifyListener,转换成dubbo对zookeeper操作的ChildListener<br> 4) 以/dubbo/com.alibaba.dubbo.demo.DemoService/providers为例创建节点zkClient.create(path, false);<br>  但是一般情况下如果服务提供者已经提供服务，那么这个目录节点应该已经存在，Dubbo在Client层屏蔽掉了创建异常。<br> 5) 以/dubbo/com.alibaba.dubbo.demo.DemoService/providers为例给节点添加监听器，返回所有子目录<br>  List<string> children = zkClient .addChildListener(path, zkListener);<br>  if (children != null ) {urls.addAll(toUrlsWithEmpty(url, path,hildren));}<br>  toUrlsWtihEmpty用来配置是不是需要订阅的url，是加入集合<br> 6） 主动根据得到服务提供者urls回调NotifyListener,引用服务提供者生成invoker可执行对象</string></p>
-</li>
-<li><p>取消订阅url， 只是去掉url上的注册的监听器</p>
-</li>
-</ol>
-
-      
-
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/22432/alipay.jpg">
-                      <span class="reward-type">支付宝</span>
-                    </div>
-                    
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/79227/wxpay.png">
-                      <span class="reward-type">微信</span>
-                    </div>
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">zookeeper</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">AI</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">TensorFlow</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/原理研究/" class="article-tag-list-link color5">原理研究</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
 	</div>
 
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACKUlEQVR42u3aS47CMBAFwLn/pRlpVmxC3nMDmjiVFULBSXnR9Mc/P/H1+LueP+ffPH//euWjb952YWBgXJbxeHkljKN7jp6ytmUnW4OBgXEDxlqQTVbI72xXxsDAwEgC7lpwbIM7BgYGxlrAbXlraSUGBgZGW8Qmpek8vH68FsfAwLggY20w8J3PH59vYGBg/HvGo7zyFPC9zz15KwwMjK0Z7XGHvH2WAPKRQ7RZGBgYt2G0ZWoLbhPBomTFwMDYmtG+7lpIfe8WnIRdDAyMTRlJmtg+oD2ikb/DKNvFwMC4IGPeJssD6Lx5V7TbMDAwNmW0ATd/ubXfFofDMDAwNmXkS0/GkG1/rH0WBgbG3ozPJYLfH21iYGDcgdGGszaxK8aQg2MfGBgY+zHmjf72uMbkYMfhpmBgYGzNmLfG1hp2H0kNMTAwNmXkhWhbpr4Gv16zPnCGgYFxS8akATcJnfkAYPG0CAYGxgUZaw2vtYbaBPyG5h0GBsZlGXkCNylok/DarhwNOzAwMDZi5OVl3rhvGcmI4iTgYmBgbMpoR4xJAZlnoMmz8kMeGBgYuzIe5dU299s78wQRAwPjPoxJ023eemsHqPlfAgYGxn6MPMgWByCCELw2Cq3nqxgYGBsx1oaOa0nbpHw9/BUGBgbG0pGIPMi2YwMMDAyMPMmbBNC2rD3ZCAwMjBsw2sKyDan5aovpKQYGxtaMyWAg2Y68iTYfo2JgYGzH+AVODX+tNDtCtQAAAABJRU5ErkJggg==" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
   
-<nav id="article-nav">
+    
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2017/05/17/TensorFlow的java API/" class="archive-article-date">
+  	<time datetime="2017-05-17T10:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-17</time>
+</a>
+        </div>
+    	 
   
-    <a href="/2017/03/08/hexo编辑博客整理/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          hexo编辑博客整理
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2017/03/08/TCP的几个状态码/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">TCP的几个状态码</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-
-
-
-
-  
-    <div class="duoshuo"></div>
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2017/05/17/TensorFlow的java API/">TensorFlow的java API</a>
+    </h1>
   
 
+        <div class="article-info info-on-right">
+          
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">AI</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">TensorFlow</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+          
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
 
 
- 
-  <section id="comments">
-    <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-zookeeper浅读" data-title="zookeeper浅读" data-url="http://yzy755.github.io/2017/03/08/zookeeper浅读/"></div>
-    <!-- 多说评论框 end -->
-    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-    <script type="text/javascript">
-    var duoshuoQuery = {short_name:'yzy755'};
-      (function() {
-        var ds = document.createElement('script');
-        ds.type = 'text/javascript';ds.async = true;
-        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-        ds.charset = 'UTF-8';
-        (document.getElementsByTagName('head')[0] 
-         || document.getElementsByTagName('body')[0]).appendChild(ds);
-      })();
-      </script>
-    <!-- 多说公共JS代码 end -->
-  </section>
+        </div>
+        <div class="clearfix"></div>
+    </header>
+  </div>
+</article>
   
+    
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/" class="archive-article-date">
+  	<time datetime="2017-05-09T10:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-05-09</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2017/05/09/TensorFlow搭建和TensorBoard可视化的使用/">TensorFlow搭建和TensorBoard可视化的使用</a>
+    </h1>
+  
+
+        <div class="article-info info-on-right">
+          
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">AI</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">TensorFlow</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+          
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+        </div>
+        <div class="clearfix"></div>
+    </header>
+  </div>
+</article>
+  
+  
+    </div></section>
+  
+
+    
+
+
           </div>
         </div>
       </div>
@@ -403,9 +375,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
+		isPost: false,
 		isArchive: false,
-		isTag: false,
+		isTag: true,
 		isCategory: false,
 		open_in_new: false,
 		root: "/",
