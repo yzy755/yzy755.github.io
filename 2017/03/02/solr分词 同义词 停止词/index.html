@@ -11,17 +11,17 @@
   <meta name="description" content="分词相关拓展，配置博微软件中特有的分词和停止词：特有的分词指的是博微软件中的词组，比如“定额”、“土方”等停止词是无功能意义的词，比如is 、a 、are 、”的”，“得”，“我” 等，这些词会在句子中多次出现却无意义，所以在分词的时候需要把这些词过滤掉。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="solr分词 同义词 停止词">
-<meta property="og:url" content="http://yzy755.github.io/2017/03/02/solr分词、同义词、停止词/index.html">
+<meta property="og:url" content="http://yzy755.github.io/2017/03/02/solr分词 同义词 停止词/index.html">
 <meta property="og:site_name" content="易泽源的博客">
 <meta property="og:description" content="分词相关拓展，配置博微软件中特有的分词和停止词：特有的分词指的是博微软件中的词组，比如“定额”、“土方”等停止词是无功能意义的词，比如is 、a 、are 、”的”，“得”，“我” 等，这些词会在句子中多次出现却无意义，所以在分词的时候需要把这些词过滤掉。">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/02/solr分词、同义词、停止词/1.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/02/solr分词、同义词、停止词/2.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/02/solr分词、同义词、停止词/3.png">
+<meta property="og:image" content="http://yzy755.github.io/2017/03/02/solr分词 同义词 停止词/1.png">
+<meta property="og:image" content="http://yzy755.github.io/2017/03/02/solr分词 同义词 停止词/2.png">
+<meta property="og:image" content="http://yzy755.github.io/2017/03/02/solr分词 同义词 停止词/3.png">
 <meta property="og:updated_time" content="2017-06-27T03:43:30.123Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="solr分词 同义词 停止词">
 <meta name="twitter:description" content="分词相关拓展，配置博微软件中特有的分词和停止词：特有的分词指的是博微软件中的词组，比如“定额”、“土方”等停止词是无功能意义的词，比如is 、a 、are 、”的”，“得”，“我” 等，这些词会在句子中多次出现却无意义，所以在分词的时候需要把这些词过滤掉。">
-<meta name="twitter:image" content="http://yzy755.github.io/2017/03/02/solr分词、同义词、停止词/1.png">
+<meta name="twitter:image" content="http://yzy755.github.io/2017/03/02/solr分词 同义词 停止词/1.png">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -171,7 +171,7 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-solr分词、同义词、停止词" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-solr分词 同义词 停止词" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
@@ -183,7 +183,7 @@
   
 
         
-        <a href="/2017/03/02/solr分词、同义词、停止词/" class="archive-article-date">
+        <a href="/2017/03/02/solr分词 同义词 停止词/" class="archive-article-date">
   	<time datetime="2017-03-02T09:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-02</time>
 </a>
         
@@ -199,7 +199,7 @@
     &lt;/analyzer&gt;
 </code></pre><p>需要使用IKAnalyzer分词器的字段配置type为text_ik，比如：</p>
 <pre><code>&lt;field name=&quot;doc_title&quot; type=&quot;text_ik&quot; indexed=&quot;true&quot; stored=&quot;true&quot; termVectors=&quot;true&quot;/&gt;
-</code></pre><p>接下来就在solr的部署目录 WEB-INF/classes中增加配置如下：<br><img src="/2017/03/02/solr分词、同义词、停止词/1.png" alt="logo"><br>IKAnalyzer.cfg.xml内容配置如下：</p>
+</code></pre><p>接下来就在solr的部署目录 WEB-INF/classes中增加配置如下：<br><img src="/2017/03/02/solr分词 同义词 停止词/1.png" alt="logo"><br>IKAnalyzer.cfg.xml内容配置如下：</p>
 <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;!DOCTYPE properties SYSTEM &quot;http://java.sun.com/dtd/properties.dtd&quot;&gt;  
 &lt;properties&gt;  
@@ -222,7 +222,7 @@
  &lt;filter class=&quot;solr.SynonymFilterFactory&quot; synonyms=&quot;synonyms.txt&quot; ignoreCase=&quot;true&quot; expand=&quot;true&quot; /&gt;  
 &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;  
 </code></pre><p>      </p>
-<p>同级目录会带有synonyms.txt文件，可添加同义词组，以“,”隔开，比如：<br><img src="/2017/03/02/solr分词、同义词、停止词/2.png" alt="logo"><br>分词的测试方式如图：<br><img src="/2017/03/02/solr分词、同义词、停止词/3.png" alt="logo"><br>选中text_ik类型，可将“定额“、“土方“分词显示出来，并去掉配置的停止词“和”<br>同义词测试方式相同。</p>
+<p>同级目录会带有synonyms.txt文件，可添加同义词组，以“,”隔开，比如：<br><img src="/2017/03/02/solr分词 同义词 停止词/2.png" alt="logo"><br>分词的测试方式如图：<br><img src="/2017/03/02/solr分词 同义词 停止词/3.png" alt="logo"><br>选中text_ik类型，可将“定额“、“土方“分词显示出来，并去掉配置的停止词“和”<br>同义词测试方式相同。</p>
 
       
 
@@ -334,7 +334,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACtElEQVR42u3aQW4cMQwEQP//0w6Qky8z6SYlrAPUnAzvWqPSQaRJfn3Fz/ff5+fPP3/TrpCs366wevDw8PBGW396ctLTX72v8PSd9puPO8TDw8O7xmsv6+TTTaRKDisKHnh4eHgf5b2/Mvnm+zEl+TAeHh7e/85rw0a7Jh4eHt5v5uXLJZf+++tnJYnrtRY8PDy8mDdrgH325+v9PTw8PLxRV70NGEkRNr++8yT7cYd4eHh4F3j75n2bKM9GslapPB4eHt5R3ubf/n0DLCngtkdQd8/w8PDwRryEMRu0ysus7TFFu8LDw8O7wGsLB21ISEibIBQ12PDw8PAu8DbX9L4PtU/0CxgeHh7eUd6pANCm5ptDLBpseHh4eBd4szGsWfqbH+W9dhoeHh7enpeXBmZts/0Zz4INHh4e3lnerFm1KaTujyZP8fHw8PDu8WaDU+1wVZuIt0MMURqNh4eHt+bl1/oenF/uSaI/LP7i4eHhrXntRvOyRdumyi/6Iizh4eHhXeDlSWryafvKfQm4KBDj4eHhHeIVJdEA1l79eeN/FiTw8PDwbvDydv4Mlpcw8mGs1VACHh4e3lHerPSQlxLaADMrAa96fXh4eHjl0FWb+CZZ6yaNno3VRsUIPDw8vDWvbWi11/SpQka9Wzw8PLwLvLYYMRsImG1rVgjGw8PDu82blVnfX5M3pZLftwMEeHh4eLd5m21FKWzQGNuvX3T28PDw8Na87/KZbaJNjts3FnEPDw8Pb8071dbKk+CEMWunbcIJHh4eXstLgkEbNuo2f8yrG2B4eHh413hny6ltmBmmwske8PDw8H4Zb9bcSpLjvMT8j0CFh4eH91Fe+8o8OU6KDskRrwIDHh4eXslrL99oHqFcP290FYk1Hh4e3gXevnzQDh/MgsGpxhseHh7egvcHIgP5PiWS9VgAAAAASUVORK5CYII=" alt="微信分享二维码">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsklEQVR42u3aQU4DMQwFUO5/aZBYIVWd/m9PoEgvqwpNO3lZxMb2x0e8Pr/X4+f8mWffenzm52p/Ybjw8PDwRlt/tp5t/fr5zUHkR5zsAQ8PD+8cL99E9KMPT7Zv3AcnPDw8vHfgJYwZOHkjHh4e3n/ktYWGa8z1L+Dh4eG9Py8pRly/si0Z5KTk7zfUWvDw8PBi3qYB9leff6m/h4eHh1d21fPVJtB5Gr3ZLR4eHt4J3n5bm4PI2XmRIvoCHh4e3q2868u6LRO0l3ubXkfJNx4eHt6tvFm5djZK1Y4L5G8pkmk8PDy8m3ibLHSDn7XKipQaDw8P7wAvv47zpDa5uPcHVKTyeHh4eLfy9sWFPDVvi8Vt0RkPDw/vd3iz4ao8LW4T91kJuEDi4eHhrXl58rpvR7WHtR/PwsPDwzvBy/+x31z6+XbbYFCUJPDw8PBu4s02ugkV+THdEITw8PDwjvFmpdW2VbZJnZPvRsk0Hh4e3pqXbzRJr2ctq1lbqyhn4OHh4R3mnSuw5uMIm2DzotaCh4eHt+bNmlJt2ywPGJv9rGoteHh4eOWdnKe2sxfkBdw2REVHg4eHh3crL2/Mt0NU+VBpUpatS7ft3AEeHh7eiJen0dEkV5lkb558etx4eHh4B3htuytJZPO0uCXNwhgeHh7eOV6+obzwmuBnpds84cbDw8M7wduUVmeDAvnl3u7txWQEHh4e3gFeFEOCMDBjzGJa8V8CHh4e3pr3Wa5N2WJTJh425PDw8PAO8PI1KxPMLvS8ZLwPb3h4eHgz3r4EsDnRttlWJ+h4eHh4x3jtIFSbLm+KGpvQhYeHh/cOvNnwU1uWzUPIizIEHh4e3p/y9i3/2bjVqmGGh4eHd4y3v+5nwwSbRtdwMgIPDw9vzds3wGZhYNPcyg8UDw8P71beF9xYkpcJc88xAAAAAElFTkSuQmCC" alt="微信分享二维码">
     </div>
 </div>
 
@@ -374,7 +374,7 @@
  
   <section id="comments">
     <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-solr分词、同义词、停止词" data-title="solr分词 同义词 停止词" data-url="http://yzy755.github.io/2017/03/02/solr分词、同义词、停止词/"></div>
+    <div class="ds-thread" data-thread-key="post-solr分词 同义词 停止词" data-title="solr分词 同义词 停止词" data-url="http://yzy755.github.io/2017/03/02/solr分词 同义词 停止词/"></div>
     <!-- 多说评论框 end -->
     <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
     <script type="text/javascript">
