@@ -1766,6 +1766,31 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
   </entry>
   
   <entry>
+    <title>微信小程序保存登录状态</title>
+    <link href="http://yzy755.github.io/2017/03/05/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E4%BF%9D%E5%AD%98%E7%99%BB%E5%BD%95%E7%8A%B6%E6%80%81/"/>
+    <id>http://yzy755.github.io/2017/03/05/微信小程序保存登录状态/</id>
+    <published>2017-03-05T09:17:53.000Z</published>
+    <updated>2017-06-27T03:34:08.164Z</updated>
+    
+    <content type="html"><![CDATA[<p>浏览器能保证访问网站的session的唯一性是因为访问网站后服务器会分配session，sessionid会记录在浏览器的cookie中.<br><a id="more"></a><br>小程序并没有这样的机制，所以当用户登陆后，小程序应保存sessionid，从而保证在发送请求时http头部携带sessionid保证用户的登录状态。服务器登录及后续请求流程：<br>    a)请求用户中心登录，校验用户名密码，返回账户实体 /openapi/accountService/login<br>    b)校验成功后保存账户实体，请求云课堂登录接口，使用shiro登录当前账号返回seesionid并在小程序端缓存，代码参考IndexController中的loginFragment方法。<br>    c)登陆后请求受保护的资源在请求中加入http头部如下：<br>        header: {<br>                //‘Accept’: ‘application/json’,<br>                ‘Cookie’: ‘sid=’ + wx.getStorageSync(“session_id”)<br>            },</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;浏览器能保证访问网站的session的唯一性是因为访问网站后服务器会分配session，sessionid会记录在浏览器的cookie中.&lt;br&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="微信小程序" scheme="http://yzy755.github.io/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/"/>
+    
+      <category term="session" scheme="http://yzy755.github.io/tags/session/"/>
+    
+  </entry>
+  
+  <entry>
     <title>微信小程序对接支付</title>
     <link href="http://yzy755.github.io/2017/03/02/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%AF%B9%E6%8E%A5%E6%94%AF%E4%BB%98/"/>
     <id>http://yzy755.github.io/2017/03/02/微信小程序对接支付/</id>
