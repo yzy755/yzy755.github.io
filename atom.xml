@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2018-08-28T08:47:27.998Z</updated>
+  <updated>2018-08-28T09:17:59.327Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -20,9 +20,10 @@
     <link href="http://yzy755.github.io/2018/05/12/shiro%E5%85%A8%E9%9D%A2%E7%9A%84%E6%9D%83%E9%99%90%E6%96%B9%E6%A1%88/"/>
     <id>http://yzy755.github.io/2018/05/12/shiro全面的权限方案/</id>
     <published>2018-05-12T09:17:53.000Z</published>
-    <updated>2018-08-28T08:47:27.998Z</updated>
+    <updated>2018-08-28T09:17:59.327Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="1-认证"><a href="#1-认证" class="headerlink" title="1.认证"></a>1.认证</h1><p>认证通过微信或钉钉的认证，认证后在天使排版中只需在shiro中默认标记为认证通过即可<br><a id="more"></a></p>
+    <content type="html"><![CDATA[<p>天使排班基于微信的用户体系，在系统中用户的角色和权限全靠数据库查询和代码控制，没有一个强大简洁的权限控制框架实在不方便，于是引入了以前使用过的shiro，并在使用上进行了加强，集成了redis权限缓存以及基于redis的sessionDAO，全面支持分布式。<br><a id="more"></a></p>
+<h1 id="1-认证"><a href="#1-认证" class="headerlink" title="1.认证"></a>1.认证</h1><p>认证通过微信或钉钉的认证，认证后在天使排版中只需在shiro中默认标记为认证通过即可</p>
 <h1 id="2-授权"><a href="#2-授权" class="headerlink" title="2.授权"></a>2.授权</h1><h2 id="2-1权限控制"><a href="#2-1权限控制" class="headerlink" title="2.1权限控制"></a>2.1权限控制</h2><h3 id="2-1-1基于角色的访问控制"><a href="#2-1-1基于角色的访问控制" class="headerlink" title="2.1.1基于角色的访问控制"></a>2.1.1基于角色的访问控制</h3><pre><code>RBAC基于角色的访问控制（Role-Based Access Control）是以角色为中心进行访问控制，比如：主体的角色为管理员可以排班，查询成员信息等，访问控制流程如下：
 </code></pre><p><img src="/2018/05/12/shiro全面的权限方案/图片1.png" alt="logo"></p>
 <p>上图中的判断逻辑代码可以理解为：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span>(主体.hasRole(<span class="string">"管理员角色id"</span>))&#123;</div><div class="line">	排班</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
@@ -75,7 +76,7 @@
     
     <summary type="html">
     
-      &lt;h1 id=&quot;1-认证&quot;&gt;&lt;a href=&quot;#1-认证&quot; class=&quot;headerlink&quot; title=&quot;1.认证&quot;&gt;&lt;/a&gt;1.认证&lt;/h1&gt;&lt;p&gt;认证通过微信或钉钉的认证，认证后在天使排版中只需在shiro中默认标记为认证通过即可&lt;br&gt;&lt;/p&gt;
+      &lt;p&gt;天使排班基于微信的用户体系，在系统中用户的角色和权限全靠数据库查询和代码控制，没有一个强大简洁的权限控制框架实在不方便，于是引入了以前使用过的shiro，并在使用上进行了加强，集成了redis权限缓存以及基于redis的sessionDAO，全面支持分布式。&lt;br&gt;&lt;/p&gt;
     
     </summary>
     
@@ -1864,49 +1865,35 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
   </entry>
   
   <entry>
-    <title>solr分词 同义词 停止词</title>
-    <link href="http://yzy755.github.io/2017/03/02/solr%E5%88%86%E8%AF%8D%20%E5%90%8C%E4%B9%89%E8%AF%8D%20%E5%81%9C%E6%AD%A2%E8%AF%8D/"/>
-    <id>http://yzy755.github.io/2017/03/02/solr分词 同义词 停止词/</id>
+    <title>solr部署</title>
+    <link href="http://yzy755.github.io/2017/03/02/solr%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yzy755.github.io/2017/03/02/solr部署/</id>
     <published>2017-03-02T09:17:53.000Z</published>
-    <updated>2017-06-27T03:43:30.123Z</updated>
+    <updated>2017-03-09T09:12:45.411Z</updated>
     
-    <content type="html"><![CDATA[<p>分词相关拓展，配置博微软件中特有的分词和停止词：<br>特有的分词指的是博微软件中的词组，比如“定额”、“土方”等<br>停止词是无功能意义的词，比如is 、a 、are 、”的”，“得”，“我” 等，这些词会在句子中多次出现却无意义，所以在分词的时候需要把这些词过滤掉。<br><a id="more"></a><br>使用IKAnalyzer中文分词器，<br>在collection/conf/schema.xml中配置</p>
-<pre><code>&lt;fieldType name=&quot;text_ik&quot; class=&quot;solr.TextField&quot;&gt; 
-  &lt;analyzer class=&quot;org.wltea.analyzer.lucene.IKAnalyzer&quot;/&gt; 
-  &lt;analyzer&gt;
-        &lt;tokenizer class=&quot;solr.WhitespaceTokenizerFactory&quot;/&gt;
-    &lt;/analyzer&gt;
-</code></pre><p>需要使用IKAnalyzer分词器的字段配置type为text_ik，比如：</p>
-<pre><code>&lt;field name=&quot;doc_title&quot; type=&quot;text_ik&quot; indexed=&quot;true&quot; stored=&quot;true&quot; termVectors=&quot;true&quot;/&gt;
-</code></pre><p>接下来就在solr的部署目录 WEB-INF/classes中增加配置如下：<br><img src="/2017/03/02/solr分词 同义词 停止词/1.png" alt="logo"><br>IKAnalyzer.cfg.xml内容配置如下：</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;!DOCTYPE properties SYSTEM &quot;http://java.sun.com/dtd/properties.dtd&quot;&gt;  
-&lt;properties&gt;  
-    &lt;comment&gt;IK Analyzer 扩展配置&lt;/comment&gt;
-    &lt;!--用户可以在这里配置自己的扩展字典 --&gt;
-    &lt;entry key=&quot;ext_dict&quot;&gt;bwwiki.dic;&lt;/entry&gt; 
-
-    &lt;!--用户可以在这里配置自己的扩展停止词字典--&gt;
-    &lt;entry key=&quot;ext_stopwords&quot;&gt;stopword.dic;&lt;/entry&gt; 
-
-&lt;/properties&gt;
-</code></pre><p>Ps:同义词拓展（暂未实际应用）：<br>在collection/conf/schema.xml中配置：</p>
-<pre><code>&lt;fieldType name=&quot;text_syn&quot; class=&quot;solr.TextField&quot;&gt;  
-   &lt;analyzer type=&quot;query&quot;&gt;  
-   &lt;tokenizer class=&quot;org.wltea.analyzer.lucene.IKTokenizerFactory&quot; useSmart=&quot;false&quot;/&gt;  
-   &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;  
-   &lt;/analyzer&gt;  
-  &lt;analyzer type=&quot;index&quot;&gt;  
-  &lt;tokenizer class=&quot;org.wltea.analyzer.lucene.IKTokenizerFactory&quot; useSmart=&quot;fasle&quot;/&gt;  
- &lt;filter class=&quot;solr.SynonymFilterFactory&quot; synonyms=&quot;synonyms.txt&quot; ignoreCase=&quot;true&quot; expand=&quot;true&quot; /&gt;  
-&lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;  
-</code></pre><p>      </p>
-<p>同级目录会带有synonyms.txt文件，可添加同义词组，以“,”隔开，比如：<br><img src="/2017/03/02/solr分词 同义词 停止词/2.png" alt="logo"><br>分词的测试方式如图：<br><img src="/2017/03/02/solr分词 同义词 停止词/3.png" alt="logo"><br>选中text_ik类型，可将“定额“、“土方“分词显示出来，并去掉配置的停止词“和”<br>同义词测试方式相同。</p>
+    <content type="html"><![CDATA[<p><a href="http://www.tuicool.com/articles/mueARf" target="_blank" rel="external">http://www.tuicool.com/articles/mueARf</a> 参考</p>
+<p>请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：</p>
+<p>复制solr.war到tomcat的webapps目录下，如图操作：</p>
+<p>启动tomcat,如图：<br><a id="more"></a><br>然后修改webapps\solr\WEB-INF下的web.xml配置文件，如图：</p>
+<p>配置solr_home目录路径，如图：</p>
+<p>然后我们需要去C盘创建一个solr_home文件夹，这就是我们SOLR_HOME根目录啦，如图：</p>
+<p>然后我们需要把E:\solr-5.1.0\server\solr目录下的所有文件及文件夹全部复制到我们刚刚创建的solr_home目录下，如图：</p>
+<p>然后我们需要把E:\solr-5.1.0\server\lib\ext目录下的所有jar包 copy到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF\lib目录下(<br>E:\apache-tomcat-7.0.55是我的tomcat安装根目录，请对照你们自己的tomcat安装目录进行调整，你懂的<br>)，如图：</p>
+<p>然后复制 E:\solr-5.1.0\server\resources目录下的log4j.properties配置文件到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF目录下，如图操作：</p>
+<p>然后重启我们的tomcat,如图：</p>
+<p>打开你的浏览器，地址栏输入 <a href="http://localhost:8080/solr" target="_blank" rel="external">http://localhost:8080/solr</a> ， 访问我们的Solr Web后台。如果你能看到这个界面，即表明Solr5部署成功了，如图：</p>
+<p>然后你就可以通过Solr Web UI添加Core啦，不过添加Core之前，你需要在solr_home目录下创建core文件夹，如图：<br>core目录下需要创建conf和data文件夹，你懂的， 《跟益达学Solr5之使用Jetty部署Solr》<br>这篇博客也提到过，如图：</p>
+<p>剩下的一些配置copy具体你们就参照那篇去操作把，这里就不重复说明了。<br>到此，Solr5如何部署到Tomcat就讲解完毕了！</p>
+<p>IK 分词器安装<br>1.将之前解压的solr-4.3.1 下的contrib和dist 文件夹复制到F:\winsolr\solr_home\solr\collection1下<br>2.将下载的IKAnalyzer的发行包解压，解压后将IKAnalyzer2012FF_u1.jar（分词器jar包）复制到F:\winsolr\solr_home\solr\collection1\contrib\analysis-extras\lib下<br>3.在F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF下新建classes文件夹<br>4.将IKAnalyzer解压出来的IKAnalyzer.cfg.xml（分词器配置文件）和 Stopword.dic（分词器停词字典,可自定义添加内容）复制到<br>  F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF\classes中<br>5.在F:\winsolr\solr_home\solr\collection1\conf下的schema.xml文件中fieldType name=”text_general”这个地方的上方添加以下内容 </p>
+<p>将pinyinfj.jar、lucene-analyzers-smartcn-4.7.0.jar、IKAnalyzer2012FF_u1.jar、pinyinAnalyzer.jar、shentong_tsearch_lib.jar放到solr部署目录的web-inf的lib目录下</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;分词相关拓展，配置博微软件中特有的分词和停止词：&lt;br&gt;特有的分词指的是博微软件中的词组，比如“定额”、“土方”等&lt;br&gt;停止词是无功能意义的词，比如is 、a 、are 、”的”，“得”，“我” 等，这些词会在句子中多次出现却无意义，所以在分词的时候需要把这些词过滤掉。&lt;br&gt;&lt;/p&gt;
+      &lt;p&gt;&lt;a href=&quot;http://www.tuicool.com/articles/mueARf&quot;&gt;http://www.tuicool.com/articles/mueARf&lt;/a&gt; 参考&lt;/p&gt;
+&lt;p&gt;请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：&lt;/p&gt;
+&lt;p&gt;复制solr.war到tomcat的webapps目录下，如图操作：&lt;/p&gt;
+&lt;p&gt;启动tomcat,如图：&lt;br&gt;&lt;/p&gt;
     
     </summary>
     
@@ -1918,81 +1905,50 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
   </entry>
   
   <entry>
-    <title>微信小程序对接支付</title>
-    <link href="http://yzy755.github.io/2017/03/02/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%AF%B9%E6%8E%A5%E6%94%AF%E4%BB%98/"/>
-    <id>http://yzy755.github.io/2017/03/02/微信小程序对接支付/</id>
+    <title>jar包在windows下的运行命令</title>
+    <link href="http://yzy755.github.io/2017/03/02/jar%E5%8C%85%E5%9C%A8windows%E4%B8%8B%E8%BF%90%E8%A1%8C%E5%91%BD%E4%BB%A4/"/>
+    <id>http://yzy755.github.io/2017/03/02/jar包在windows下运行命令/</id>
     <published>2017-03-02T09:17:53.000Z</published>
-    <updated>2017-04-11T09:28:05.484Z</updated>
+    <updated>2017-03-09T09:13:47.771Z</updated>
     
-    <content type="html"><![CDATA[<p>所有支付方式都需要通过 「统一下单」的 API 来获取一个支付凭证。<br>但在小程序内测期间，还没有「统一下单」的概念。HTML 5 应用发起支付需要直接通过前端构造参数来发起（不经过后端验证），很容易造成支付凭证泄露等安全问题。<br>为此，微信支付将其流程进行了优化：在所有支付场景中插入「统一下单」的特性。推荐开发者在后端完成支付参数的构建等行为。<br>该优化带来以下好处:</p>
-<pre><code>* 尽可能让开发者不犯低级错误，造成财务损失。
-* 简化构造支付参数的复杂度，所有支付方式可共享一个支付后端接口。
-</code></pre><a id="more"></a>
-<p>通过「统一下单」获取到相对应 prepay_id 或者 code_url 等参数，即可通过各种支付模式的 SDK 来进行微信支付的发起。<br>需要注意的是，必须对通知参数进行签名验证，以确保安全。<br>进行签名验证时，除去签名字段（一般参数名为: sign）不需要参与签名外，其余所有接收到的参数均需要参与签名。<br>比如拼接的请求支付宝的参数为total_fee,body,appid，那么签名就必须用这三个参数<br>得到prepay_id后还需在发起wx.requestPayment前对 wx.requestPayment请求所需的参数进行签名<br>所需的参数为’timeStamp’: res.data.timeStamp,<br>            ‘nonceStr’: nonce_str,<br>            ‘package’: ‘prepay_id=’+prepay_id,<br>            ‘signType’: ‘MD5’,<br>            ‘paySign’: res.data.sign,<br>但是后台生成该签名还需appId（I大写！！）随后用返回的参数和生成的timeStamp进行请求（ appId、timeStamp、nonceStr、package、signType）。</p>
-<p>之后又将微信支付集成到了web端，官方对于网页版的微信支付有两种模式，我使用的是更为简单的模式二，参考<a href="https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_5" target="_blank" rel="external">https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_5</a><br>时序图如下：<br><img src="/2017/03/02/微信小程序对接支付/timing.png" alt="logo"><br>与小程序的统一下单api所需的参数不同的是：小程序的trade_type一定是”JSAPI”,相应的一定要传当前使用小程序的用户openid；扫码支付模式二的trade_type是”NATIVE”，不需要用户的openid,其他参数相同，为：<br>        wxRequestParam.setAppid(ConstantUtil.APP_ID);<br>        wxRequestParam.setMch_id(ConstantUtil.MCH_ID);<br>        wxRequestParam.setNonce_str(WXUtil.getNonceStr());<br>        wxRequestParam.setBody(commonsOrder.getTitle());<br>        wxRequestParam.setSpbill_create_ip(request.getRemoteAddr().startsWith(“0”)?”127.0.0.1”:request.getRemoteAddr());<br>        wxRequestParam.setOut_trade_no(commonsOrder.getOrderCode());<br>        wxRequestParam.setTotal_fee(StringUtils.substringBefore(String.valueOf(commonsOrder.getOrderFee().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() * 100), “.”));<br>        wxRequestParam.setNotify_url(ConstantUtil.NOTIFY_URL);<br>        wxRequestParam.setSign(sign);<br>        wxRequestParam.setTrade_type(“NATIVE”);<br>        // 下面是小程序不同的参数<br>        wxRequestParam.setOpenid(openid);<br>        wxRequestParam.setTrade_type(“JSAPI”);</p>
-<p>统一下单后返回参数中有一个code_url，使用 <a href="http://qr.liantu.com/api.php?text=code_url" target="_blank" rel="external">http://qr.liantu.com/api.php?text=code_url</a> 即可看到一张二维码，扫码就支付啦，是不是比较简单- -</p>
-<p>——————————————–2017.4.6更新——————————————————<br>老大说使用其他网站平台生成二维码感觉不靠谱，所以去网上看了下有没有自己“画”二维码的库类，当然是有的，google爸爸就有一套基于nio的图片制作工具：<br>添加依赖：</p>
-<pre><code>&lt;dependency&gt;  
-    &lt;groupId&gt;com.google.zxing&lt;/groupId&gt;  
-    &lt;artifactId&gt;core&lt;/artifactId&gt;  
-    &lt;version&gt;3.0.0&lt;/version&gt;  
-&lt;/dependency&gt;  
-&lt;dependency&gt;  
-    &lt;groupId&gt;com.google.zxing&lt;/groupId&gt;  
-    &lt;artifactId&gt;javase&lt;/artifactId&gt;  
-    &lt;version&gt;3.0.0&lt;/version&gt;  
-&lt;/dependency&gt; 
-</code></pre><p>编写工具类，代码如下：<br>    /**</p>
-<pre><code> * @param qrImagePath 生成的图片绝对路径
- * @param qrImageName 生成的图片名称
- * @param content 待扫描的内容
- * @throws WriterException
- * @throws IOException
- */
-public static String createQRcode(String qrImagePath, String qrImageName,
-        String content) throws WriterException, IOException {
-    int width = 300; // 图像宽度
-    int height = 300; // 图像高度
-    String format = &quot;png&quot;;// 图像类型
-    Map&lt;EncodeHintType, Object&gt; hints = new HashMap&lt;EncodeHintType, Object&gt;();
-    hints.put(EncodeHintType.CHARACTER_SET, &quot;UTF-8&quot;);
-    BitMatrix bitMatrix = new MultiFormatWriter().encode(content,
-            BarcodeFormat.QR_CODE, width, height, hints);// 生成矩阵
-    Path path = FileSystems.getDefault().getPath(qrImagePath, qrImageName);
-    MatrixToImageWriter.writeToPath(bitMatrix, format, path);// 输出图像
-    return path.toString();
-}
-
-// 原来的生成方法
-public static String QRfromLiantu(String chl) throws Exception {
-    chl = UrlEncode(chl);
-    String QRfromLiantu = &quot;http://qr.liantu.com/api.php?text=&quot; + chl;
-    return QRfromLiantu;
-}
-
-// 特殊字符处理
-public static String UrlEncode(String src)
-        throws UnsupportedEncodingException {
-    return URLEncoder.encode(src, &quot;UTF-8&quot;).replace(&quot;+&quot;, &quot;%20&quot;);
-}
-</code></pre><p>然后调用就简单啦，消除领导的顾虑<br>看了下京东的微信二维码支付，一分钟刷新一次，有自己独立的二维码服务，后期抽空研究下。。。</p>
+    <content type="html"><![CDATA[<p>1、打jar包 jar -cvf xx.jar 文件夹名称</p>
+<p>说明一下：<em>.</em>表示把当前目录下面以及子目录的所有class都打到这个xx.jar里。</p>
+<p>-cvf的含义，可以自己去用jar命令去查看</p>
+<p>如果要单独对某个或某些class文件进行打包，可以这样：</p>
+<p>jar -cvf xx.jar Foo.class Bar.class </p>
+<a id="more"></a>
+<p>2.运行jar</p>
+<p>java -jar xx.jar</p>
+<p>要运行一个jar，则此jar内部的META-INF\MANIFEST.MF文件里必须指明要执行的main方法类</p>
+<p>具体格式如：</p>
+<p>Manifest-Version: 1.0<br>Created-By: 1.6.0_03 (Sun Microsystems Inc.)<br>Main-class: Test<br>如果此处的Test.class在com.xx包下面，则需要指明。</p>
+<p>如果在运行时报了invalid or corrupt jarfile错误，则需要检查Main-class: Test 之间是不是缺少了空格。</p>
+<p>3.指定运行jar里面的class</p>
+<p>java -cp xx.jar com.xx.Test</p>
+<p>4.编译某个java文件，但是依赖某个jar</p>
+<p>javac -cp xx.jar Test.java</p>
+<p> (Test.java里面import了xx.jar里面的某个class)</p>
+<p>5.运行某个java文件，但是依赖某个jar</p>
+<p>java -cp .;xx.jar Test</p>
+<p>注意：引用xx.jar的时候，不要漏掉.;（这个表示当前目录）</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;所有支付方式都需要通过 「统一下单」的 API 来获取一个支付凭证。&lt;br&gt;但在小程序内测期间，还没有「统一下单」的概念。HTML 5 应用发起支付需要直接通过前端构造参数来发起（不经过后端验证），很容易造成支付凭证泄露等安全问题。&lt;br&gt;为此，微信支付将其流程进行了优化：在所有支付场景中插入「统一下单」的特性。推荐开发者在后端完成支付参数的构建等行为。&lt;br&gt;该优化带来以下好处:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;* 尽可能让开发者不犯低级错误，造成财务损失。
-* 简化构造支付参数的复杂度，所有支付方式可共享一个支付后端接口。
-&lt;/code&gt;&lt;/pre&gt;
+      &lt;p&gt;1、打jar包 jar -cvf xx.jar 文件夹名称&lt;/p&gt;
+&lt;p&gt;说明一下：&lt;em&gt;.&lt;/em&gt;表示把当前目录下面以及子目录的所有class都打到这个xx.jar里。&lt;/p&gt;
+&lt;p&gt;-cvf的含义，可以自己去用jar命令去查看&lt;/p&gt;
+&lt;p&gt;如果要单独对某个或某些class文件进行打包，可以这样：&lt;/p&gt;
+&lt;p&gt;jar -cvf xx.jar Foo.class Bar.class &lt;/p&gt;
     
     </summary>
     
       <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     
     
-      <category term="微信小程序" scheme="http://yzy755.github.io/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/"/>
+      <category term="java" scheme="http://yzy755.github.io/tags/java/"/>
     
-      <category term="微信支付" scheme="http://yzy755.github.io/tags/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98/"/>
+      <category term="jar包" scheme="http://yzy755.github.io/tags/jar%E5%8C%85/"/>
     
   </entry>
   

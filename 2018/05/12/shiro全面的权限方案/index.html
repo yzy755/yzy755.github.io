@@ -8,12 +8,12 @@
   <link rel="dns-prefetch" href="http://yzy755.github.io">
   <title>shiro全面的权限方案 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1.认证认证通过微信或钉钉的认证，认证后在天使排版中只需在shiro中默认标记为认证通过即可">
+  <meta name="description" content="天使排班基于微信的用户体系，在系统中用户的角色和权限全靠数据库查询和代码控制，没有一个强大简洁的权限控制框架实在不方便，于是引入了以前使用过的shiro，并在使用上进行了加强，集成了redis权限缓存以及基于redis的sessionDAO，全面支持分布式。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="shiro全面的权限方案">
 <meta property="og:url" content="http://yzy755.github.io/2018/05/12/shiro全面的权限方案/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="1.认证认证通过微信或钉钉的认证，认证后在天使排版中只需在shiro中默认标记为认证通过即可">
+<meta property="og:description" content="天使排班基于微信的用户体系，在系统中用户的角色和权限全靠数据库查询和代码控制，没有一个强大简洁的权限控制框架实在不方便，于是引入了以前使用过的shiro，并在使用上进行了加强，集成了redis权限缓存以及基于redis的sessionDAO，全面支持分布式。">
 <meta property="og:image" content="http://yzy755.github.io/2018/05/12/shiro全面的权限方案/图片1.png">
 <meta property="og:image" content="http://yzy755.github.io/2018/05/12/shiro全面的权限方案/图片2.png">
 <meta property="og:image" content="http://yzy755.github.io/2018/05/12/shiro全面的权限方案/图片3.png">
@@ -34,10 +34,10 @@
 <meta property="og:image" content="http://yzy755.github.io/2018/05/12/shiro全面的权限方案/图片18.png">
 <meta property="og:image" content="http://yzy755.github.io/2018/05/12/shiro全面的权限方案/图片19.png">
 <meta property="og:image" content="http://yzy755.github.io/2018/05/12/shiro全面的权限方案/图片20.png">
-<meta property="og:updated_time" content="2018-08-28T08:47:27.998Z">
+<meta property="og:updated_time" content="2018-08-28T09:17:59.327Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="shiro全面的权限方案">
-<meta name="twitter:description" content="1.认证认证通过微信或钉钉的认证，认证后在天使排版中只需在shiro中默认标记为认证通过即可">
+<meta name="twitter:description" content="天使排班基于微信的用户体系，在系统中用户的角色和权限全靠数据库查询和代码控制，没有一个强大简洁的权限控制框架实在不方便，于是引入了以前使用过的shiro，并在使用上进行了加强，集成了redis权限缓存以及基于redis的sessionDAO，全面支持分布式。">
 <meta name="twitter:image" content="http://yzy755.github.io/2018/05/12/shiro全面的权限方案/图片1.png">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
@@ -208,7 +208,8 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="1-认证"><a href="#1-认证" class="headerlink" title="1.认证"></a>1.认证</h1><p>认证通过微信或钉钉的认证，认证后在天使排版中只需在shiro中默认标记为认证通过即可<br><a id="more"></a></p>
+        <p>天使排班基于微信的用户体系，在系统中用户的角色和权限全靠数据库查询和代码控制，没有一个强大简洁的权限控制框架实在不方便，于是引入了以前使用过的shiro，并在使用上进行了加强，集成了redis权限缓存以及基于redis的sessionDAO，全面支持分布式。<br><a id="more"></a></p>
+<h1 id="1-认证"><a href="#1-认证" class="headerlink" title="1.认证"></a>1.认证</h1><p>认证通过微信或钉钉的认证，认证后在天使排版中只需在shiro中默认标记为认证通过即可</p>
 <h1 id="2-授权"><a href="#2-授权" class="headerlink" title="2.授权"></a>2.授权</h1><h2 id="2-1权限控制"><a href="#2-1权限控制" class="headerlink" title="2.1权限控制"></a>2.1权限控制</h2><h3 id="2-1-1基于角色的访问控制"><a href="#2-1-1基于角色的访问控制" class="headerlink" title="2.1.1基于角色的访问控制"></a>2.1.1基于角色的访问控制</h3><pre><code>RBAC基于角色的访问控制（Role-Based Access Control）是以角色为中心进行访问控制，比如：主体的角色为管理员可以排班，查询成员信息等，访问控制流程如下：
 </code></pre><p><img src="/2018/05/12/shiro全面的权限方案/图片1.png" alt="logo"></p>
 <p>上图中的判断逻辑代码可以理解为：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span>(主体.hasRole(<span class="string">"管理员角色id"</span>))&#123;</div><div class="line">	排班</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
@@ -535,11 +536,15 @@
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
+                <a href="javascript:void(0)" class="js-tag color5">jar包</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -551,11 +556,7 @@
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">jar包</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">redis</a>
+                <a href="javascript:void(0)" class="js-tag color3">调优</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -567,11 +568,7 @@
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">调优</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">solr</a>
+                <a href="javascript:void(0)" class="js-tag color1">redis</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -583,15 +580,19 @@
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">solr</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">数据库分析</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">数据分析</a>
+                <a href="javascript:void(0)" class="js-tag color5">zookeeper</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">zookeeper</a>
+                <a href="javascript:void(0)" class="js-tag color5">数据分析</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -603,15 +604,15 @@
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">微信支付</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">session</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">线程安全</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">微信支付</a>
               </li>
              
               <li class="article-tag-list-item">
