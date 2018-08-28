@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2017-05-25T02:04:39.899Z</updated>
+  <updated>2018-08-28T08:47:27.998Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -14,6 +14,79 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>shiro全面的权限方案</title>
+    <link href="http://yzy755.github.io/2018/05/12/shiro%E5%85%A8%E9%9D%A2%E7%9A%84%E6%9D%83%E9%99%90%E6%96%B9%E6%A1%88/"/>
+    <id>http://yzy755.github.io/2018/05/12/shiro全面的权限方案/</id>
+    <published>2018-05-12T09:17:53.000Z</published>
+    <updated>2018-08-28T08:47:27.998Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="1-认证"><a href="#1-认证" class="headerlink" title="1.认证"></a>1.认证</h1><p>认证通过微信或钉钉的认证，认证后在天使排版中只需在shiro中默认标记为认证通过即可<br><a id="more"></a></p>
+<h1 id="2-授权"><a href="#2-授权" class="headerlink" title="2.授权"></a>2.授权</h1><h2 id="2-1权限控制"><a href="#2-1权限控制" class="headerlink" title="2.1权限控制"></a>2.1权限控制</h2><h3 id="2-1-1基于角色的访问控制"><a href="#2-1-1基于角色的访问控制" class="headerlink" title="2.1.1基于角色的访问控制"></a>2.1.1基于角色的访问控制</h3><pre><code>RBAC基于角色的访问控制（Role-Based Access Control）是以角色为中心进行访问控制，比如：主体的角色为管理员可以排班，查询成员信息等，访问控制流程如下：
+</code></pre><p><img src="/2018/05/12/shiro全面的权限方案/图片1.png" alt="logo"></p>
+<p>上图中的判断逻辑代码可以理解为：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span>(主体.hasRole(<span class="string">"管理员角色id"</span>))&#123;</div><div class="line">	排班</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>缺点：以角色进行访问控制粒度较粗，如果上图中排班所需要的角色变化为创建者和管理员，此时就需要修改判断逻辑为“判断主体的角色是否是创建者或管理员”，系统可扩展性差。<br>修改代码如下：<br>if(主体.hasRole(“管理员角色id”) ||  主体.hasRole(“创建者角色id”)){<br>    排班<br>}</p>
+<h3 id="2-1-2基于资源的访问控制"><a href="#2-1-2基于资源的访问控制" class="headerlink" title="2.1.2基于资源的访问控制"></a>2.1.2基于资源的访问控制</h3><pre><code>RBAC基于资源的访问控制（Resource-Based Access Control）是以资源为中心进行访问控制，比如：主体必须具有排班权限才可以排班等，访问控制流程如下：
+</code></pre><p>上图中的判断逻辑代码可以理解为：<br>if(主体.hasPermission(“排班权限标识”)){<br>    排班<br>}</p>
+<p>优点：系统设计时定义好排班的权限标识，即使排班所需要的角色变化为创建者和管理员也只需要将“排班权限”添加到“管理角色”的权限列表中，判断逻辑不用修改，系统可扩展性强。</p>
+<h3 id="2-1-3基于url拦截"><a href="#2-1-3基于url拦截" class="headerlink" title="2.1.3基于url拦截"></a>2.1.3基于url拦截</h3><pre><code>基于url拦截是企业中常用的权限管理方法，实现思路是：将系统操作的每个url配置在权限表中，将权限对应到角色，将角色分配给用户，用户访问系统功能通过Filter进行过虑，过虑器获取到用户访问的url，只要访问的url是用户分配角色中的url则放行继续访问。
+如下图：
+</code></pre><p><img src="/2018/05/12/shiro全面的权限方案/图片2.png" alt="logo"></p>
+<h2 id="2-2权限模型"><a href="#2-2权限模型" class="headerlink" title="2.2权限模型"></a>2.2权限模型</h2><p>对主体、资源、权限通过数据模型表示。</p>
+<p>主体（账号、密码）<br>资源（资源名称、访问地址）<br>权限（权限名称、资源id）<br>角色（角色名称）<br>角色和权限关系（角色id、权限id）<br>主体和角色关系（主体id、角色id）</p>
+<p>通常企业开发中将资源和权限表合并为一张权限表，如下：<br>资源（资源名称、访问地址）<br>权限（权限名称、资源id）<br>合并为：<br>权限（权限名称、资源名称、资源访问地址）<br>如下图：</p>
+<p><img src="/2018/05/12/shiro全面的权限方案/图片3.png" alt="logo"></p>
+<p>上图常被称为权限管理的通用模型，在开发中根据系统自身的特点还会对上图进行修改，字段可以个性化。</p>
+<h1 id="3-Shiro"><a href="#3-Shiro" class="headerlink" title="3. Shiro"></a>3. Shiro</h1><h2 id="3-1-Shiro架构"><a href="#3-1-Shiro架构" class="headerlink" title="3.1 Shiro架构"></a>3.1 Shiro架构</h2><p><img src="/2018/05/12/shiro全面的权限方案/图片4.png" alt="logo"></p>
+<h3 id="3-1-1-Subject"><a href="#3-1-1-Subject" class="headerlink" title="3.1.1 Subject"></a>3.1.1 Subject</h3><p>Subject即主体，外部应用与subject进行交互，subject记录了当前操作用户，将用户的概念理解为当前操作的主体，可能是一个通过浏览器请求的用户，也可能是一个运行的程序。    Subject在shiro中是一个接口，接口中定义了很多认证授相关的方法，外部程序通过subject进行认证授，而subject是通过SecurityManager安全管理器进行认证授权</p>
+<h3 id="3-1-2-SecurityManager"><a href="#3-1-2-SecurityManager" class="headerlink" title="3.1.2 SecurityManager"></a>3.1.2 SecurityManager</h3><p>SecurityManager即安全管理器，对全部的subject进行安全管理，它是shiro的核心，负责对所有的subject进行安全管理。通过SecurityManager可以完成subject的认证、授权等，实质上SecurityManager是通过Authenticator进行认证，通过Authorizer进行授权，通过SessionManager进行会话管理等。<br>SecurityManager是一个接口，继承了Authenticator, Authorizer, SessionManager这三个接口。</p>
+<h3 id="3-1-3-Authenticator"><a href="#3-1-3-Authenticator" class="headerlink" title="3.1.3 Authenticator"></a>3.1.3 Authenticator</h3><p>Authenticator即认证器，对用户身份进行认证，Authenticator是一个接口，shiro提供ModularRealmAuthenticator实现类，通过ModularRealmAuthenticator基本上可以满足大多数需求，也可以自定义认证器。</p>
+<h3 id="3-1-4-Authorizer"><a href="#3-1-4-Authorizer" class="headerlink" title="3.1.4 Authorizer"></a>3.1.4 Authorizer</h3><p>Authorizer即授权器，用户通过认证器认证通过，在访问功能时需要通过授权器判断用户是否有此功能的操作权限。</p>
+<h3 id="3-1-5-realm"><a href="#3-1-5-realm" class="headerlink" title="3.1.5 realm"></a>3.1.5 realm</h3><p>Realm即领域，相当于datasource数据源，securityManager进行安全认证需要通过Realm获取用户权限数据，比如：如果用户身份数据在数据库那么realm就需要从数据库获取用户身份信息。<br>注意：不要把realm理解成只是从数据源取数据，在realm中还有认证授权校验的相关的代码。<br>其中，最基础的是 Realm 接口，AuthenticationRealm 负责认证，AuthorizingRealm负责授权，通常自定义的 realm 继承AuthorizingRealm 。</p>
+<h3 id="3-1-6-sessionManager"><a href="#3-1-6-sessionManager" class="headerlink" title="3.1.6 sessionManager"></a>3.1.6 sessionManager</h3><p>sessionManager即会话管理，shiro框架定义了一套会话管理，它不依赖web容器的session，所以shiro可以使用在非web应用上，也可以将分布式应用的会话集中在一点管理，此特性可使它实现单点登录。</p>
+<h3 id="3-1-7-SessionDAO"><a href="#3-1-7-SessionDAO" class="headerlink" title="3.1.7 SessionDAO"></a>3.1.7 SessionDAO</h3><p>SessionDAO即会话dao，是对session会话操作的一套接口，比如要将session存储到数据库，可以通过jdbc将会话存储到数据库。<br>通过SessionDao管理session数据，针对个性化的session数据存储需要使用sessionDao</p>
+<h3 id="3-1-8-CacheManager"><a href="#3-1-8-CacheManager" class="headerlink" title="3.1.8 CacheManager"></a>3.1.8 CacheManager</h3><p>CacheManager即缓存管理，将用户权限数据存储在缓存，这样可以提高性能。<br>Shiro有默认的cache实现，是通过自定义map实现的，可整合ehcache或者redis实现cache</p>
+<h3 id="3-1-9-Cryptography"><a href="#3-1-9-Cryptography" class="headerlink" title="3.1.9 Cryptography"></a>3.1.9 Cryptography</h3><p>Cryptography即密码管理，shiro提供了一套加密/解密的组件，方便开发。比如提供常用的散列、加/解密等功能。</p>
+<h2 id="3-2-shiro的jar包"><a href="#3-2-shiro的jar包" class="headerlink" title="3.2 shiro的jar包"></a>3.2 shiro的jar包</h2><p>与其它java开源框架类似，将shiro的jar包加入项目就可以使用shiro提供的功能了。shiro-core是核心包必须选用，还提供了与web整合的shiro-web、与spring整合的shiro-spring、与任务调度quartz整合的shiro-quartz等，下边是shiro各jar包的maven坐标。<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">	&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.apache.shiro&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;shiro-core&lt;/artifactId&gt;</div><div class="line">			&lt;version&gt;1.2.3&lt;/version&gt;</div><div class="line">		&lt;/dependency&gt;</div><div class="line">		&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.apache.shiro&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;shiro-web&lt;/artifactId&gt;</div><div class="line">			&lt;version&gt;1.2.3&lt;/version&gt;</div><div class="line">		&lt;/dependency&gt;</div><div class="line">		&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.apache.shiro&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;shiro-spring&lt;/artifactId&gt;</div><div class="line">			&lt;version&gt;1.2.3&lt;/version&gt;</div><div class="line">		&lt;/dependency&gt;</div><div class="line">		&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.apache.shiro&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;shiro-quartz&lt;/artifactId&gt;</div><div class="line">			&lt;version&gt;1.2.3&lt;/version&gt;</div><div class="line">		&lt;/dependency&gt;</div><div class="line"></div><div class="line">也可以通过引入shiro-all包括shiro所有的包：</div><div class="line">	&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.apache.shiro&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;shiro-all&lt;/artifactId&gt;</div><div class="line">			&lt;version&gt;1.2.3&lt;/version&gt;</div><div class="line">		&lt;/dependency&gt;</div></pre></td></tr></table></figure></p>
+<h2 id="3-3-shiro入口"><a href="#3-3-shiro入口" class="headerlink" title="3.3 shiro入口"></a>3.3 shiro入口</h2><p>Web.xml:<br><img src="/2018/05/12/shiro全面的权限方案/图片5.png" alt="logo"><br>Stringmvc:<br><img src="/2018/05/12/shiro全面的权限方案/图片6.png" alt="logo"></p>
+<h2 id="3-4-shiro认证"><a href="#3-4-shiro认证" class="headerlink" title="3.4 shiro认证"></a>3.4 shiro认证</h2><p>认证流程<br><img src="/2018/05/12/shiro全面的权限方案/图片7.png" alt="logo"></p>
+<h5 id="1、web初始化securityManager。"><a href="#1、web初始化securityManager。" class="headerlink" title="1、web初始化securityManager。"></a>1、web初始化securityManager。</h5><h5 id="2、调用subject-login方法主体提交认证，提交的token"><a href="#2、调用subject-login方法主体提交认证，提交的token" class="headerlink" title="2、调用subject.login方法主体提交认证，提交的token"></a>2、调用subject.login方法主体提交认证，提交的token</h5><h5 id="3、securityManager进行认证，securityManager最终由ModularRealmAuthenticator进行认证。"><a href="#3、securityManager进行认证，securityManager最终由ModularRealmAuthenticator进行认证。" class="headerlink" title="3、securityManager进行认证，securityManager最终由ModularRealmAuthenticator进行认证。"></a>3、securityManager进行认证，securityManager最终由ModularRealmAuthenticator进行认证。</h5><h5 id="4、ModularRealmAuthenticator给Realm传入token"><a href="#4、ModularRealmAuthenticator给Realm传入token" class="headerlink" title="4、ModularRealmAuthenticator给Realm传入token"></a>4、ModularRealmAuthenticator给Realm传入token</h5><h5 id="5、Realm根据输入的token（UsernamePasswordToken）调用doGetAuthenticationInfo从数据库查询用户信息，根据账号查询用户信息（账号和密码）"><a href="#5、Realm根据输入的token（UsernamePasswordToken）调用doGetAuthenticationInfo从数据库查询用户信息，根据账号查询用户信息（账号和密码）" class="headerlink" title="5、Realm根据输入的token（UsernamePasswordToken）调用doGetAuthenticationInfo从数据库查询用户信息，根据账号查询用户信息（账号和密码）"></a>5、Realm根据输入的token（UsernamePasswordToken）调用doGetAuthenticationInfo从数据库查询用户信息，根据账号查询用户信息（账号和密码）</h5><pre><code>如果查询到用户信息，就给ModularRealmAuthenticator返回用户信息（账号和密码）
+如果查询不到，就给ModularRealmAuthenticator返回null
+</code></pre><h5 id="6、ModularRealmAuthenticator接收Realm返回Authentication认证信息"><a href="#6、ModularRealmAuthenticator接收Realm返回Authentication认证信息" class="headerlink" title="6、ModularRealmAuthenticator接收Realm返回Authentication认证信息"></a>6、ModularRealmAuthenticator接收Realm返回Authentication认证信息</h5><p>如果返回的认证信息是null，ModularRealmAuthenticator抛出异常（org.apache.shiro.authc.UnknownAccountException）</p>
+<p>如果返回的认证信息不是null（说明数据库找到了用户），对Realm返回用户密码 和 token中的密码 进行对比，如果不一致抛出异常（org.apache.shiro.authc.IncorrectCredentialsException）</p>
+<h2 id="3-5-shiro授权"><a href="#3-5-shiro授权" class="headerlink" title="3.5 shiro授权"></a>3.5 shiro授权</h2><p>授权流程<br><img src="/2018/05/12/shiro全面的权限方案/图片8.png" alt="logo"></p>
+<h5 id="1、对subject进行授权，调用方法isPermitted（”permission串”）"><a href="#1、对subject进行授权，调用方法isPermitted（”permission串”）" class="headerlink" title="1、对subject进行授权，调用方法isPermitted（”permission串”）"></a>1、对subject进行授权，调用方法isPermitted（”permission串”）</h5><h5 id="2、SecurityManager执行授权，通过ModularRealmAuthorizer执行授权"><a href="#2、SecurityManager执行授权，通过ModularRealmAuthorizer执行授权" class="headerlink" title="2、SecurityManager执行授权，通过ModularRealmAuthorizer执行授权"></a>2、SecurityManager执行授权，通过ModularRealmAuthorizer执行授权</h5><h5 id="3、ModularRealmAuthorizer执行realm（从数据库查询权限数据"><a href="#3、ModularRealmAuthorizer执行realm（从数据库查询权限数据" class="headerlink" title="3、ModularRealmAuthorizer执行realm（从数据库查询权限数据"></a>3、ModularRealmAuthorizer执行realm（从数据库查询权限数据</h5><pre><code>调用realm的授权方法：doGetAuthorizationInfo
+</code></pre><h5 id="4、realm从数据库查询权限数据，返回ModularRealmAuthorizer"><a href="#4、realm从数据库查询权限数据，返回ModularRealmAuthorizer" class="headerlink" title="4、realm从数据库查询权限数据，返回ModularRealmAuthorizer"></a>4、realm从数据库查询权限数据，返回ModularRealmAuthorizer</h5><h5 id="5、ModularRealmAuthorizer调用PermissionResolver进行权限串比对"><a href="#5、ModularRealmAuthorizer调用PermissionResolver进行权限串比对" class="headerlink" title="5、ModularRealmAuthorizer调用PermissionResolver进行权限串比对"></a>5、ModularRealmAuthorizer调用PermissionResolver进行权限串比对</h5><h5 id="6、如果比对后，isPermitted中”permission串”在realm查询到权限数据中，说明用户访问permission串有权限，否则-没有权限，抛出异常。"><a href="#6、如果比对后，isPermitted中”permission串”在realm查询到权限数据中，说明用户访问permission串有权限，否则-没有权限，抛出异常。" class="headerlink" title="6、如果比对后，isPermitted中”permission串”在realm查询到权限数据中，说明用户访问permission串有权限，否则 没有权限，抛出异常。"></a>6、如果比对后，isPermitted中”permission串”在realm查询到权限数据中，说明用户访问permission串有权限，否则 没有权限，抛出异常。</h5><h2 id="3-6自定义realm"><a href="#3-6自定义realm" class="headerlink" title="3.6自定义realm"></a>3.6自定义realm</h2><p>自定义realm继承AuthorizingRealm，其中两个最重要的方法doGetAuthenticationInfo认证方法、doGetAuthorizationInfo授权方法，重载两个方法，在自定义realm中注入角色和权限的service进行查询。</p>
+<h3 id="3-6-1认证方法"><a href="#3-6-1认证方法" class="headerlink" title="3.6.1认证方法"></a>3.6.1认证方法</h3><p>根据shiro认证流程，在调用subject.login()方法后会进入认证方法，在该方法中将用户名和用户密码写入shiro认证信息中。由于天使排班没有自己的账号密码模块，可以将用户id作为用户名，密码设置为空进行记录：</p>
+<p>登陆：<br><img src="/2018/05/12/shiro全面的权限方案/图片9.png" alt="logo"><br>认证：<br><img src="/2018/05/12/shiro全面的权限方案/图片10.png" alt="logo"></p>
+<h3 id="3-6-2授权方法"><a href="#3-6-2授权方法" class="headerlink" title="3.6.2授权方法"></a>3.6.2授权方法</h3><p>授权方法触发的方式有很多，简单的方式可以在认证方法中显式调用，正常的方式是在用户访问受保护的资源时进行授权，这个前提是在shiro的配置中配置哪些资源是需要权限访问的，配置有两种方式，第一种方式：在shiroFilter总过滤器中，配置url对应需要的角色或权限比如：<br><img src="/2018/05/12/shiro全面的权限方案/图片11.png" alt="logo"><br>第二种方式：在方法上添加注解，方法可以使service方法，也可以是controller，建议在controller方法上加，service方法由于复用的关系，加权限控制不适合，比如：<br><img src="/2018/05/12/shiro全面的权限方案/图片12.png" alt="logo"><br><img src="/2018/05/12/shiro全面的权限方案/图片13.png" alt="logo"><br>授权方法实现：<br><img src="/2018/05/12/shiro全面的权限方案/图片14.png" alt="logo"><br><img src="/2018/05/12/shiro全面的权限方案/图片15.png" alt="logo"></p>
+<h1 id="4-扩展shiro"><a href="#4-扩展shiro" class="headerlink" title="4.扩展shiro"></a>4.扩展shiro</h1><h2 id="4-1需求"><a href="#4-1需求" class="headerlink" title="4.1需求"></a>4.1需求</h2><p>在线修改用户角色或权限实时生效</p>
+<h2 id="4-2为什么要扩展"><a href="#4-2为什么要扩展" class="headerlink" title="4.2为什么要扩展"></a>4.2为什么要扩展</h2><p>在用户认证和授权完成后，为了提高性能，使用了cacheManage组件缓存了用户的角色权限信息，在用户退出登录之前不会再次请求授权方法，需要在适当的时机清除指定用户的权限缓存，指定用户在缓存清空后访问受保护的资源之前重新进行授权。</p>
+<h2 id="4-3怎么做"><a href="#4-3怎么做" class="headerlink" title="4.3怎么做"></a>4.3怎么做</h2><p>在shiroFilter核心过滤器中，提供了filters参数，这个参数记录了能够控制资源访问的权限过滤器链，初始化过程中shiro会注册默认的filter，shiro默认提供如下过滤器：<br><img src="/2018/05/12/shiro全面的权限方案/图片16.png" alt="logo"></p>
+<p>在这基础上自定义自己的过滤器，这里选择继承AccessControlFilter，重载两个方法：<br>isAccessAllowed：即是否允许访问，返回 true 表示允许；<br>    onAccessDenied：表示访问拒绝时是否自己处理，如果返回 true 表示自己不处理且继续拦截器链执行，返回 false 表示自己已经处理了（比如重定向到另一个页面）。</p>
+<p>isAccessAllowed方法默认返回false不允许访问，随后就进入onAccessDenied方法，然后就可以自己处理当前用户了，判断当前用户session中是否被标记为修改了权限，如果被标记了的话，就清除当前用户的缓存，最后返回true，如下：<br><img src="/2018/05/12/shiro全面的权限方案/图片17.png" alt="logo"><br>配置如下：<br><img src="/2018/05/12/shiro全面的权限方案/图片18.png" alt="logo"></p>
+<p>如何标记用户，在管理员修改用户的角色权限逻辑中，根据被修改的用户id，找到其对应的session并标记，这里需要在修改的service中注入sessionDao对象，从而获取想要的session。</p>
+<h1 id="5-数据库设计"><a href="#5-数据库设计" class="headerlink" title="5.数据库设计"></a>5.数据库设计</h1><p>权限表<br><img src="/2018/05/12/shiro全面的权限方案/图片19.png" alt="logo"></p>
+<p>角色权限关联表<br><img src="/2018/05/12/shiro全面的权限方案/图片20.png" alt="logo"></p>
+<p>角色表、用户表、用户角色关联表沿用以前的设计</p>
+<p>海鹚的session是重写的，sessionId和cookiename都是自定义的，与shiro的session不能通用，重写sessionDAO实现session同步，屏蔽公司的filter，自定义sessionId和cookiename</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;1-认证&quot;&gt;&lt;a href=&quot;#1-认证&quot; class=&quot;headerlink&quot; title=&quot;1.认证&quot;&gt;&lt;/a&gt;1.认证&lt;/h1&gt;&lt;p&gt;认证通过微信或钉钉的认证，认证后在天使排版中只需在shiro中默认标记为认证通过即可&lt;br&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="shiro" scheme="http://yzy755.github.io/tags/shiro/"/>
+    
+      <category term="海鹚" scheme="http://yzy755.github.io/tags/%E6%B5%B7%E9%B9%9A/"/>
+    
+  </entry>
   
   <entry>
     <title>TensorFlow的Python API</title>
@@ -278,11 +351,11 @@ if __name__ == &apos;__main__&apos;:
       <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     
     
-      <category term="java" scheme="http://yzy755.github.io/tags/java/"/>
-    
       <category term="AI" scheme="http://yzy755.github.io/tags/AI/"/>
     
       <category term="TensorFlow" scheme="http://yzy755.github.io/tags/TensorFlow/"/>
+    
+      <category term="java" scheme="http://yzy755.github.io/tags/java/"/>
     
   </entry>
   
@@ -731,9 +804,9 @@ if __name__ == &apos;__main__&apos;:
       <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     
     
-      <category term="数据分析" scheme="http://yzy755.github.io/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"/>
-    
       <category term="python" scheme="http://yzy755.github.io/tags/python/"/>
+    
+      <category term="数据分析" scheme="http://yzy755.github.io/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"/>
     
   </entry>
   
@@ -1791,6 +1864,60 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
   </entry>
   
   <entry>
+    <title>solr分词 同义词 停止词</title>
+    <link href="http://yzy755.github.io/2017/03/02/solr%E5%88%86%E8%AF%8D%20%E5%90%8C%E4%B9%89%E8%AF%8D%20%E5%81%9C%E6%AD%A2%E8%AF%8D/"/>
+    <id>http://yzy755.github.io/2017/03/02/solr分词 同义词 停止词/</id>
+    <published>2017-03-02T09:17:53.000Z</published>
+    <updated>2017-06-27T03:43:30.123Z</updated>
+    
+    <content type="html"><![CDATA[<p>分词相关拓展，配置博微软件中特有的分词和停止词：<br>特有的分词指的是博微软件中的词组，比如“定额”、“土方”等<br>停止词是无功能意义的词，比如is 、a 、are 、”的”，“得”，“我” 等，这些词会在句子中多次出现却无意义，所以在分词的时候需要把这些词过滤掉。<br><a id="more"></a><br>使用IKAnalyzer中文分词器，<br>在collection/conf/schema.xml中配置</p>
+<pre><code>&lt;fieldType name=&quot;text_ik&quot; class=&quot;solr.TextField&quot;&gt; 
+  &lt;analyzer class=&quot;org.wltea.analyzer.lucene.IKAnalyzer&quot;/&gt; 
+  &lt;analyzer&gt;
+        &lt;tokenizer class=&quot;solr.WhitespaceTokenizerFactory&quot;/&gt;
+    &lt;/analyzer&gt;
+</code></pre><p>需要使用IKAnalyzer分词器的字段配置type为text_ik，比如：</p>
+<pre><code>&lt;field name=&quot;doc_title&quot; type=&quot;text_ik&quot; indexed=&quot;true&quot; stored=&quot;true&quot; termVectors=&quot;true&quot;/&gt;
+</code></pre><p>接下来就在solr的部署目录 WEB-INF/classes中增加配置如下：<br><img src="/2017/03/02/solr分词 同义词 停止词/1.png" alt="logo"><br>IKAnalyzer.cfg.xml内容配置如下：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE properties SYSTEM &quot;http://java.sun.com/dtd/properties.dtd&quot;&gt;  
+&lt;properties&gt;  
+    &lt;comment&gt;IK Analyzer 扩展配置&lt;/comment&gt;
+    &lt;!--用户可以在这里配置自己的扩展字典 --&gt;
+    &lt;entry key=&quot;ext_dict&quot;&gt;bwwiki.dic;&lt;/entry&gt; 
+
+    &lt;!--用户可以在这里配置自己的扩展停止词字典--&gt;
+    &lt;entry key=&quot;ext_stopwords&quot;&gt;stopword.dic;&lt;/entry&gt; 
+
+&lt;/properties&gt;
+</code></pre><p>Ps:同义词拓展（暂未实际应用）：<br>在collection/conf/schema.xml中配置：</p>
+<pre><code>&lt;fieldType name=&quot;text_syn&quot; class=&quot;solr.TextField&quot;&gt;  
+   &lt;analyzer type=&quot;query&quot;&gt;  
+   &lt;tokenizer class=&quot;org.wltea.analyzer.lucene.IKTokenizerFactory&quot; useSmart=&quot;false&quot;/&gt;  
+   &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;  
+   &lt;/analyzer&gt;  
+  &lt;analyzer type=&quot;index&quot;&gt;  
+  &lt;tokenizer class=&quot;org.wltea.analyzer.lucene.IKTokenizerFactory&quot; useSmart=&quot;fasle&quot;/&gt;  
+ &lt;filter class=&quot;solr.SynonymFilterFactory&quot; synonyms=&quot;synonyms.txt&quot; ignoreCase=&quot;true&quot; expand=&quot;true&quot; /&gt;  
+&lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;  
+</code></pre><p>      </p>
+<p>同级目录会带有synonyms.txt文件，可添加同义词组，以“,”隔开，比如：<br><img src="/2017/03/02/solr分词 同义词 停止词/2.png" alt="logo"><br>分词的测试方式如图：<br><img src="/2017/03/02/solr分词 同义词 停止词/3.png" alt="logo"><br>选中text_ik类型，可将“定额“、“土方“分词显示出来，并去掉配置的停止词“和”<br>同义词测试方式相同。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;分词相关拓展，配置博微软件中特有的分词和停止词：&lt;br&gt;特有的分词指的是博微软件中的词组，比如“定额”、“土方”等&lt;br&gt;停止词是无功能意义的词，比如is 、a 、are 、”的”，“得”，“我” 等，这些词会在句子中多次出现却无意义，所以在分词的时候需要把这些词过滤掉。&lt;br&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="solr" scheme="http://yzy755.github.io/tags/solr/"/>
+    
+  </entry>
+  
+  <entry>
     <title>微信小程序对接支付</title>
     <link href="http://yzy755.github.io/2017/03/02/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%AF%B9%E6%8E%A5%E6%94%AF%E4%BB%98/"/>
     <id>http://yzy755.github.io/2017/03/02/微信小程序对接支付/</id>
@@ -1866,94 +1993,6 @@ public static String UrlEncode(String src)
       <category term="微信小程序" scheme="http://yzy755.github.io/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/"/>
     
       <category term="微信支付" scheme="http://yzy755.github.io/tags/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>solr部署</title>
-    <link href="http://yzy755.github.io/2017/03/02/solr%E9%83%A8%E7%BD%B2/"/>
-    <id>http://yzy755.github.io/2017/03/02/solr部署/</id>
-    <published>2017-03-02T09:17:53.000Z</published>
-    <updated>2017-03-09T09:12:45.411Z</updated>
-    
-    <content type="html"><![CDATA[<p><a href="http://www.tuicool.com/articles/mueARf" target="_blank" rel="external">http://www.tuicool.com/articles/mueARf</a> 参考</p>
-<p>请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：</p>
-<p>复制solr.war到tomcat的webapps目录下，如图操作：</p>
-<p>启动tomcat,如图：<br><a id="more"></a><br>然后修改webapps\solr\WEB-INF下的web.xml配置文件，如图：</p>
-<p>配置solr_home目录路径，如图：</p>
-<p>然后我们需要去C盘创建一个solr_home文件夹，这就是我们SOLR_HOME根目录啦，如图：</p>
-<p>然后我们需要把E:\solr-5.1.0\server\solr目录下的所有文件及文件夹全部复制到我们刚刚创建的solr_home目录下，如图：</p>
-<p>然后我们需要把E:\solr-5.1.0\server\lib\ext目录下的所有jar包 copy到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF\lib目录下(<br>E:\apache-tomcat-7.0.55是我的tomcat安装根目录，请对照你们自己的tomcat安装目录进行调整，你懂的<br>)，如图：</p>
-<p>然后复制 E:\solr-5.1.0\server\resources目录下的log4j.properties配置文件到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF目录下，如图操作：</p>
-<p>然后重启我们的tomcat,如图：</p>
-<p>打开你的浏览器，地址栏输入 <a href="http://localhost:8080/solr" target="_blank" rel="external">http://localhost:8080/solr</a> ， 访问我们的Solr Web后台。如果你能看到这个界面，即表明Solr5部署成功了，如图：</p>
-<p>然后你就可以通过Solr Web UI添加Core啦，不过添加Core之前，你需要在solr_home目录下创建core文件夹，如图：<br>core目录下需要创建conf和data文件夹，你懂的， 《跟益达学Solr5之使用Jetty部署Solr》<br>这篇博客也提到过，如图：</p>
-<p>剩下的一些配置copy具体你们就参照那篇去操作把，这里就不重复说明了。<br>到此，Solr5如何部署到Tomcat就讲解完毕了！</p>
-<p>IK 分词器安装<br>1.将之前解压的solr-4.3.1 下的contrib和dist 文件夹复制到F:\winsolr\solr_home\solr\collection1下<br>2.将下载的IKAnalyzer的发行包解压，解压后将IKAnalyzer2012FF_u1.jar（分词器jar包）复制到F:\winsolr\solr_home\solr\collection1\contrib\analysis-extras\lib下<br>3.在F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF下新建classes文件夹<br>4.将IKAnalyzer解压出来的IKAnalyzer.cfg.xml（分词器配置文件）和 Stopword.dic（分词器停词字典,可自定义添加内容）复制到<br>  F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF\classes中<br>5.在F:\winsolr\solr_home\solr\collection1\conf下的schema.xml文件中fieldType name=”text_general”这个地方的上方添加以下内容 </p>
-<p>将pinyinfj.jar、lucene-analyzers-smartcn-4.7.0.jar、IKAnalyzer2012FF_u1.jar、pinyinAnalyzer.jar、shentong_tsearch_lib.jar放到solr部署目录的web-inf的lib目录下</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;a href=&quot;http://www.tuicool.com/articles/mueARf&quot;&gt;http://www.tuicool.com/articles/mueARf&lt;/a&gt; 参考&lt;/p&gt;
-&lt;p&gt;请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：&lt;/p&gt;
-&lt;p&gt;复制solr.war到tomcat的webapps目录下，如图操作：&lt;/p&gt;
-&lt;p&gt;启动tomcat,如图：&lt;br&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    
-    
-      <category term="solr" scheme="http://yzy755.github.io/tags/solr/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>jar包在windows下的运行命令</title>
-    <link href="http://yzy755.github.io/2017/03/02/jar%E5%8C%85%E5%9C%A8windows%E4%B8%8B%E8%BF%90%E8%A1%8C%E5%91%BD%E4%BB%A4/"/>
-    <id>http://yzy755.github.io/2017/03/02/jar包在windows下运行命令/</id>
-    <published>2017-03-02T09:17:53.000Z</published>
-    <updated>2017-03-09T09:13:47.771Z</updated>
-    
-    <content type="html"><![CDATA[<p>1、打jar包 jar -cvf xx.jar 文件夹名称</p>
-<p>说明一下：<em>.</em>表示把当前目录下面以及子目录的所有class都打到这个xx.jar里。</p>
-<p>-cvf的含义，可以自己去用jar命令去查看</p>
-<p>如果要单独对某个或某些class文件进行打包，可以这样：</p>
-<p>jar -cvf xx.jar Foo.class Bar.class </p>
-<a id="more"></a>
-<p>2.运行jar</p>
-<p>java -jar xx.jar</p>
-<p>要运行一个jar，则此jar内部的META-INF\MANIFEST.MF文件里必须指明要执行的main方法类</p>
-<p>具体格式如：</p>
-<p>Manifest-Version: 1.0<br>Created-By: 1.6.0_03 (Sun Microsystems Inc.)<br>Main-class: Test<br>如果此处的Test.class在com.xx包下面，则需要指明。</p>
-<p>如果在运行时报了invalid or corrupt jarfile错误，则需要检查Main-class: Test 之间是不是缺少了空格。</p>
-<p>3.指定运行jar里面的class</p>
-<p>java -cp xx.jar com.xx.Test</p>
-<p>4.编译某个java文件，但是依赖某个jar</p>
-<p>javac -cp xx.jar Test.java</p>
-<p> (Test.java里面import了xx.jar里面的某个class)</p>
-<p>5.运行某个java文件，但是依赖某个jar</p>
-<p>java -cp .;xx.jar Test</p>
-<p>注意：引用xx.jar的时候，不要漏掉.;（这个表示当前目录）</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;1、打jar包 jar -cvf xx.jar 文件夹名称&lt;/p&gt;
-&lt;p&gt;说明一下：&lt;em&gt;.&lt;/em&gt;表示把当前目录下面以及子目录的所有class都打到这个xx.jar里。&lt;/p&gt;
-&lt;p&gt;-cvf的含义，可以自己去用jar命令去查看&lt;/p&gt;
-&lt;p&gt;如果要单独对某个或某些class文件进行打包，可以这样：&lt;/p&gt;
-&lt;p&gt;jar -cvf xx.jar Foo.class Bar.class &lt;/p&gt;
-    
-    </summary>
-    
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    
-    
-      <category term="java" scheme="http://yzy755.github.io/tags/java/"/>
-    
-      <category term="jar包" scheme="http://yzy755.github.io/tags/jar%E5%8C%85/"/>
     
   </entry>
   
