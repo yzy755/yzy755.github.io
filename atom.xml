@@ -1891,35 +1891,49 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
   </entry>
   
   <entry>
-    <title>solr部署</title>
-    <link href="http://yzy755.github.io/2017/03/02/solr%E9%83%A8%E7%BD%B2/"/>
-    <id>http://yzy755.github.io/2017/03/02/solr部署/</id>
+    <title>solr分词 同义词 停止词</title>
+    <link href="http://yzy755.github.io/2017/03/02/solr%E5%88%86%E8%AF%8D%20%E5%90%8C%E4%B9%89%E8%AF%8D%20%E5%81%9C%E6%AD%A2%E8%AF%8D/"/>
+    <id>http://yzy755.github.io/2017/03/02/solr分词 同义词 停止词/</id>
     <published>2017-03-02T09:17:53.000Z</published>
-    <updated>2017-03-09T09:12:45.411Z</updated>
+    <updated>2017-06-27T03:43:30.123Z</updated>
     
-    <content type="html"><![CDATA[<p><a href="http://www.tuicool.com/articles/mueARf" target="_blank" rel="external">http://www.tuicool.com/articles/mueARf</a> 参考</p>
-<p>请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：</p>
-<p>复制solr.war到tomcat的webapps目录下，如图操作：</p>
-<p>启动tomcat,如图：<br><a id="more"></a><br>然后修改webapps\solr\WEB-INF下的web.xml配置文件，如图：</p>
-<p>配置solr_home目录路径，如图：</p>
-<p>然后我们需要去C盘创建一个solr_home文件夹，这就是我们SOLR_HOME根目录啦，如图：</p>
-<p>然后我们需要把E:\solr-5.1.0\server\solr目录下的所有文件及文件夹全部复制到我们刚刚创建的solr_home目录下，如图：</p>
-<p>然后我们需要把E:\solr-5.1.0\server\lib\ext目录下的所有jar包 copy到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF\lib目录下(<br>E:\apache-tomcat-7.0.55是我的tomcat安装根目录，请对照你们自己的tomcat安装目录进行调整，你懂的<br>)，如图：</p>
-<p>然后复制 E:\solr-5.1.0\server\resources目录下的log4j.properties配置文件到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF目录下，如图操作：</p>
-<p>然后重启我们的tomcat,如图：</p>
-<p>打开你的浏览器，地址栏输入 <a href="http://localhost:8080/solr" target="_blank" rel="external">http://localhost:8080/solr</a> ， 访问我们的Solr Web后台。如果你能看到这个界面，即表明Solr5部署成功了，如图：</p>
-<p>然后你就可以通过Solr Web UI添加Core啦，不过添加Core之前，你需要在solr_home目录下创建core文件夹，如图：<br>core目录下需要创建conf和data文件夹，你懂的， 《跟益达学Solr5之使用Jetty部署Solr》<br>这篇博客也提到过，如图：</p>
-<p>剩下的一些配置copy具体你们就参照那篇去操作把，这里就不重复说明了。<br>到此，Solr5如何部署到Tomcat就讲解完毕了！</p>
-<p>IK 分词器安装<br>1.将之前解压的solr-4.3.1 下的contrib和dist 文件夹复制到F:\winsolr\solr_home\solr\collection1下<br>2.将下载的IKAnalyzer的发行包解压，解压后将IKAnalyzer2012FF_u1.jar（分词器jar包）复制到F:\winsolr\solr_home\solr\collection1\contrib\analysis-extras\lib下<br>3.在F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF下新建classes文件夹<br>4.将IKAnalyzer解压出来的IKAnalyzer.cfg.xml（分词器配置文件）和 Stopword.dic（分词器停词字典,可自定义添加内容）复制到<br>  F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF\classes中<br>5.在F:\winsolr\solr_home\solr\collection1\conf下的schema.xml文件中fieldType name=”text_general”这个地方的上方添加以下内容 </p>
-<p>将pinyinfj.jar、lucene-analyzers-smartcn-4.7.0.jar、IKAnalyzer2012FF_u1.jar、pinyinAnalyzer.jar、shentong_tsearch_lib.jar放到solr部署目录的web-inf的lib目录下</p>
+    <content type="html"><![CDATA[<p>分词相关拓展，配置博微软件中特有的分词和停止词：<br>特有的分词指的是博微软件中的词组，比如“定额”、“土方”等<br>停止词是无功能意义的词，比如is 、a 、are 、”的”，“得”，“我” 等，这些词会在句子中多次出现却无意义，所以在分词的时候需要把这些词过滤掉。<br><a id="more"></a><br>使用IKAnalyzer中文分词器，<br>在collection/conf/schema.xml中配置</p>
+<pre><code>&lt;fieldType name=&quot;text_ik&quot; class=&quot;solr.TextField&quot;&gt; 
+  &lt;analyzer class=&quot;org.wltea.analyzer.lucene.IKAnalyzer&quot;/&gt; 
+  &lt;analyzer&gt;
+        &lt;tokenizer class=&quot;solr.WhitespaceTokenizerFactory&quot;/&gt;
+    &lt;/analyzer&gt;
+</code></pre><p>需要使用IKAnalyzer分词器的字段配置type为text_ik，比如：</p>
+<pre><code>&lt;field name=&quot;doc_title&quot; type=&quot;text_ik&quot; indexed=&quot;true&quot; stored=&quot;true&quot; termVectors=&quot;true&quot;/&gt;
+</code></pre><p>接下来就在solr的部署目录 WEB-INF/classes中增加配置如下：<br><img src="/2017/03/02/solr分词 同义词 停止词/1.png" alt="logo"><br>IKAnalyzer.cfg.xml内容配置如下：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE properties SYSTEM &quot;http://java.sun.com/dtd/properties.dtd&quot;&gt;  
+&lt;properties&gt;  
+    &lt;comment&gt;IK Analyzer 扩展配置&lt;/comment&gt;
+    &lt;!--用户可以在这里配置自己的扩展字典 --&gt;
+    &lt;entry key=&quot;ext_dict&quot;&gt;bwwiki.dic;&lt;/entry&gt; 
+
+    &lt;!--用户可以在这里配置自己的扩展停止词字典--&gt;
+    &lt;entry key=&quot;ext_stopwords&quot;&gt;stopword.dic;&lt;/entry&gt; 
+
+&lt;/properties&gt;
+</code></pre><p>Ps:同义词拓展（暂未实际应用）：<br>在collection/conf/schema.xml中配置：</p>
+<pre><code>&lt;fieldType name=&quot;text_syn&quot; class=&quot;solr.TextField&quot;&gt;  
+   &lt;analyzer type=&quot;query&quot;&gt;  
+   &lt;tokenizer class=&quot;org.wltea.analyzer.lucene.IKTokenizerFactory&quot; useSmart=&quot;false&quot;/&gt;  
+   &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;  
+   &lt;/analyzer&gt;  
+  &lt;analyzer type=&quot;index&quot;&gt;  
+  &lt;tokenizer class=&quot;org.wltea.analyzer.lucene.IKTokenizerFactory&quot; useSmart=&quot;fasle&quot;/&gt;  
+ &lt;filter class=&quot;solr.SynonymFilterFactory&quot; synonyms=&quot;synonyms.txt&quot; ignoreCase=&quot;true&quot; expand=&quot;true&quot; /&gt;  
+&lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;  
+</code></pre><p>      </p>
+<p>同级目录会带有synonyms.txt文件，可添加同义词组，以“,”隔开，比如：<br><img src="/2017/03/02/solr分词 同义词 停止词/2.png" alt="logo"><br>分词的测试方式如图：<br><img src="/2017/03/02/solr分词 同义词 停止词/3.png" alt="logo"><br>选中text_ik类型，可将“定额“、“土方“分词显示出来，并去掉配置的停止词“和”<br>同义词测试方式相同。</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;&lt;a href=&quot;http://www.tuicool.com/articles/mueARf&quot;&gt;http://www.tuicool.com/articles/mueARf&lt;/a&gt; 参考&lt;/p&gt;
-&lt;p&gt;请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：&lt;/p&gt;
-&lt;p&gt;复制solr.war到tomcat的webapps目录下，如图操作：&lt;/p&gt;
-&lt;p&gt;启动tomcat,如图：&lt;br&gt;&lt;/p&gt;
+      &lt;p&gt;分词相关拓展，配置博微软件中特有的分词和停止词：&lt;br&gt;特有的分词指的是博微软件中的词组，比如“定额”、“土方”等&lt;br&gt;停止词是无功能意义的词，比如is 、a 、are 、”的”，“得”，“我” 等，这些词会在句子中多次出现却无意义，所以在分词的时候需要把这些词过滤掉。&lt;br&gt;&lt;/p&gt;
     
     </summary>
     
