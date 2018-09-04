@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2018-09-04T09:07:11.466Z</updated>
+  <updated>2018-09-04T09:18:26.737Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yzy755.github.io/2018/09/03/MQ%E4%B8%9A%E5%8A%A1%E8%A7%A3%E8%80%A6/"/>
     <id>http://yzy755.github.io/2018/09/03/MQ业务解耦/</id>
     <published>2018-09-03T09:00:53.000Z</published>
-    <updated>2018-09-04T09:07:11.466Z</updated>
+    <updated>2018-09-04T09:18:26.737Z</updated>
     
     <content type="html"><![CDATA[<p>天使排班中有工时存欠的概念，意思是记录护士姐姐们相比一周的标准工时多或少工作的时长，作为统计工作情况的一个依据，存欠值守用户手动输入、实际排班时长、请假以及加班时长的影响，涉及到很多个业务模块，若让业务模块每次数据变更都去计算存欠值耦合就太过严重，所以用MQ解耦<br><a id="more"></a></p>
 <p>业务模块每次数据变更，比如加班申请通过后发布加班时长增加的消息，存欠统计模块订阅需要的消息<br><img src="/2018/09/03/MQ业务解耦/图片1.png" alt="logo"></p>
@@ -32,7 +32,7 @@
     
     </summary>
     
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+      <category term="工作实践" scheme="http://yzy755.github.io/categories/%E5%B7%A5%E4%BD%9C%E5%AE%9E%E8%B7%B5/"/>
     
     
       <category term="activityMQ" scheme="http://yzy755.github.io/tags/activityMQ/"/>
@@ -46,7 +46,7 @@
     <link href="http://yzy755.github.io/2018/05/12/shiro%E5%85%A8%E9%9D%A2%E7%9A%84%E6%9D%83%E9%99%90%E6%96%B9%E6%A1%88/"/>
     <id>http://yzy755.github.io/2018/05/12/shiro全面的权限方案/</id>
     <published>2018-05-12T09:17:53.000Z</published>
-    <updated>2018-08-28T09:17:59.327Z</updated>
+    <updated>2018-09-04T09:18:43.315Z</updated>
     
     <content type="html"><![CDATA[<p>天使排班基于微信的用户体系，在系统中用户的角色和权限全靠数据库查询和代码控制，没有一个强大简洁的权限控制框架实在不方便，于是引入了以前使用过的shiro，并在使用上进行了加强，集成了redis权限缓存以及基于redis的sessionDAO，全面支持分布式。<br><a id="more"></a></p>
 <h1 id="1-认证"><a href="#1-认证" class="headerlink" title="1.认证"></a>1.认证</h1><p>认证通过微信或钉钉的认证，认证后在天使排版中只需在shiro中默认标记为认证通过即可</p>
@@ -106,7 +106,7 @@
     
     </summary>
     
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+      <category term="工作实践" scheme="http://yzy755.github.io/categories/%E5%B7%A5%E4%BD%9C%E5%AE%9E%E8%B7%B5/"/>
     
     
       <category term="海鹚" scheme="http://yzy755.github.io/tags/%E6%B5%B7%E9%B9%9A/"/>
@@ -842,7 +842,7 @@ if __name__ == &apos;__main__&apos;:
     <link href="http://yzy755.github.io/2017/04/20/%E6%8A%A2%E8%B4%AD%E7%A7%92%E6%9D%80%E5%8A%9F%E8%83%BD%E7%9A%84%E5%B9%B6%E5%8F%91%E8%AE%BE%E8%AE%A1/"/>
     <id>http://yzy755.github.io/2017/04/20/抢购秒杀功能的并发设计/</id>
     <published>2017-04-20T06:54:36.000Z</published>
-    <updated>2017-04-20T07:45:26.167Z</updated>
+    <updated>2018-09-04T09:19:14.904Z</updated>
     
     <content type="html"><![CDATA[<p>最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！<br><a id="more"></a><br>其实说到底就是多线程并发请求的数据一致性的问题，当然也有很多处理方法，最先想到的肯定是锁（synchronized），可以明确的是加锁是肯定可以解决该问题的，但是所谓互联网项目，若有朝一日并发请求量有的突破，这种线程阻塞的访问方式肯定是体验糟糕的，所以我想试试其他方式。</p>
 <p>首先想到的就是基于单线程，多路复用io（mutiplexing）模式的redis，结合我们的业务是关于众筹抢购的，用户占用众筹名额的记录用redis记录非常适用：<br>redis提供了 INCR key 方法，下面是该方法官方的解释：<br>    对存储在指定key的数值执行原子的加1操作。<br>    如果指定的key不存在，那么在执行incr操作之前，会先将它的值设定为0。<br>    如果指定的key中存储的值不是字符串类型（fix：）或者存储的字符串类型不能表示为一个整数，<br>    那么执行这个命令时服务器会返回一个错误(eq:(error) ERR value is not an integer or out of range)。<br>    这个操作仅限于64位的有符号整型数据。<br>注意看，是原子的加1操作，所以记录众筹的数量后，不管并发多少用户抢购众筹，众筹数都是原子加1，不会出现少加从而出现超卖的情况，加上我们业务控制到达限额数量后停止购买功能。<br>有个问题是用户抢占了名额后迟迟不付款，所以我利用了原先就有的检查未付款订单过期的任务，在检查到未支付的众筹订单过期后使用 DECRBY key decrement 做减操作，该方法官方的解释：<br>    将key对应的数字减decrement。如果key不存在，操作之前，key就会被置为0。如果key的value类型错误或者是个不能表示成数字的字符串，就返回错误。这个操作最多支持64位有符号的正型数字。<br>当热，值的添加和删除肯定也是要用到的，参考官方文档 <a href="http://www.redis.cn/" target="_blank" rel="external">http://www.redis.cn/</a><br>这样就释放的未支付抢占的名额，同样这是原子操作。这样整体就保持了高效和线程安全。</p>
@@ -915,7 +915,7 @@ if __name__ == &apos;__main__&apos;:
     
     </summary>
     
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+      <category term="工作实践" scheme="http://yzy755.github.io/categories/%E5%B7%A5%E4%BD%9C%E5%AE%9E%E8%B7%B5/"/>
     
     
       <category term="redis" scheme="http://yzy755.github.io/tags/redis/"/>
@@ -1057,7 +1057,7 @@ if __name__ == &apos;__main__&apos;:
     <link href="http://yzy755.github.io/2017/04/11/%E5%9F%BA%E4%BA%8Eshiro%E6%8B%93%E5%B1%95%E5%B9%B6%E5%8F%91%E7%99%BB%E5%BD%95%E4%BA%BA%E6%95%B0%E6%8E%A7%E5%88%B6/"/>
     <id>http://yzy755.github.io/2017/04/11/基于shiro拓展并发登录人数控制/</id>
     <published>2017-04-11T09:17:53.000Z</published>
-    <updated>2017-04-13T03:44:08.041Z</updated>
+    <updated>2018-09-04T09:19:03.766Z</updated>
     
     <content type="html"><![CDATA[<p>在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！<a id="more"></a><br>spring security就直接提供了相应的功能；我的项目使用的权限框架是apach的shiro，Shiro的话没有提供默认实现，不过可以很容易的在Shiro中加入这个功能<br>我们来看下shiro拦截机制中filter的关系图<br><img src="/2017/04/11/基于shiro拓展并发登录人数控制/filter.png" alt="logo"><br>这里只介绍AccessControlFilter：<br>    AccessControlFilter提供了访问控制的基础功能；比如是否允许访问/当访问拒绝时如何处理等：<br>        abstract boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception;<br>        boolean onAccessDenied(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception;<br>        abstract boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception;</p>
 <pre><code>    isAccessAllowed：表示是否允许访问；mappedValue就是[urls]配置中拦截器参数部分，如果允许访问返回true，否则false；
@@ -1372,7 +1372,7 @@ onPreHandle会自动调用这两个方法决定是否继续处理：
     
     </summary>
     
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+      <category term="工作实践" scheme="http://yzy755.github.io/categories/%E5%B7%A5%E4%BD%9C%E5%AE%9E%E8%B7%B5/"/>
     
     
       <category term="shiro" scheme="http://yzy755.github.io/tags/shiro/"/>
@@ -1870,7 +1870,7 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
     <link href="http://yzy755.github.io/2017/03/05/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E4%BF%9D%E5%AD%98%E7%99%BB%E5%BD%95%E7%8A%B6%E6%80%81/"/>
     <id>http://yzy755.github.io/2017/03/05/微信小程序保存登录状态/</id>
     <published>2017-03-05T09:17:53.000Z</published>
-    <updated>2017-06-27T03:34:08.164Z</updated>
+    <updated>2018-09-04T09:19:36.105Z</updated>
     
     <content type="html"><![CDATA[<p>浏览器能保证访问网站的session的唯一性是因为访问网站后服务器会分配session，sessionid会记录在浏览器的cookie中.<br><a id="more"></a><br>小程序并没有这样的机制，所以当用户登陆后，小程序应保存sessionid，从而保证在发送请求时http头部携带sessionid保证用户的登录状态。服务器登录及后续请求流程：<br>    a)请求用户中心登录，校验用户名密码，返回账户实体 /openapi/accountService/login<br>    b)校验成功后保存账户实体，请求云课堂登录接口，使用shiro登录当前账号返回seesionid并在小程序端缓存，代码参考IndexController中的loginFragment方法。<br>    c)登陆后请求受保护的资源在请求中加入http头部如下：<br>        header: {<br>                //‘Accept’: ‘application/json’,<br>                ‘Cookie’: ‘sid=’ + wx.getStorageSync(“session_id”)<br>            },</p>
 ]]></content>
@@ -1881,7 +1881,7 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
     
     </summary>
     
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+      <category term="工作实践" scheme="http://yzy755.github.io/categories/%E5%B7%A5%E4%BD%9C%E5%AE%9E%E8%B7%B5/"/>
     
     
       <category term="微信小程序" scheme="http://yzy755.github.io/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/"/>
@@ -1891,49 +1891,35 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
   </entry>
   
   <entry>
-    <title>solr分词 同义词 停止词</title>
-    <link href="http://yzy755.github.io/2017/03/02/solr%E5%88%86%E8%AF%8D%20%E5%90%8C%E4%B9%89%E8%AF%8D%20%E5%81%9C%E6%AD%A2%E8%AF%8D/"/>
-    <id>http://yzy755.github.io/2017/03/02/solr分词 同义词 停止词/</id>
+    <title>solr部署</title>
+    <link href="http://yzy755.github.io/2017/03/02/solr%E9%83%A8%E7%BD%B2/"/>
+    <id>http://yzy755.github.io/2017/03/02/solr部署/</id>
     <published>2017-03-02T09:17:53.000Z</published>
-    <updated>2017-06-27T03:43:30.123Z</updated>
+    <updated>2017-03-09T09:12:45.411Z</updated>
     
-    <content type="html"><![CDATA[<p>分词相关拓展，配置博微软件中特有的分词和停止词：<br>特有的分词指的是博微软件中的词组，比如“定额”、“土方”等<br>停止词是无功能意义的词，比如is 、a 、are 、”的”，“得”，“我” 等，这些词会在句子中多次出现却无意义，所以在分词的时候需要把这些词过滤掉。<br><a id="more"></a><br>使用IKAnalyzer中文分词器，<br>在collection/conf/schema.xml中配置</p>
-<pre><code>&lt;fieldType name=&quot;text_ik&quot; class=&quot;solr.TextField&quot;&gt; 
-  &lt;analyzer class=&quot;org.wltea.analyzer.lucene.IKAnalyzer&quot;/&gt; 
-  &lt;analyzer&gt;
-        &lt;tokenizer class=&quot;solr.WhitespaceTokenizerFactory&quot;/&gt;
-    &lt;/analyzer&gt;
-</code></pre><p>需要使用IKAnalyzer分词器的字段配置type为text_ik，比如：</p>
-<pre><code>&lt;field name=&quot;doc_title&quot; type=&quot;text_ik&quot; indexed=&quot;true&quot; stored=&quot;true&quot; termVectors=&quot;true&quot;/&gt;
-</code></pre><p>接下来就在solr的部署目录 WEB-INF/classes中增加配置如下：<br><img src="/2017/03/02/solr分词 同义词 停止词/1.png" alt="logo"><br>IKAnalyzer.cfg.xml内容配置如下：</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;!DOCTYPE properties SYSTEM &quot;http://java.sun.com/dtd/properties.dtd&quot;&gt;  
-&lt;properties&gt;  
-    &lt;comment&gt;IK Analyzer 扩展配置&lt;/comment&gt;
-    &lt;!--用户可以在这里配置自己的扩展字典 --&gt;
-    &lt;entry key=&quot;ext_dict&quot;&gt;bwwiki.dic;&lt;/entry&gt; 
-
-    &lt;!--用户可以在这里配置自己的扩展停止词字典--&gt;
-    &lt;entry key=&quot;ext_stopwords&quot;&gt;stopword.dic;&lt;/entry&gt; 
-
-&lt;/properties&gt;
-</code></pre><p>Ps:同义词拓展（暂未实际应用）：<br>在collection/conf/schema.xml中配置：</p>
-<pre><code>&lt;fieldType name=&quot;text_syn&quot; class=&quot;solr.TextField&quot;&gt;  
-   &lt;analyzer type=&quot;query&quot;&gt;  
-   &lt;tokenizer class=&quot;org.wltea.analyzer.lucene.IKTokenizerFactory&quot; useSmart=&quot;false&quot;/&gt;  
-   &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;  
-   &lt;/analyzer&gt;  
-  &lt;analyzer type=&quot;index&quot;&gt;  
-  &lt;tokenizer class=&quot;org.wltea.analyzer.lucene.IKTokenizerFactory&quot; useSmart=&quot;fasle&quot;/&gt;  
- &lt;filter class=&quot;solr.SynonymFilterFactory&quot; synonyms=&quot;synonyms.txt&quot; ignoreCase=&quot;true&quot; expand=&quot;true&quot; /&gt;  
-&lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;  
-</code></pre><p>      </p>
-<p>同级目录会带有synonyms.txt文件，可添加同义词组，以“,”隔开，比如：<br><img src="/2017/03/02/solr分词 同义词 停止词/2.png" alt="logo"><br>分词的测试方式如图：<br><img src="/2017/03/02/solr分词 同义词 停止词/3.png" alt="logo"><br>选中text_ik类型，可将“定额“、“土方“分词显示出来，并去掉配置的停止词“和”<br>同义词测试方式相同。</p>
+    <content type="html"><![CDATA[<p><a href="http://www.tuicool.com/articles/mueARf" target="_blank" rel="external">http://www.tuicool.com/articles/mueARf</a> 参考</p>
+<p>请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：</p>
+<p>复制solr.war到tomcat的webapps目录下，如图操作：</p>
+<p>启动tomcat,如图：<br><a id="more"></a><br>然后修改webapps\solr\WEB-INF下的web.xml配置文件，如图：</p>
+<p>配置solr_home目录路径，如图：</p>
+<p>然后我们需要去C盘创建一个solr_home文件夹，这就是我们SOLR_HOME根目录啦，如图：</p>
+<p>然后我们需要把E:\solr-5.1.0\server\solr目录下的所有文件及文件夹全部复制到我们刚刚创建的solr_home目录下，如图：</p>
+<p>然后我们需要把E:\solr-5.1.0\server\lib\ext目录下的所有jar包 copy到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF\lib目录下(<br>E:\apache-tomcat-7.0.55是我的tomcat安装根目录，请对照你们自己的tomcat安装目录进行调整，你懂的<br>)，如图：</p>
+<p>然后复制 E:\solr-5.1.0\server\resources目录下的log4j.properties配置文件到E:\apache-tomcat-7.0.55\webapps\solr\WEB-INF目录下，如图操作：</p>
+<p>然后重启我们的tomcat,如图：</p>
+<p>打开你的浏览器，地址栏输入 <a href="http://localhost:8080/solr" target="_blank" rel="external">http://localhost:8080/solr</a> ， 访问我们的Solr Web后台。如果你能看到这个界面，即表明Solr5部署成功了，如图：</p>
+<p>然后你就可以通过Solr Web UI添加Core啦，不过添加Core之前，你需要在solr_home目录下创建core文件夹，如图：<br>core目录下需要创建conf和data文件夹，你懂的， 《跟益达学Solr5之使用Jetty部署Solr》<br>这篇博客也提到过，如图：</p>
+<p>剩下的一些配置copy具体你们就参照那篇去操作把，这里就不重复说明了。<br>到此，Solr5如何部署到Tomcat就讲解完毕了！</p>
+<p>IK 分词器安装<br>1.将之前解压的solr-4.3.1 下的contrib和dist 文件夹复制到F:\winsolr\solr_home\solr\collection1下<br>2.将下载的IKAnalyzer的发行包解压，解压后将IKAnalyzer2012FF_u1.jar（分词器jar包）复制到F:\winsolr\solr_home\solr\collection1\contrib\analysis-extras\lib下<br>3.在F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF下新建classes文件夹<br>4.将IKAnalyzer解压出来的IKAnalyzer.cfg.xml（分词器配置文件）和 Stopword.dic（分词器停词字典,可自定义添加内容）复制到<br>  F:\winsolr\apache-tomcat-7.0.37\webapps\solr\WEB-INF\classes中<br>5.在F:\winsolr\solr_home\solr\collection1\conf下的schema.xml文件中fieldType name=”text_general”这个地方的上方添加以下内容 </p>
+<p>将pinyinfj.jar、lucene-analyzers-smartcn-4.7.0.jar、IKAnalyzer2012FF_u1.jar、pinyinAnalyzer.jar、shentong_tsearch_lib.jar放到solr部署目录的web-inf的lib目录下</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;分词相关拓展，配置博微软件中特有的分词和停止词：&lt;br&gt;特有的分词指的是博微软件中的词组，比如“定额”、“土方”等&lt;br&gt;停止词是无功能意义的词，比如is 、a 、are 、”的”，“得”，“我” 等，这些词会在句子中多次出现却无意义，所以在分词的时候需要把这些词过滤掉。&lt;br&gt;&lt;/p&gt;
+      &lt;p&gt;&lt;a href=&quot;http://www.tuicool.com/articles/mueARf&quot;&gt;http://www.tuicool.com/articles/mueARf&lt;/a&gt; 参考&lt;/p&gt;
+&lt;p&gt;请下载tgz包而不是zip包，特此提醒！ 解压solr-5.1.0.zip到任意盘符，如图：&lt;/p&gt;
+&lt;p&gt;复制solr.war到tomcat的webapps目录下，如图操作：&lt;/p&gt;
+&lt;p&gt;启动tomcat,如图：&lt;br&gt;&lt;/p&gt;
     
     </summary>
     
