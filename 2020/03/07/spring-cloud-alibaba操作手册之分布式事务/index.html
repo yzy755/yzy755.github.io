@@ -22,7 +22,7 @@
 <meta property="og:image" content="http://yzy755.github.io/2020/03/07/spring-cloud-alibaba操作手册之分布式事务/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200624171016755.png">
 <meta property="og:image" content="http://yzy755.github.io/2020/03/07/spring-cloud-alibaba操作手册之分布式事务/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200624171211591.png">
 <meta property="og:image" content="http://yzy755.github.io/2020/03/07/spring-cloud-alibaba操作手册之分布式事务/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200624172215657.png">
-<meta property="og:updated_time" content="2020-11-03T10:25:47.478Z">
+<meta property="og:updated_time" content="2020-11-03T10:27:59.212Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="spring-cloud-alibaba操作手册之分布式事务">
 <meta name="twitter:description" content="分布式事务模拟分布式事务异常1、创建两个工程 order、pay，pom.xml">
@@ -202,7 +202,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h1><h2 id="模拟分布式事务异常"><a href="#模拟分布式事务异常" class="headerlink" title="模拟分布式事务异常"></a>模拟分布式事务异常</h2><p>1、创建两个工程 order、pay，pom.xml</p>
+        <h2 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h2><h2 id="模拟分布式事务异常"><a href="#模拟分布式事务异常" class="headerlink" title="模拟分布式事务异常"></a>模拟分布式事务异常</h2><p>1、创建两个工程 order、pay，pom.xml</p>
 <a id="more"></a>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-jdbc<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.projectlombok<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>lombok<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">optional</span>&gt;</span>true<span class="tag">&lt;/<span class="name">optional</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
 <p>2、建两个数据库 order、pay，两个微服务分别访问。</p>
@@ -311,7 +311,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践、学习笔记/" class="article-tag-list-link color5">工作实践、学习笔记</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>

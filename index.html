@@ -194,7 +194,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h1><h2 id="模拟分布式事务异常"><a href="#模拟分布式事务异常" class="headerlink" title="模拟分布式事务异常"></a>模拟分布式事务异常</h2><p>1、创建两个工程 order、pay，pom.xml</p>
+        <h2 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h2><h2 id="模拟分布式事务异常"><a href="#模拟分布式事务异常" class="headerlink" title="模拟分布式事务异常"></a>模拟分布式事务异常</h2><p>1、创建两个工程 order、pay，pom.xml</p>
         
           <a class="article-more-a" href="/2020/03/07/spring-cloud-alibaba操作手册之分布式事务/#more">more >></a>
         
@@ -222,7 +222,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践、学习笔记/" class="article-tag-list-link color5">工作实践、学习笔记</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
@@ -269,7 +269,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="服务网关"><a href="#服务网关" class="headerlink" title="服务网关"></a>服务网关</h1><p>Spring Cloud Gateway 是基于 Netty，跟 Servlet 不兼容，所以你的工程中不能出现 Servlet 的组件 。</p>
+        <h2 id="服务网关"><a href="#服务网关" class="headerlink" title="服务网关"></a>服务网关</h2><p>Spring Cloud Gateway 是基于 Netty，跟 Servlet 不兼容，所以你的工程中不能出现 Servlet 的组件 。</p>
         
           <a class="article-more-a" href="/2020/03/06/spring-cloud-alibaba操作手册之服务网关/#more">more >></a>
         
@@ -297,7 +297,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践学习笔记/" class="article-tag-list-link color5">工作实践 学习笔记</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
@@ -344,7 +344,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="整合-RocketMQ"><a href="#整合-RocketMQ" class="headerlink" title="整合 RocketMQ"></a>整合 RocketMQ</h1><h2 id="安装-RocketMQ"><a href="#安装-RocketMQ" class="headerlink" title="安装 RocketMQ"></a>安装 RocketMQ</h2><p>1、传入 Linux 服务器</p>
+        <h2 id="整合-RocketMQ"><a href="#整合-RocketMQ" class="headerlink" title="整合 RocketMQ"></a>整合 RocketMQ</h2><h3 id="安装-RocketMQ"><a href="#安装-RocketMQ" class="headerlink" title="安装 RocketMQ"></a>安装 RocketMQ</h3><p>1、传入 Linux 服务器</p>
 <p>2、解压缩</p>
         
           <a class="article-more-a" href="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/#more">more >></a>
@@ -420,7 +420,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="Sentinel-服务限流降级"><a href="#Sentinel-服务限流降级" class="headerlink" title="Sentinel 服务限流降级"></a>Sentinel 服务限流降级</h1><p>雪崩效应：有A服务的不可用导致的B、C…服务不可用的现象</p>
+        <h2 id="Sentinel-服务限流降级"><a href="#Sentinel-服务限流降级" class="headerlink" title="Sentinel 服务限流降级"></a>Sentinel 服务限流降级</h2><p>雪崩效应：有A服务的不可用导致的B、C…服务不可用的现象</p>
 <p>解决方案</p>
 <p>1、设置线程超时</p>
 <p>2、设置限流</p>
@@ -452,7 +452,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践学习笔记/" class="article-tag-list-link color5">工作实践 学习笔记</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
@@ -499,7 +499,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="Ribbon-负载均衡"><a href="#Ribbon-负载均衡" class="headerlink" title="Ribbon 负载均衡"></a>Ribbon 负载均衡</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Configuration</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConsumerConfig</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Bean</span></div><div class="line">    <span class="meta">@LoadBalanced</span></div><div class="line">    <span class="function"><span class="keyword">public</span> RestTemplate <span class="title">restTemplate</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> RestTemplate();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+        <h2 id="Ribbon-负载均衡"><a href="#Ribbon-负载均衡" class="headerlink" title="Ribbon 负载均衡"></a>Ribbon 负载均衡</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Configuration</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConsumerConfig</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Bean</span></div><div class="line">    <span class="meta">@LoadBalanced</span></div><div class="line">    <span class="function"><span class="keyword">public</span> RestTemplate <span class="title">restTemplate</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> RestTemplate();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
         
           <a class="article-more-a" href="/2020/03/03/spring-cloud-alibaba操作手册之Ribbon 负载均衡/#more">more >></a>
         
@@ -527,7 +527,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践学习笔记/" class="article-tag-list-link color5">工作实践 学习笔记</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
@@ -574,7 +574,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="Nacos-服务发现与调用"><a href="#Nacos-服务发现与调用" class="headerlink" title="Nacos 服务发现与调用"></a>Nacos 服务发现与调用</h1><p>pom.xml 添加 discovery，完成服务发现。</p>
+        <h2 id="Nacos-服务发现与调用"><a href="#Nacos-服务发现与调用" class="headerlink" title="Nacos 服务发现与调用"></a>Nacos 服务发现与调用</h2><p>pom.xml 添加 discovery，完成服务发现。</p>
         
           <a class="article-more-a" href="/2020/03/03/spring-cloud-alibaba操作手册之Nacos 服务发现与调用/#more">more >></a>
         
@@ -602,7 +602,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践学习笔记/" class="article-tag-list-link color5">工作实践 学习笔记</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
@@ -649,7 +649,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="Nacos-服务注册"><a href="#Nacos-服务注册" class="headerlink" title="Nacos 服务注册"></a>Nacos 服务注册</h1><p>解压，启动服务。</p>
+        <h2 id="Nacos-服务注册"><a href="#Nacos-服务注册" class="headerlink" title="Nacos 服务注册"></a>Nacos 服务注册</h2><p>解压，启动服务。</p>
 <p>Nacos 搭建成功，接下来注册服务。</p>
 <p>在父工程路径下创建子工程，让子工程继承父工程的环境依赖，pom.xml 中添加 nacos 发现组件。</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-discovery<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
@@ -679,7 +679,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践学习笔记/" class="article-tag-list-link color5">工作实践 学习笔记</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
@@ -726,8 +726,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>创建父工程</p>
-<p>Spring Cloud Alibaba 的环境在父工程中创建，微服务的各个组件作为子工程，继承父工程的环境。</p>
+        <h2 id="创建父工程"><a href="#创建父工程" class="headerlink" title="创建父工程"></a>创建父工程</h2><p>Spring Cloud Alibaba 的环境在父工程中创建，微服务的各个组件作为子工程，继承父工程的环境。</p>
 <p>Spring Boot —》Spring Cloud —》Spring Cloud Alibaba</p>
         
           <a class="article-more-a" href="/2020/03/02/spring-cloud-alibaba操作手册之创建父工程/#more">more >></a>
@@ -756,7 +755,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践学习笔记/" class="article-tag-list-link color5">工作实践 学习笔记</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
