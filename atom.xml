@@ -144,7 +144,7 @@
     <link href="http://yzy755.github.io/2020/03/05/spring-cloud-alibaba%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C%E4%B9%8B%E6%95%B4%E5%90%88%20RocketMQ/"/>
     <id>http://yzy755.github.io/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/</id>
     <published>2020-03-05T09:23:40.000Z</published>
-    <updated>2020-11-03T10:28:47.890Z</updated>
+    <updated>2020-11-04T10:41:37.998Z</updated>
     
     <content type="html"><![CDATA[<h2 id="整合-RocketMQ"><a href="#整合-RocketMQ" class="headerlink" title="整合 RocketMQ"></a>整合 RocketMQ</h2><h3 id="安装-RocketMQ"><a href="#安装-RocketMQ" class="headerlink" title="安装 RocketMQ"></a>安装 RocketMQ</h3><p>1、传入 Linux 服务器</p>
 <p>2、解压缩</p>
@@ -154,18 +154,18 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nohup ./bin/mqnamesrv &amp;</div></pre></td></tr></table></figure>
 <p>4、检查是否启动成功</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netstat -an | grep 9876</div></pre></td></tr></table></figure>
-<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200612162924121.png" alt="image-20200612162924121"></p>
+<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/1604486306694.png" alt="1604486306694"></p>
 <p>5、启动 Broker</p>
 <p>启动之前需要编辑配置文件，修改 JVM 内存设置，默认给的内存 4 GB，超过我们的 JVM 了。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd bin</div><div class="line">vim runserver.sh</div></pre></td></tr></table></figure>
-<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200612163432947.png" alt="image-20200612163432947"></p>
+<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/1604486343246.png" alt="1604486343246"></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vim runbroker.sh</div></pre></td></tr></table></figure>
-<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200612163711475.png" alt="image-20200612163711475"></p>
+<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/1604486364259.png" alt="1604486364259"></p>
 <p>启动 Broker</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nohup ./mqbroker -n localhost:9876 &amp;</div></pre></td></tr></table></figure>
 <p>可以查看日志</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tail -f ~/logs/rocketmqlogs/broker.log</div></pre></td></tr></table></figure>
-<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200612164059688.png" alt="image-20200612164059688"></p>
+<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/1604486386015.png" alt="1604486386015"></p>
 <p>启动成功</p>
 <p>6、测试 RocketMQ</p>
 <p>消息发送</p>
@@ -175,18 +175,18 @@
 <p>7、关闭 RocketMQ</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cd bin</div><div class="line">./mqshutdown broker</div><div class="line">./mqshutdown namesrv</div></pre></td></tr></table></figure>
 <h3 id="安装-RocketMQ-控制台"><a href="#安装-RocketMQ-控制台" class="headerlink" title="安装 RocketMQ 控制台"></a>安装 RocketMQ 控制台</h3><p>1、解压缩，修改配置，打包</p>
-<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200612190405331.png" alt="image-20200612190405331"></p>
+<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/1604486413542.png" alt="1604486413542"></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn clean package -Dmaven.test.skip=true</div></pre></td></tr></table></figure>
-<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200612190454926.png" alt="image-20200612190454926"></p>
+<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/1604486431359.png" alt="1604486431359"></p>
 <p>2、进入 target 启动 jar</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">java -jar rocketmq-console-ng-1.0.0.jar</div></pre></td></tr></table></figure>
-<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200612191058068.png" alt="image-20200612191058068"></p>
+<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/1604486448601.png" alt="1604486448601"></p>
 <p>打开浏览器访问 localhost:9877，如果报错</p>
-<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200612191202652.png" alt="image-20200612191202652"></p>
+<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/1604486464540.png" alt="1604486464540"></p>
 <p>这是因为我们的 RocketMQ 安装在 Linux 中，控制台在 windows，Linux 需要开放端口才能访问，开放 10909 和 9876 端口</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">firewall-cmd --zone=public --add-port=10909/tcp --permanent</div><div class="line">firewall-cmd --zone=public --add-port=9876/tcp --permanent</div><div class="line">systemctl restart firewalld.service</div><div class="line">firewall-cmd --reload</div></pre></td></tr></table></figure>
 <p>重新启动控制台项目</p>
-<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/Users\ningn\AppData\Roaming\Typora\typora-user-images\image-20200612191417412.png" alt="image-20200612191417412"></p>
+<p><img src="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/1604486483836.png" alt="1604486483836"></p>
 <h3 id="Java-实现消息发送"><a href="#Java-实现消息发送" class="headerlink" title="Java 实现消息发送"></a>Java 实现消息发送</h3><p>1、pom.xml 中引入依赖</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.rocketmq<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>rocketmq-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
 <p>2、生产消息</p>
