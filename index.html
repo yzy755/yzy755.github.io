@@ -782,29 +782,33 @@
 
  
   
-    <article id="post-MQ业务解耦" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-JAVA内存模型" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/03/MQ业务解耦/">MQ业务解耦</a>
+      <a class="article-title" href="/2019/05/02/JAVA内存模型/">JAVA内存模型</a>
     </h1>
   
 
         
-        <a href="/2018/09/03/MQ业务解耦/" class="archive-article-date">
-  	<time datetime="2018-09-03T09:00:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-09-03</time>
+        <a href="/2019/05/02/JAVA内存模型/" class="archive-article-date">
+  	<time datetime="2019-05-02T12:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-05-02</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>天使排班中有工时存欠的概念，意思是记录护士姐姐们相比一周的标准工时多或少工作的时长，作为统计工作情况的一个依据，存欠值守用户手动输入、实际排班时长、请假以及加班时长的影响，涉及到很多个业务模块，若让业务模块每次数据变更都去计算存欠值耦合就太过严重，所以用MQ解耦<br></p>
+        <p>JAVA内存模型 即 Java Memory Model 即 JMM，它定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。<br>JMM 体现在以下几个方面</p>
+<pre><code>* 原子性 - 保证指令不会受到线程上下文切换的影响
+* 可见性 - 保证指令不会受 cpu 缓存的影响
+* 有序性 - 保证指令不会受 cpu 指令并行优化的影响
+</code></pre>
         
-          <a class="article-more-a" href="/2018/09/03/MQ业务解耦/#more">more >></a>
+          <a class="article-more-a" href="/2019/05/02/JAVA内存模型/#more">more >></a>
         
       
 
@@ -818,11 +822,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">activityMQ</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">海鹚</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JMM</a>
         		</li>
       		
 		</ul>
@@ -834,7 +834,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践/" class="article-tag-list-link color5">工作实践</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
@@ -843,7 +843,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2018/09/03/MQ业务解耦/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/05/02/JAVA内存模型/">展开全文 >></a>
         </p>
       
 
@@ -861,29 +861,33 @@
 
  
   
-    <article id="post-shiro全面的权限方案" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-JAVA内存结构" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/12/shiro全面的权限方案/">shiro全面的权限方案</a>
+      <a class="article-title" href="/2019/05/02/JAVA内存结构/">JAVA内存模型</a>
     </h1>
   
 
         
-        <a href="/2018/05/12/shiro全面的权限方案/" class="archive-article-date">
-  	<time datetime="2018-05-12T09:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-05-12</time>
+        <a href="/2019/05/02/JAVA内存结构/" class="archive-article-date">
+  	<time datetime="2019-05-02T12:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-05-02</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>天使排班基于微信的用户体系，在系统中用户的角色和权限全靠数据库查询和代码控制，没有一个强大简洁的权限控制框架实在不方便，于是引入了以前使用过的shiro，并在使用上进行了加强，集成了redis权限缓存以及基于redis的sessionDAO，全面支持分布式。<br></p>
+        <p>JAVA内存模型 即 Java Memory Model 即 JMM，它定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。<br>JMM 体现在以下几个方面</p>
+<pre><code>* 原子性 - 保证指令不会受到线程上下文切换的影响
+* 可见性 - 保证指令不会受 cpu 缓存的影响
+* 有序性 - 保证指令不会受 cpu 指令并行优化的影响
+</code></pre>
         
-          <a class="article-more-a" href="/2018/05/12/shiro全面的权限方案/#more">more >></a>
+          <a class="article-more-a" href="/2019/05/02/JAVA内存结构/#more">more >></a>
         
       
 
@@ -897,11 +901,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">海鹚</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">shiro</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JMM</a>
         		</li>
       		
 		</ul>
@@ -913,7 +913,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践/" class="article-tag-list-link color5">工作实践</a>
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
@@ -922,7 +922,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2018/05/12/shiro全面的权限方案/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/05/02/JAVA内存结构/">展开全文 >></a>
         </p>
       
 
@@ -1150,6 +1150,10 @@
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">oauth2.0</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
               </li>
             
             <div class="clearfix"></div>

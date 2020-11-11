@@ -436,6 +436,96 @@
   </entry>
   
   <entry>
+    <title>JAVA内存模型</title>
+    <link href="http://yzy755.github.io/2019/05/02/JAVA%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"/>
+    <id>http://yzy755.github.io/2019/05/02/JAVA内存模型/</id>
+    <published>2019-05-02T12:17:53.000Z</published>
+    <updated>2020-11-10T10:52:15.447Z</updated>
+    
+    <content type="html"><![CDATA[<p>JAVA内存模型 即 Java Memory Model 即 JMM，它定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。<br>JMM 体现在以下几个方面</p>
+<pre><code>* 原子性 - 保证指令不会受到线程上下文切换的影响
+* 可见性 - 保证指令不会受 cpu 缓存的影响
+* 有序性 - 保证指令不会受 cpu 指令并行优化的影响
+</code></pre><a id="more"></a>
+<p>既然JMM需要规范这个三个方面，那么势必在某些情况下我们的java程序会因为这个三个方便产生问题咯，什么情况下呢，就是多线程并发使用共享资源的时候，我们一步一步来说</p>
+<h1 id="原子性问题"><a href="#原子性问题" class="headerlink" title="原子性问题"></a>原子性问题</h1><p>如果一个语句执行一个单独不可分割的指令，那么它是原子的。严格的原子操作排除了任何抢占的可能性，更方便的理解是这个值永远是最新的 <strong>一个或多个操作，要么全部执行且在执行过程中不被任何因素打断</strong> </p>
+<p>在学线程并发执行临界区代码时就容易发生非原子性操作，比如i++操作，保证原子性可以用synchronized、Lock独占锁解决，也可使用cas无锁机制解决</p>
+<h1 id="可见性问题"><a href="#可见性问题" class="headerlink" title="可见性问题"></a>可见性问题</h1><h2 id="cpu缓存结构"><a href="#cpu缓存结构" class="headerlink" title="cpu缓存结构"></a>cpu缓存结构</h2><p>现在的cpu都是多核的（单核cpu不存在线程并发请求临界资源问题），而且运行速度非常块，然而我们的存储设备（内存，硬盘）得读取速度远远跟不上的运算速度，所有就有了多级缓存（还有寄存器也可以看作缓存）</p>
+<p>结构如图：<img src="/2019/05/02/JAVA内存模型/MY\myblog\public\2019\05\02\1604914627101.png" alt="1604914627101"></p>
+<p>不同线程在不同cpu核心上对临界资源进行读写就存在缓存一致性的问题，因为不同CPU核心上的线程如果缓存了同一份主存上的数据然后进行写操作，线程彼此之间是不可见的，最后更新主存值的时候就会不准确，解决这个问题的办法就是禁用CPU缓存，让线程每次都去主存上读写数据，java使用 volatile 关键字来确保变量的可见性，当然，使用synchronized关键字来修饰代码块也是可以保证的。</p>
+<h1 id="有序性问题"><a href="#有序性问题" class="headerlink" title="有序性问题"></a>有序性问题</h1><p>JVM 会在不影响正确性的前提下，可以调整语句的执行顺序，来充分发挥CPU运算单元的效率，前提是要符合as-if-serial语义，操作与操作之间要符合 happens-before 规则</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">as-if-serial语义：不管怎么重排序，单线程程序的执行结果不能被改变。编译器、处理器都必须遵守as-if-serial语义</div><div class="line"></div><div class="line">happens-before 反映在以下几种情况：</div><div class="line">	1、线程解锁 m 之前对变量的写，对于接下来对 m 加锁的其它线程对该变量的读可见</div><div class="line">	2、线程对 volatile 变量的写，对接下来其它线程对该变量的读可见</div><div class="line">	3、线程结束前对变量的写，对其它线程得知它结束后的读可见（比如其它线程调用 t1.isAlive() 或t1.join()等待它结束）</div><div class="line">	4、线程 t1 打断 t2（interrupt）前对变量的写，对于其他线程得知 t2 被打断后对变量的读可见（通过t2.interrupted 或 t2.isInterrupted）</div><div class="line">	5、具有传递性，如果 x hb-&gt; y 并且 y hb-&gt; z 那么有 x hb-&gt; z</div></pre></td></tr></table></figure>
+<p>在java中，使用volatile关键字修饰变量可以防止指令重排序来解决有序性问题。</p>
+<h1 id="volatile原理"><a href="#volatile原理" class="headerlink" title="volatile原理"></a>volatile原理</h1><p>volatile 的底层是通过对变量增加内存屏障（Memory Fence），内存屏障包含两种：读屏障、写屏障，对 volatile 变量的写指令后会加入写屏障对 volatile 变量的读指令前会加入读屏障</p>
+<h2 id="如何保证可见性"><a href="#如何保证可见性" class="headerlink" title="如何保证可见性"></a>如何保证可见性</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">读屏障：保证在该屏障之后，对共享变量的读取加载的是主存中的最新数据</div><div class="line">写屏障：保证在该屏障之前，对贡献变量的改动都同不到主存中去</div></pre></td></tr></table></figure>
+<p>可以理解为被volatile修饰的共享变量的读写跳过CPU缓存，直接操作主存，而且有意思的是在写屏障之前的非volatile修饰的共享变量也能保证可见性</p>
+<h2 id="如何保证有序性"><a href="#如何保证有序性" class="headerlink" title="如何保证有序性"></a>如何保证有序性</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">* 写屏障会确保指令重排序时，不会将写屏障之前的代码排在写屏障之后</div><div class="line">* 读屏障会确保指令重排序时，不会将读屏障之后的代码排在读屏障之前</div></pre></td></tr></table></figure>
+<h2 id="为什么不能保证原子性"><a href="#为什么不能保证原子性" class="headerlink" title="为什么不能保证原子性"></a>为什么不能保证原子性</h2><p>最重要的一点就是不能解决指令交错<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">* 写屏障仅仅是保证之后的读能够读到最新的结果，但不能保证多线程下读跑到它前面去</div><div class="line">* 而有序性的保证也只是保证了本线程内相关代码不被重排序</div></pre></td></tr></table></figure></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;JAVA内存模型 即 Java Memory Model 即 JMM，它定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。&lt;br&gt;JMM 体现在以下几个方面&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;* 原子性 - 保证指令不会受到线程上下文切换的影响
+* 可见性 - 保证指令不会受 cpu 缓存的影响
+* 有序性 - 保证指令不会受 cpu 指令并行优化的影响
+&lt;/code&gt;&lt;/pre&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="JMM" scheme="http://yzy755.github.io/tags/JMM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JAVA内存模型</title>
+    <link href="http://yzy755.github.io/2019/05/02/JAVA%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/"/>
+    <id>http://yzy755.github.io/2019/05/02/JAVA内存结构/</id>
+    <published>2019-05-02T12:17:53.000Z</published>
+    <updated>2020-11-10T10:52:15.447Z</updated>
+    
+    <content type="html"><![CDATA[<p>JAVA内存模型 即 Java Memory Model 即 JMM，它定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。<br>JMM 体现在以下几个方面</p>
+<pre><code>* 原子性 - 保证指令不会受到线程上下文切换的影响
+* 可见性 - 保证指令不会受 cpu 缓存的影响
+* 有序性 - 保证指令不会受 cpu 指令并行优化的影响
+</code></pre><a id="more"></a>
+<p>既然JMM需要规范这个三个方面，那么势必在某些情况下我们的java程序会因为这个三个方便产生问题咯，什么情况下呢，就是多线程并发使用共享资源的时候，我们一步一步来说</p>
+<h1 id="原子性问题"><a href="#原子性问题" class="headerlink" title="原子性问题"></a>原子性问题</h1><p>如果一个语句执行一个单独不可分割的指令，那么它是原子的。严格的原子操作排除了任何抢占的可能性，更方便的理解是这个值永远是最新的 <strong>一个或多个操作，要么全部执行且在执行过程中不被任何因素打断</strong> </p>
+<p>在学线程并发执行临界区代码时就容易发生非原子性操作，比如i++操作，保证原子性可以用synchronized、Lock独占锁解决，也可使用cas无锁机制解决</p>
+<h1 id="可见性问题"><a href="#可见性问题" class="headerlink" title="可见性问题"></a>可见性问题</h1><h2 id="cpu缓存结构"><a href="#cpu缓存结构" class="headerlink" title="cpu缓存结构"></a>cpu缓存结构</h2><p>现在的cpu都是多核的（单核cpu不存在线程并发请求临界资源问题），而且运行速度非常块，然而我们的存储设备（内存，硬盘）得读取速度远远跟不上的运算速度，所有就有了多级缓存（还有寄存器也可以看作缓存）</p>
+<p>结构如图：<img src="/2019/05/02/JAVA内存结构/MY\myblog\public\2019\05\02\1604914627101.png" alt="1604914627101"></p>
+<p>不同线程在不同cpu核心上对临界资源进行读写就存在缓存一致性的问题，因为不同CPU核心上的线程如果缓存了同一份主存上的数据然后进行写操作，线程彼此之间是不可见的，最后更新主存值的时候就会不准确，解决这个问题的办法就是禁用CPU缓存，让线程每次都去主存上读写数据，java使用 volatile 关键字来确保变量的可见性，当然，使用synchronized关键字来修饰代码块也是可以保证的。</p>
+<h1 id="有序性问题"><a href="#有序性问题" class="headerlink" title="有序性问题"></a>有序性问题</h1><p>JVM 会在不影响正确性的前提下，可以调整语句的执行顺序，来充分发挥CPU运算单元的效率，前提是要符合as-if-serial语义，操作与操作之间要符合 happens-before 规则</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">as-if-serial语义：不管怎么重排序，单线程程序的执行结果不能被改变。编译器、处理器都必须遵守as-if-serial语义</div><div class="line"></div><div class="line">happens-before 反映在以下几种情况：</div><div class="line">	1、线程解锁 m 之前对变量的写，对于接下来对 m 加锁的其它线程对该变量的读可见</div><div class="line">	2、线程对 volatile 变量的写，对接下来其它线程对该变量的读可见</div><div class="line">	3、线程结束前对变量的写，对其它线程得知它结束后的读可见（比如其它线程调用 t1.isAlive() 或t1.join()等待它结束）</div><div class="line">	4、线程 t1 打断 t2（interrupt）前对变量的写，对于其他线程得知 t2 被打断后对变量的读可见（通过t2.interrupted 或 t2.isInterrupted）</div><div class="line">	5、具有传递性，如果 x hb-&gt; y 并且 y hb-&gt; z 那么有 x hb-&gt; z</div></pre></td></tr></table></figure>
+<p>在java中，使用volatile关键字修饰变量可以防止指令重排序来解决有序性问题。</p>
+<h1 id="volatile原理"><a href="#volatile原理" class="headerlink" title="volatile原理"></a>volatile原理</h1><p>volatile 的底层是通过对变量增加内存屏障（Memory Fence），内存屏障包含两种：读屏障、写屏障，对 volatile 变量的写指令后会加入写屏障对 volatile 变量的读指令前会加入读屏障</p>
+<h2 id="如何保证可见性"><a href="#如何保证可见性" class="headerlink" title="如何保证可见性"></a>如何保证可见性</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">读屏障：保证在该屏障之后，对共享变量的读取加载的是主存中的最新数据</div><div class="line">写屏障：保证在该屏障之前，对贡献变量的改动都同不到主存中去</div></pre></td></tr></table></figure>
+<p>可以理解为被volatile修饰的共享变量的读写跳过CPU缓存，直接操作主存，而且有意思的是在写屏障之前的非volatile修饰的共享变量也能保证可见性</p>
+<h2 id="如何保证有序性"><a href="#如何保证有序性" class="headerlink" title="如何保证有序性"></a>如何保证有序性</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">* 写屏障会确保指令重排序时，不会将写屏障之前的代码排在写屏障之后</div><div class="line">* 读屏障会确保指令重排序时，不会将读屏障之后的代码排在读屏障之前</div></pre></td></tr></table></figure>
+<h2 id="为什么不能保证原子性"><a href="#为什么不能保证原子性" class="headerlink" title="为什么不能保证原子性"></a>为什么不能保证原子性</h2><p>最重要的一点就是不能解决指令交错<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">* 写屏障仅仅是保证之后的读能够读到最新的结果，但不能保证多线程下读跑到它前面去</div><div class="line">* 而有序性的保证也只是保证了本线程内相关代码不被重排序</div></pre></td></tr></table></figure></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;JAVA内存模型 即 Java Memory Model 即 JMM，它定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。&lt;br&gt;JMM 体现在以下几个方面&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;* 原子性 - 保证指令不会受到线程上下文切换的影响
+* 可见性 - 保证指令不会受 cpu 缓存的影响
+* 有序性 - 保证指令不会受 cpu 指令并行优化的影响
+&lt;/code&gt;&lt;/pre&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="JMM" scheme="http://yzy755.github.io/tags/JMM/"/>
+    
+  </entry>
+  
+  <entry>
     <title>MQ业务解耦</title>
     <link href="http://yzy755.github.io/2018/09/03/MQ%E4%B8%9A%E5%8A%A1%E8%A7%A3%E8%80%A6/"/>
     <id>http://yzy755.github.io/2018/09/03/MQ业务解耦/</id>
@@ -1370,432 +1460,6 @@ if __name__ == &apos;__main__&apos;:
     
     
       <category term="redis" scheme="http://yzy755.github.io/tags/redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>第三方快捷登录开发后对oauth的认识</title>
-    <link href="http://yzy755.github.io/2017/04/13/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BF%AB%E6%8D%B7%E7%99%BB%E5%BD%95%E5%BC%80%E5%8F%91%E5%90%8E%E5%AF%B9oauth%E7%9A%84%E8%AE%A4%E8%AF%86/"/>
-    <id>http://yzy755.github.io/2017/04/13/第三方快捷登录开发后对oauth的认识/</id>
-    <published>2017-04-13T06:17:53.000Z</published>
-    <updated>2017-04-13T03:56:09.779Z</updated>
-    
-    <content type="html"><![CDATA[<p>公司用户中心系统不仅需要传统的注册登录，主流的快捷登录肯定也必不可少，第三方快捷登录的流程和相应系统数据表的设计就先不记录了，主要摘抄一下网上对oauth的介绍和自己的理解<br><a id="more"></a><br>OAuth是一个关于授权（authorization）的开放网络标准—-&gt;open authorization </p>
-<p>应用场景：</p>
-<p>有一个”云冲印”的网站，可以将用户储存在Google的照片，冲印出来。用户为了使用该服务，必须让”云冲印”读取自己储存在Google上的照片。</p>
-<p>问题是只有得到用户的授权，Google才会同意”云冲印”读取这些照片。那么，”云冲印”怎样获得用户的授权呢？<br>传统方法是，用户将自己的Google用户名和密码，告诉”云冲印”，后者就可以读取用户的照片了。这样的做法有以下几个严重的缺点。<br>（1）”云冲印”为了后续的服务，会保存用户的密码，这样很不安全。<br>（2）Google不得不部署密码登录，而我们知道，单纯的密码登录并不安全。<br>（3）”云冲印”拥有了获取用户储存在Google所有资料的权力，用户没法限制”云冲印”获得授权的范围和有效期。<br>（4）用户只有修改密码，才能收回赋予”云冲印”的权力。但是这样做，会使得其他所有获得用户授权的第三方应用程序全部失效。<br>（5）只要有一个第三方应用程序被破解，就会导致用户密码泄漏，以及所有被密码保护的数据泄漏。<br>OAuth就是为了解决上面这些问题而诞生的。<br>原理：<br>OAuth在”客户端”与”服务提供商”之间，设置了一个授权层（authorization layer）。”客户端”不能直接登录”服务提供商”，只能登录授权层，以此将用户与客户端区分开来。”客户端”登录授权层所用的令牌（token），与用户的密码不同。用户可以在登录的时候，指定授权层令牌的权限范围和有效期。<br>“客户端”登录授权层以后，”服务提供商”根据令牌的权限范围和有效期，向”客户端”开放用户储存的资料。</p>
-<p>客户端的授权模式<br>客户端必须得到用户的授权（authorization grant），才能获得令牌（access token）。OAuth 2.0定义了四种授权方式。<br>授权码模式（authorization code）<br>简化模式（implicit）<br>密码模式（resource owner password credentials）<br>客户端模式（client credentials）</p>
-<p>授权码模式<br>授权码模式（authorization code）是功能最完整、流程最严密的授权模式。它的特点就是通过客户端的后台服务器，与”服务提供商”的认证服务器进行互动。令牌对访问者是不可见的，后台是由httpclient获取令牌和所需信息的。<br><img src="/2017/04/13/第三方快捷登录开发后对oauth的认识/oauth1.png" alt="logo"></p>
-<p>（A）用户访问客户端，后者将前者导向认证服务器。<br>（B）用户选择是否给予客户端授权。<br>（C）假设用户给予授权，认证服务器将用户导向客户端事先指定的”重定向URI”（redirection URI），同时附上一个授权码。<br>（D）客户端收到授权码，附上早先的”重定向URI”，向认证服务器申请令牌。这一步是在客户端的后台的服务器上完成的，对用户不可见。<br>（E）认证服务器核对了授权码和重定向URI，确认无误后，向客户端发送访问令牌（access token）和更新令牌（refresh token）。<br>……</p>
-<p>A步骤中，客户端申请认证的URI，包含以下参数：<br>response_type：表示授权类型，必选项，此处的值固定为”code”<br>client_id：表示客户端的ID，必选项<br>redirect_uri：表示重定向URI，必选项<br>scope：表示申请的权限范围，可选项<br>state：表示客户端的当前状态，可以指定任意值，认证服务器会原封不动地返回这个值。<br>示例url：<a href="http://openapi.qzone.qq.com/oauth/show?which=Login&amp;display=pc&amp;response_type=code&amp;client_id=101188868&amp;redirect_uri=account.booway.com.cn&amp;state=qqdenglu__http://yun.booway.com.cn/index.xhtml&amp;scope=get_user_info,get_info,add_t%20del_t%20add_pic_t,get_repost_list,get_other_info%20get_fanslist,get_idollist%20add_idol%20del_idol" target="_blank" rel="external">http://openapi.qzone.qq.com/oauth/show?which=Login&amp;display=pc&amp;response_type=code&amp;client_id=101188868&amp;redirect_uri=account.booway.com.cn&amp;state=qqdenglu__http://yun.booway.com.cn/index.xhtml&amp;scope=get_user_info,get_info,add_t%20del_t%20add_pic_t,get_repost_list,get_other_info%20get_fanslist,get_idollist%20add_idol%20del_idol</a><br>C步骤中，服务器回应客户端的URI，包含以下参数：<br>code：表示授权码，必选项。该码的有效期应该很短，通常设为10分钟，客户端只能使用该码一次，否则会被授权服务器拒绝。该码与客户端ID和重定向URI，是一一对应关系。<br>state：如果客户端的请求中包含这个参数，认证服务器的回应也必须一模一样包含这个参数。<br>D步骤中，客户端向认证服务器申请令牌的HTTP请求，包含以下参数：<br>grant_type：表示使用的授权模式，必选项，此处的值固定为”authorization_code”。<br>code：表示上一步获得的授权码，必选项。<br>redirect_uri：表示重定向URI，必选项，且必须与A步骤中的该参数值保持一致。<br>client_id：表示客户端ID，必选项。<br>E步骤中，认证服务器发送的HTTP回复，包含以下参数：<br>access_token：表示访问令牌，必选项。<br>token_type：表示令牌类型，该值大小写不敏感，必选项，可以是bearer类型或mac类型。<br>expires_in：表示过期时间，单位为秒。如果省略该参数，必须其他方式设置过期时间。<br>refresh_token：表示更新令牌，用来获取下一次的访问令牌，可选项。<br>scope：表示权限范围，如果与客户端申请的范围一致，此项可省略。<br><img src="/2017/04/13/第三方快捷登录开发后对oauth的认识/oauth2.png" alt="logo"><br>云计算应用实例：QQ第三方登录</p>
-<p>简化模式<br>简化模式（implicit grant type）不通过第三方应用程序的服务器，直接在浏览器中向认证服务器申请令牌，跳过了”授权码”这个步骤，因此得名。所有步骤在浏览器中完成，令牌对访问者是可见的，且客户端不需要认证。<br><img src="/2017/04/13/第三方快捷登录开发后对oauth的认识/oauth3.png" alt="logo"></p>
-<p>步骤如下：<br>（A）客户端将用户导向认证服务器。<br>（B）用户决定是否给于客户端授权。<br>（C）假设用户给予授权，认证服务器将用户导向客户端指定的”重定向URI”，并在URI的Hash部分包含了访问令牌。<br>（D）浏览器向资源服务器发出请求，其中不包括上一步收到的Hash值。<br>（E）资源服务器返回一个网页，其中包含的代码可以获取Hash值中的令牌。<br>（F）浏览器执行上一步获得的脚本，提取出令牌。<br>（G）浏览器将令牌发给客户端。<br>A步骤中，客户端发出的HTTP请求，包含以下参数：<br>response_type：表示授权类型，此处的值固定为”token”，必选项。<br>client_id：表示客户端的ID，必选项。<br>redirect_uri：表示重定向的URI，必选项。<br>scope：表示权限范围，可选项。<br>state：表示客户端的当前状态，可以指定任意值，认证服务器会原封不动地返回这个值。<br>示例url：localhost:8080/booway_uums/openapi/oauth2/authorize-implicit?client_id=123&amp;response_type=token&amp;redirect_uri=oob<br>C步骤中，认证服务器回应客户端的URI，包含以下参数：<br>access_token：表示访问令牌，必选项。<br>token_type：表示令牌类型，该值大小写不敏感，必选项。可以是bearer类型或mac类型。<br>expires_in：表示过期时间，单位为秒。如果省略该参数，必须其他方式设置过期时间。<br>scope：表示权限范围，如果与客户端申请的范围一致，此项可省略。<br>state：如果客户端的请求中包含这个参数，认证服务器的回应也必须一模一样包含这个参数。<br>示例url：<a href="http://localhost:8080/booway_uums/index/success.html#access_token=cb1617c64f1d6c2937c64b3599f2dd2&amp;state=null&amp;token_type=bearer&amp;expires_in=604800000&amp;scope=readCalendar" target="_blank" rel="external">http://localhost:8080/booway_uums/index/success.html#access_token=cb1617c64f1d6c2937c64b3599f2dd2&amp;state=null&amp;token_type=bearer&amp;expires_in=604800000&amp;scope=readCalendar</a><br><img src="/2017/04/13/第三方快捷登录开发后对oauth的认识/oauth4.png" alt="logo"></p>
-<p>Access Token 类型介绍<br>OAuth2.0支持Bearer和MAC两种类型的Access Token。其中MAC类型只适用于API2.0接口：<br>Bearer 介绍<br>优点：<br>调用简单，不需要对请求进行签名。<br>缺点：<br>请求API需要使用https协议保证信息传输安全。<br>Access Token有效期一个月，过期后需要使用Refresh Token进行刷新。<br>MAC 介绍<br>优点：<br>不依赖https协议，无协议加密带来的性能开销。<br>Access Token长期有效，无需使用Refresh Token刷新。<br>缺点：<br>需要进行MAC计算。<br>默认情况下，会获得Bearer类型的Access Token。如果开发者想要获得MAC类型的Access Token，需要在获取token时指定’token_type’参数为’mac’。</p>
-<p>MAC计算<br>标准化字符串<br>标准化的请求字符串，就是用指定的请求属性按照某个规则拼接而成的字符串。在这里，其实标准化请求字符串，就是将 时间戳 + 随机码 + http方法 + uri + 主机 + 端口 + 其他参数的请求参数，以换行符(即：\n)为连接符，合并起来得到的字符串。即使不需要其他参数也请在最后增加\n。</p>
-<p>如果用户访问的时候，客户端的”访问令牌”已经过期，则需要使用”更新令牌”申请一个新的访问令牌。<br>客户端发出更新令牌的HTTP请求，包含以下参数：<br>granttype：表示使用的授权模式，此处的值固定为”refreshtoken”，必选项。<br>refresh_token：表示早前收到的更新令牌，必选项。<br>scope：表示申请的授权范围，不可以超出上一次申请的范围，如果省略该参数，则表示与上一次一致。</p>
-<p>计算expires_in到期时间的方法：7776000<br>long longTime = System.currentTimeMillis() + Long.parseLong(“604800000”) * 1000;<br>        System.out.println(longTime);<br>        Date date = new Date(longTime);<br>        System.out.println(date);</p>
-<p>密码模式<br>密码模式（Resource Owner Password Credentials Grant）中，用户向客户端提供自己的用户名和密码。客户端使用这些信息，向”服务商提供商”索要授权。<br>在这种模式中，用户必须把自己的密码给客户端，但是客户端不得储存密码。这通常用在用户对客户端高度信任的情况下，比如客户端是操作系统的一部分，或者由一个著名公司出品。而认证服务器只有在其他授权模式无法执行的情况下，才能考虑使用这种模式。<br>客户端模式<br>客户端模式（Client Credentials Grant）指客户端以自己的名义，而不是以用户的名义，向”服务提供商”进行认证。严格地说，客户端模式并不属于OAuth框架所要解决的问题。在这种模式中，用户直接向客户端注册，客户端以自己的名义要求”服务提供商”提供服务，其实不存在授权问题。</p>
-<p>搭建OAuth<br>框架：<br>Spring Security for OAuth ?<br>Apis Authorization Server<br>Restlet Framework<br>Apache CXF</p>
-<p>Shiro oauth??</p>
-<p>一个OAuth2.0服务器端的实现 </p>
-<p>数据库简单设计:<br>(可以不用数据库,access_token是临时的,放在内存中即可) </p>
-<p>create table access_token (<br>id bigint,<br>access_token varchar(255) NOT NULL,<br>token_type varchar(255),<br>expires varchar(255),<br>refresh_token varchar(255),<br>username varchar(255),<br>client_id varchar(255),<br>createdtime datetime,<br>modifiedtime datetime<br>); </p>
-<p>create table user (<br>uid bigint,<br>username varchar(255) NOT NULL,<br>password varchar(255) NOT NULL<br>); </p>
-<p>create table client (<br>id bigint,<br>client_id varchar(255) NOT NULL,<br>client_secret varchar(255)<br>); </p>
-<p>OAuth2.0协议主要是用access_token代替密码.<br>授权服务器保管用户密码并向第三方应用发放access_token,第三方应用接触不到用户<br>的密码.<br>资源服务器保管需要授权才能访问的资源(其实就是服务器提供的API),第三方应用凭<br>access_token访问资源服务器.(资源服务器还要问一下授权服务器这个access_token是<br>不是真的) </p>
-<p>授权服务器做两件事: </p>
-<ol>
-<li>发放access_token的servlet </li>
-<li>向资源服务器提供一个验证access_token真伪的WebService </li>
-</ol>
-<p>四种获取access token的方式<br>1    “Authorization Code” Grant<br>2    “Implicit” Grant<br>3    “Resource Owner Password Credentials” Grant<br>4    “Client Credentials” Grant  </p>
-<ul>
-<li>Refreshing an Access Token </li>
-</ul>
-<p>(在第一种方式里面要分两步获取access_token.) </p>
-<p>class TokenServlet extends HttpServlet<br>{<br>     void doGet()<br>     {<br>         String response_type = request.getParameter(“response_type”);<br>         if (response_type.equals(“token”))<br>         {<br>              // TODO 第二种:”Implicit方式”;<br>         }<br>     } </p>
-<pre><code>void doPost() 
-{ 
-    // TODO Filter Authorization: Basic base64(appkey:appsecret)  
-// 验证 appkey appsecret
-
-    String grant_type = request.getParameter(&quot;grant_type&quot;);     
-
-    if (grant_type.equals(&quot;authorization_code&quot;)) 
-    {             
-        // TODO 第一种:&quot;Authorization Code方式&quot;;             
-        return ; 
-    } 
-
-    if (grant_type.equals(&quot;password&quot;)) 
-    {             
-        // TODO 第三种:&quot;Password方式&quot;;             
-        return ; 
-    } 
-
-    if (grant_type.equals(&quot;client_credentials&quot;)) 
-    {             
-        // TODO 第四种:&quot;Client Credentials方式&quot;;             
-        return ; 
-    } 
-
-    if (grant_type.equals(&quot;refresh_token&quot;)) 
-    {             
-        // TODO 第五种:&quot;RefreshToken方式&quot;;             
-        return ; 
-    } 
-
-} 
-</code></pre><p>} </p>
-<p>OAuth2.0存在的安全问题：</p>
-<p>场景一：见demo—-&gt;访问信任页面A，授权后产生cookie，<br>在未退出或者未关闭浏览器的情况下携带A页面的cookie访问危险网站B<br>B站中要求访问页面A，A并不知道这是用户的请求还是跨站请求所以会同意访问，B达到了模拟用户操作的目的。</p>
-<p>场景二：<br>通过Authorization code方式绑定QQ账号<br>（1）用户甲到第三方网站A登录后，到了绑定页面。此时还没绑定微博。<br>（2）绑定页面提供一个按钮：“绑定QQ”（地址a：<a href="http://aaa.com/index.xhtml?m=user_3rd_bind_qq）" target="_blank" rel="external">http://aaa.com/index.xhtml?m=user_3rd_bind_qq）</a><br>（3）用户甲点击地址a，程序生成如下地址b：<br><a href="https://api.weibo.com/oauth2/authorize?client_id=【9999999】&amp;redirect_uri=【http://aaa.comindex.xhtml?m=user_3rd_bind_qq_callback】&amp;response_type=【code】" target="_blank" rel="external">https://api.weibo.com/oauth2/authorize?client_id=【9999999】&amp;redirect_uri=【http://aaa.comindex.xhtml?m=user_3rd_bind_qq_callback】&amp;response_type=【code】</a><br>（4）用户甲浏览器定向到地址b，授权该应用。<br>（5）授权服务器根据传递的redirect_uri参数，组合认证参数code生成地址c：<br><a href="http://aaa.comindex.xhtml?m=user_3rd_bind_qq_callback&amp;code=【809ui0asduve】" target="_blank" rel="external">http://aaa.comindex.xhtml?m=user_3rd_bind_qq_callback&amp;code=【809ui0asduve】</a><br>（6）用户甲浏览器返回到地址c，完成绑定。<br>第5步中返回地址所带的code 与当前用户的关系。。。<br>两用户同时进行QQ绑定若没有各自特定的标识参数的后果。。。<br>可以在第五步做手脚交换二者的code 就可以形成交叉绑定</p>
-<p>state: RECOMMENDED. An opaque value used by the client to maintain state between the request and callback.  The authorization server includes this value when redirecting the user-agent back to the client.  The parameter SHOULD be used for preventing cross-site request forgery as described in Section 10.12. </p>
-<p>使用state参数用于请求阶段和回调阶段之间的状态保持可防止CSRF攻击和防止错误绑定<br>记录请求之前state，返回后比对—–&gt;安全<br>返回的state只能匹配固定几种url头部才通过验证—–&gt;方便</p>
-<p>Spring Security for OAuth 是针对OAuth2基于Security 的实现，token存放于内存</p>
-<p>Shiro的1.2版本提供接入oauth2，实现可以用Apache Oltu，有整合资料</p>
-<p>Apache Oltu是OAuth协议的Java语言实现。<br>现在实现了oauth2.0标准的Java版本有：<br>1、Spring Security for OAuth<br>2、Apache Oltu(Apache Amber)<br>3、Apis Authorization Server<br>4、Restlet Framework<br>5、Apache CXF</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;公司用户中心系统不仅需要传统的注册登录，主流的快捷登录肯定也必不可少，第三方快捷登录的流程和相应系统数据表的设计就先不记录了，主要摘抄一下网上对oauth的介绍和自己的理解&lt;br&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    
-    
-      <category term="第三方快捷登录" scheme="http://yzy755.github.io/tags/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BF%AB%E6%8D%B7%E7%99%BB%E5%BD%95/"/>
-    
-      <category term="oauth2.0" scheme="http://yzy755.github.io/tags/oauth2-0/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>基于shiro拓展并发登录人数控制</title>
-    <link href="http://yzy755.github.io/2017/04/11/%E5%9F%BA%E4%BA%8Eshiro%E6%8B%93%E5%B1%95%E5%B9%B6%E5%8F%91%E7%99%BB%E5%BD%95%E4%BA%BA%E6%95%B0%E6%8E%A7%E5%88%B6/"/>
-    <id>http://yzy755.github.io/2017/04/11/基于shiro拓展并发登录人数控制/</id>
-    <published>2017-04-11T09:17:53.000Z</published>
-    <updated>2018-09-04T09:19:03.766Z</updated>
-    
-    <content type="html"><![CDATA[<p>在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！<a id="more"></a><br>spring security就直接提供了相应的功能；我的项目使用的权限框架是apach的shiro，Shiro的话没有提供默认实现，不过可以很容易的在Shiro中加入这个功能<br>我们来看下shiro拦截机制中filter的关系图<br><img src="/2017/04/11/基于shiro拓展并发登录人数控制/filter.png" alt="logo"><br>这里只介绍AccessControlFilter：<br>    AccessControlFilter提供了访问控制的基础功能；比如是否允许访问/当访问拒绝时如何处理等：<br>        abstract boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception;<br>        boolean onAccessDenied(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception;<br>        abstract boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception;</p>
-<pre><code>    isAccessAllowed：表示是否允许访问；mappedValue就是[urls]配置中拦截器参数部分，如果允许访问返回true，否则false；
-    onAccessDenied：表示当访问拒绝时是否已经处理了；如果返回true表示需要继续处理；如果返回false表示该拦截器实例已经处理了，将直接返回即可。
-
-onPreHandle会自动调用这两个方法决定是否继续处理：
-    boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {  
-        return isAccessAllowed(request, response, mappedValue) || onAccessDenied(request, response, mappedValue);  
-    }   
-
-另外AccessControlFilter还提供了如下方法用于处理如登录成功后/重定向到上一个请求： 
-    void setLoginUrl(String loginUrl) //身份验证时使用，默认/login.jsp  
-    String getLoginUrl()  
-    Subject getSubject(ServletRequest request, ServletResponse response) //获取Subject实例  
-    boolean isLoginRequest(ServletRequest request, ServletResponse response)//当前请求是否是登录请求  
-    void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException //将当前请求保存起来并重定向到登录页面  
-    void saveRequest(ServletRequest request) //将请求保存起来，如登录成功后再重定向回该请求  
-    void redirectToLogin(ServletRequest request, ServletResponse response) //重定向到登录页面 
-    比如基于表单的身份验证就需要使用这些功能。
-</code></pre><p>如果我们想进行访问访问的控制就可以继承AccessControlFilter；如果我们要添加一些通用数据我们可以直接继承PathMatchingFilter。所以定义一个类继承AccessControlFilter重写onAccessDenied方法，isAccessAllowed方法直接返回false，使程序进入拒绝访问的处理过程，也就是onAccessDenied方法，在这个方法中，我们的思路就是<br>    1.使用链表记录同一用户的登录sessionid，用shiro提供的cache记录用户和session的映射关系，用户名为key,链表为value<br>    2.用户登录后使用subject拿到用户名，以用户名取出当前服务器存储的sessionid链表，判断链表中有无当前登录的sessionid，无则push<br>    3.判断链表的的长度，若大于系统允许的登录数，链表进行移除操作，获得移除的session并标记为被踢出（移除的顺序可配置为踢前者或者后者）<br>    4.被移除的session（客户端）再次访问系统页面时，走完上述过程发现自己有被踢出的标记，调用subject.logout()方法，并重定向到踢出的提示页面<br>帖一波代码：</p>
-<pre><code>public class KickoutSessionControlFilter extends AccessControlFilter
-{
-    private Logger logger = LoggerFactory.getLogger(KickoutSessionControlFilter.class);
-    private String kickoutUrl; // 踢出后到的地址
-    private boolean kickoutAfter; // 踢出之前登录的或之后登录的用户 (在配置文件中配)
-    private int maxSession = 1; // 同一个帐号最大会话数 默认1
-
-    private SessionManager sessionManager;
-
-    private Cache&lt;String, Deque&lt;Serializable&gt;&gt; cache;
-    @Override
-    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception
-    {
-        return false;
-    }
-
-    @Override
-    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception
-    {
-        Subject subject = getSubject(request, response);
-        if (!subject.isAuthenticated() &amp;&amp; !subject.isRemembered())
-        {
-            // 如果没有登录，直接进行之后的流程
-            return true;
-        }
-
-        Session session = subject.getSession();
-        String username = (String) subject.getPrincipal();
-        Serializable sessionId = session.getId();
-
-        // 同步控制
-        Deque&lt;Serializable&gt; deque = cache.get(username);
-        if (deque == null)
-        {
-            deque = new LinkedList&lt;Serializable&gt;();
-        }
-
-        // 如果队列里没有此sessionId，且用户没有被踢出；放入队列
-        if (!deque.contains(sessionId) &amp;&amp; session.getAttribute(&quot;kickout&quot;) == null)
-        {
-            deque.push(sessionId);
-        }
-
-        // 如果队列里的sessionId数超出最大会话数，开始踢人
-        while (deque.size() &gt; maxSession)
-        {
-            Serializable kickoutSessionId = null;
-            if (kickoutAfter)
-            { // 如果踢出后者
-                kickoutSessionId = deque.removeFirst();
-            }
-            else
-            { // 否则踢出前者
-                kickoutSessionId = deque.removeLast();
-            }
-            try
-            {
-                Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
-                if (kickoutSession != null)
-                {
-                    // 设置会话的kickout属性表示踢出了
-                    kickoutSession.setAttribute(&quot;kickout&quot;, true);
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                logger.error(e.getMessage(), e);
-            }
-        }
-        cache.put(username, deque);
-
-        // 如果被踢出了，直接退出，重定向到踢出后的地址
-        if (session.getAttribute(&quot;kickout&quot;) != null)
-        {
-            try
-            {
-                subject.logout();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                logger.error(e.getMessage(), e);
-            }
-            saveRequest(request);
-            WebUtils.issueRedirect(request, response, kickoutUrl);
-            return false;
-        }
-        return true;
-    }
-
-    public void setKickoutUrl(String kickoutUrl)
-    {
-        this.kickoutUrl = kickoutUrl;
-    }
-
-    public void setKickoutAfter(boolean kickoutAfter)
-    {
-        this.kickoutAfter = kickoutAfter;
-    }
-
-    public void setMaxSession(int maxSession)
-    {
-        this.maxSession = maxSession;
-    }
-
-    public void setSessionManager(SessionManager sessionManager)
-    {
-        this.sessionManager = sessionManager;
-    }
-
-    public void setCacheManager(CacheManager cacheManager)
-    {
-        this.cache = cacheManager.getCache(&quot;shiro-kickout-session&quot;);
-    }
-}
-</code></pre><p>当然上述的实现离不开shiro的正确配置，帖一波配置：</p>
-<pre><code>&lt;bean id=&quot;securityManager&quot; class=&quot;org.apache.shiro.web.mgt.DefaultWebSecurityManager&quot;&gt;
-    &lt;property name=&quot;realms&quot;&gt;
-        &lt;util:list id=&quot;beanList&quot;&gt;
-            &lt;ref bean=&quot;myCasRealm&quot; /&gt;
-            &lt;ref bean=&quot;myLoginRealm&quot; /&gt;
-        &lt;/util:list&gt;
-    &lt;/property&gt;
-    &lt;!-- &lt;property name=&quot;realm&quot; ref=&quot;myCasRealm&quot; /&gt; --&gt;
-    &lt;property name=&quot;subjectFactory&quot; ref=&quot;casSubjectFactory&quot; /&gt;
-    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
-    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot; /&gt;
-&lt;/bean&gt;
-
-&lt;!-- 如果要实现cas的remember me的功能，需要用到下面这个bean，并设置到securityManager的subjectFactory中 --&gt;
-&lt;bean id=&quot;casSubjectFactory&quot; class=&quot;org.apache.shiro.cas.CasSubjectFactory&quot; /&gt;
-
-&lt;!-- 項目自定义的Realm --&gt;
-&lt;bean id=&quot;myCasRealm&quot; class=&quot;com.booway.shiro.MyCasRealm&quot;&gt;
-    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
-    &lt;property name=&quot;casServerUrlPrefix&quot; value=&quot;${cas.server.url}&quot; /&gt;
-    &lt;!-- 客户端的回调地址设置，必须和下面的shiro-cas过滤器拦截的地址一致 --&gt;
-    &lt;property name=&quot;casService&quot; value=&quot;/cas&quot; /&gt;
-&lt;/bean&gt;
-
-&lt;!-- 項目自定义的Realm --&gt;
-&lt;bean id=&quot;myLoginRealm&quot; class=&quot;com.booway.shiro.MyLoginRealm&quot;&gt;
-    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
-    &lt;property name=&quot;casServerUrlPrefix&quot; value=&quot;${cas.server.url}&quot; /&gt;
-    &lt;!-- 客户端的回调地址设置，必须和下面的shiro-cas过滤器拦截的地址一致 --&gt;
-    &lt;property name=&quot;casService&quot; value=&quot;/cas&quot; /&gt;
-&lt;/bean&gt;
-
-&lt;!-- 用户授权信息Cache --&gt;
-&lt;bean id=&quot;cacheManager&quot; class=&quot;org.apache.shiro.cache.MemoryConstrainedCacheManager&quot; /&gt;
-
-&lt;!-- 会话ID生成器 --&gt;
-&lt;bean id=&quot;sessionIdGenerator&quot; class=&quot;org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator&quot;/&gt;
-
-&lt;!-- 会话DAO --&gt;
-&lt;bean id=&quot;sessionDAO&quot; class=&quot;org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO&quot;&gt;
-    &lt;property name=&quot;activeSessionsCacheName&quot; value=&quot;shiro-activeSessionCache&quot;/&gt;
-    &lt;property name=&quot;sessionIdGenerator&quot; ref=&quot;sessionIdGenerator&quot;/&gt;
-&lt;/bean&gt;
-
-&lt;!-- 会话Cookie模板 --&gt;
-&lt;bean id=&quot;sessionIdCookie&quot; class=&quot;org.apache.shiro.web.servlet.SimpleCookie&quot;&gt;
-    &lt;constructor-arg value=&quot;sid&quot;/&gt;
-    &lt;property name=&quot;httpOnly&quot; value=&quot;true&quot;/&gt;
-    &lt;property name=&quot;maxAge&quot; value=&quot;3600&quot;/&gt;
-&lt;/bean&gt;
-
-&lt;!-- 会话管理器 --&gt;
-&lt;bean id=&quot;sessionManager&quot; class=&quot;org.apache.shiro.web.session.mgt.DefaultWebSessionManager&quot;&gt;
-    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
-    &lt;property name=&quot;globalSessionTimeout&quot; value=&quot;1800000&quot;/&gt;
-    &lt;property name=&quot;deleteInvalidSessions&quot; value=&quot;true&quot;/&gt;
-    &lt;property name=&quot;sessionValidationSchedulerEnabled&quot; value=&quot;true&quot;/&gt;
-    &lt;property name=&quot;sessionValidationScheduler&quot; ref=&quot;sessionValidationScheduler&quot;/&gt;
-    &lt;property name=&quot;sessionDAO&quot; ref=&quot;sessionDAO&quot;/&gt;
-    &lt;property name=&quot;sessionIdCookieEnabled&quot; value=&quot;true&quot;/&gt;
-    &lt;property name=&quot;sessionIdCookie&quot; ref=&quot;sessionIdCookie&quot;/&gt;
-&lt;/bean&gt;
-
-&lt;!-- 会话验证调度器 --&gt;
-&lt;bean id=&quot;sessionValidationScheduler&quot; class=&quot;org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler&quot;&gt;
-    &lt;property name=&quot;sessionValidationInterval&quot; value=&quot;1800000&quot;/&gt;
-    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot;/&gt;
-&lt;/bean&gt;
-
-&lt;bean id=&quot;kickoutSessionControlFilter&quot;
-    class=&quot;com.booway.shiro.KickoutSessionControlFilter&quot;&gt;
-    &lt;property name=&quot;cacheManager&quot; ref=&quot;cacheManager&quot; /&gt;
-    &lt;property name=&quot;sessionManager&quot; ref=&quot;sessionManager&quot; /&gt;
-
-    &lt;property name=&quot;kickoutAfter&quot; value=&quot;false&quot; /&gt;
-    &lt;property name=&quot;maxSession&quot; value=&quot;1&quot; /&gt;
-    &lt;property name=&quot;kickoutUrl&quot; value=&quot;/kickout.xhtml&quot; /&gt;
-&lt;/bean&gt;
-
-&lt;!-- Shiro Filter --&gt;
-&lt;bean id=&quot;shiroFilter&quot; class=&quot;com.booway.shiro.ShiroFilterFactoryBean&quot;&gt;
-    &lt;property name=&quot;securityManager&quot; ref=&quot;securityManager&quot; /&gt;
-    &lt;!-- 用于调用Controller --&gt;
-    &lt;property name=&quot;service&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
-    &lt;property name=&quot;loginUrl&quot; value=&quot;${cas.server.login.url}?service=&quot; /&gt;
-    &lt;!-- 用户访问未授权页面后跳转的错误信息页面 --&gt;
-    &lt;property name=&quot;unauthorizedUrl&quot; value=&quot;/401.html&quot;&gt;&lt;/property&gt;
-
-    &lt;!-- 自己实现的formAuthcFilter，加入key type --&gt;
-    &lt;property name=&quot;filters&quot;&gt;
-        &lt;util:map&gt;
-            &lt;entry key=&quot;casFilter&quot; value-ref=&quot;casFilter&quot;&gt;
-            &lt;/entry&gt;
-            &lt;entry key=&quot;singleSignOutFilter&quot; value-ref=&quot;singleSignOutFilter&quot;&gt;
-            &lt;/entry&gt;
-            &lt;entry key=&quot;roles&quot; value-ref=&quot;roleFilter&quot;&gt;
-            &lt;/entry&gt;
-            &lt;entry key=&quot;kickout&quot; value-ref=&quot;kickoutSessionControlFilter&quot;&gt;
-            &lt;/entry&gt;
-        &lt;/util:map&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&quot;filterChainDefinitions&quot;&gt;
-        &lt;value&gt;
-            /** = singleSignOutFilter,casFilter,kickout
-
-        &lt;/value&gt;
-    &lt;/property&gt;
-&lt;/bean&gt;
-
-&lt;bean id=&quot;casFilter&quot; class=&quot;com.booway.shiro.MyCasFilter&quot;&gt;
-    &lt;!-- 配置验证错误时的失败页面 --&gt;
-    &lt;property name=&quot;failureUrl&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
-    &lt;property name=&quot;successUrl&quot; value=&quot;/index.xhtml&quot; /&gt;
-    &lt;property name=&quot;casLoginUrl&quot; value=&quot;${cas.server.login.url}&quot; /&gt;
-    &lt;property name=&quot;interceptUrlPrefix&quot;&gt;
-        &lt;list&gt;
-
-        &lt;/list&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&quot;loginUrls&quot;&gt;
-        &lt;list&gt;
-            &lt;value&gt;/index/login.xhtml&lt;/value&gt;
-        &lt;/list&gt;
-    &lt;/property&gt;
-    &lt;!-- &lt;property name=&quot;excludeUrls&quot;&gt; &lt;list&gt; &lt;value&gt;/index.xhtml&lt;/value&gt; &lt;/list&gt; 
-        &lt;/property&gt; --&gt;
-&lt;/bean&gt;
-
-&lt;bean id=&quot;userFilter&quot; class=&quot;com.booway.shiro.MyUserFilter&quot;&gt;
-    &lt;!-- 配置验证错误时的失败页面 --&gt;
-    &lt;property name=&quot;failureUrl&quot; value=&quot;${uam.login.failurl}&quot; /&gt;
-
-&lt;/bean&gt;
-
-&lt;bean id=&quot;logoutFilter&quot; class=&quot;com.booway.shiro.MyLogoutFilter&quot;&gt;
-&lt;/bean&gt;
-
-&lt;bean id=&quot;roleFilter&quot; class=&quot;com.booway.shiro.RolesAuthorizationFilter&quot;&gt;
-&lt;/bean&gt;
-
-&lt;!-- 退出过滤器 --&gt;
-&lt;bean id=&quot;singleSignOutFilter&quot; class=&quot;com.booway.shiro.CustomSingleSignOutFilter&quot;&gt;
-&lt;/bean&gt;
-
-&lt;!-- 保证实现了Shiro内部lifecycle函数的bean执行 --&gt;
-&lt;bean id=&quot;lifecycleBeanPostProcessor&quot; class=&quot;org.apache.shiro.spring.LifecycleBeanPostProcessor&quot; /&gt;
-
-&lt;!-- AOP式方法级权限检查 --&gt;
-&lt;bean
-    class=&quot;org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator&quot;
-    depends-on=&quot;lifecycleBeanPostProcessor&quot;&gt;
-    &lt;property name=&quot;proxyTargetClass&quot; value=&quot;true&quot; /&gt;
-&lt;/bean&gt;
-
-&lt;bean
-    class=&quot;org.springframework.beans.factory.config.MethodInvokingFactoryBean&quot;&gt;
-    &lt;property name=&quot;staticMethod&quot;
-        value=&quot;org.apache.shiro.SecurityUtils.setSecurityManager&quot; /&gt;
-    &lt;property name=&quot;arguments&quot; ref=&quot;securityManager&quot; /&gt;
-&lt;/bean&gt;
-
-&lt;!-- 开启Shiro的注解(如@RequiresRoles,@RequiresPermissions), 需借助SpringAOP扫描使用Shiro注解的类,并在必要时进行安全逻辑验证 --&gt;
-&lt;bean
-    class=&quot;org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor&quot;&gt;
-    &lt;property name=&quot;securityManager&quot; ref=&quot;securityManager&quot; /&gt;
-&lt;/bean&gt;
-</code></pre><p>这样一个shiro的拓展就完成啦！</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;在公司做了个视频网站，当然视频是需要购买的，就像爱奇艺那样，所以同一用户就要有一个客户端登录个数的控制，不然一个用户买了，能让一个公司的人看- -！&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="工作实践" scheme="http://yzy755.github.io/categories/%E5%B7%A5%E4%BD%9C%E5%AE%9E%E8%B7%B5/"/>
-    
-    
-      <category term="shiro" scheme="http://yzy755.github.io/tags/shiro/"/>
     
   </entry>
   
