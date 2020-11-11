@@ -6,14 +6,14 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>JAVA内存模型 | 易泽源的博客</title>
+  <title>JAVA内存结构 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="JAVA内存模型 即 Java Memory Model 即 JMM，它定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。JMM 体现在以下几个方面
 * 原子性 - 保证指令不会受到线程上下文切换的影响
 * 可见性 - 保证指令不会受 cpu 缓存的影响
 * 有序性 - 保证指令不会受 cpu 指令并行优化的影响">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JAVA内存模型">
+<meta property="og:title" content="JAVA内存结构">
 <meta property="og:url" content="http://yzy755.github.io/2019/05/02/JAVA内存结构/index.html">
 <meta property="og:site_name" content="易泽源的博客">
 <meta property="og:description" content="JAVA内存模型 即 Java Memory Model 即 JMM，它定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。JMM 体现在以下几个方面
@@ -21,9 +21,9 @@
 * 可见性 - 保证指令不会受 cpu 缓存的影响
 * 有序性 - 保证指令不会受 cpu 指令并行优化的影响">
 <meta property="og:image" content="http://yzy755.github.io/2019/05/02/JAVA内存结构/MY\myblog\public\2019\05\02\1604914627101.png">
-<meta property="og:updated_time" content="2020-11-10T10:52:15.447Z">
+<meta property="og:updated_time" content="2020-11-11T10:38:42.808Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="JAVA内存模型">
+<meta name="twitter:title" content="JAVA内存结构">
 <meta name="twitter:description" content="JAVA内存模型 即 Java Memory Model 即 JMM，它定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。JMM 体现在以下几个方面
 * 原子性 - 保证指令不会受到线程上下文切换的影响
 * 可见性 - 保证指令不会受 cpu 缓存的影响
@@ -191,7 +191,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      JAVA内存模型
+      JAVA内存结构
     </h1>
   
 
@@ -267,7 +267,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JMM</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JVM</a>
         		</li>
       		
 		</ul>
@@ -379,7 +379,7 @@
  
   <section id="comments">
     <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-JAVA内存结构" data-title="JAVA内存模型" data-url="http://yzy755.github.io/2019/05/02/JAVA内存结构/"></div>
+    <div class="ds-thread" data-thread-key="post-JAVA内存结构" data-title="JAVA内存结构" data-url="http://yzy755.github.io/2019/05/02/JAVA内存结构/"></div>
     <!-- 多说评论框 end -->
     <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
     <script type="text/javascript">
@@ -603,6 +603,10 @@
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">JVM</a>
               </li>
             
             <div class="clearfix"></div>
