@@ -6,43 +6,42 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>TCP的几个状态码 | 易泽源的博客</title>
+  <title>TCP的三次握手和四次挥手 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
 其中，对于我们日常的分析有用的就是前面的五个字段。
 它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
+SYN表示建立连接，1表示发起，
+FIN表示关闭连接，1表示发起
+ACK表示响应，1表示确认
 PSH表示有 DATA数据传输，
 RST表示连接重置。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TCP的几个状态码">
-<meta property="og:url" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/index.html">
+<meta property="og:title" content="TCP的三次握手和四次挥手">
+<meta property="og:url" content="http://yzy755.github.io/2017/03/08/TCP的三次握手和四次挥手/index.html">
 <meta property="og:site_name" content="易泽源的博客">
 <meta property="og:description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
 其中，对于我们日常的分析有用的就是前面的五个字段。
 它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
+SYN表示建立连接，1表示发起，
+FIN表示关闭连接，1表示发起
+ACK表示响应，1表示确认
 PSH表示有 DATA数据传输，
 RST表示连接重置。">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect2.png">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/close.png">
-<meta property="og:updated_time" content="2017-03-09T09:55:25.371Z">
+<meta property="og:image" content="https://pics1.baidu.com/feed/d8f9d72a6059252d20d93b0a6645fb3e59b5b9d2.jpeg?token=c86d4509157378798ebbccbe843486d1&s=9746F8123F5754CA48D574DA0300D0B2">
+<meta property="og:image" content="https://pics5.baidu.com/feed/48540923dd54564e5260495ce0006487d0584fb6.jpeg?token=c3a743af38e25ff66deb6a07891be58e&s=C584FC1A71CFF4EE1A75A45203007073">
+<meta property="og:updated_time" content="2020-11-24T10:00:53.667Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="TCP的几个状态码">
+<meta name="twitter:title" content="TCP的三次握手和四次挥手">
 <meta name="twitter:description" content="在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.
 其中，对于我们日常的分析有用的就是前面的五个字段。
 它们的含义是：
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
+SYN表示建立连接，1表示发起，
+FIN表示关闭连接，1表示发起
+ACK表示响应，1表示确认
 PSH表示有 DATA数据传输，
 RST表示连接重置。">
-<meta name="twitter:image" content="http://yzy755.github.io/2017/03/08/TCP的几个状态码/connect.png">
+<meta name="twitter:image" content="https://pics1.baidu.com/feed/d8f9d72a6059252d20d93b0a6645fb3e59b5b9d2.jpeg?token=c86d4509157378798ebbccbe843486d1&s=9746F8123F5754CA48D574DA0300D0B2">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -198,19 +197,19 @@ RST表示连接重置。">
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-TCP的几个状态码" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-TCP的三次握手和四次挥手" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      TCP的几个状态码
+      TCP的三次握手和四次挥手
     </h1>
   
 
         
-        <a href="/2017/03/08/TCP的几个状态码/" class="archive-article-date">
+        <a href="/2017/03/08/TCP的三次握手和四次挥手/" class="archive-article-date">
   	<time datetime="2017-03-08T03:48:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-08</time>
 </a>
         
@@ -221,29 +220,45 @@ RST表示连接重置。">
         <p>在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.</p>
 <p>其中，对于我们日常的分析有用的就是前面的五个字段。</p>
 <p>它们的含义是：</p>
-<p>SYN表示建立连接，</p>
-<p>FIN表示关闭连接，</p>
-<p>ACK表示响应，</p>
+<p>SYN表示建立连接，1表示发起，</p>
+<p>FIN表示关闭连接，1表示发起</p>
+<p>ACK表示响应，1表示确认</p>
 <p>PSH表示有 DATA数据传输，</p>
 <p>RST表示连接重置。<br><a id="more"></a></p>
-<p>其中，ACK是可能与SYN，FIN等同时使用的，比如SYN和ACK可能同时为1，它表示的就是建立连接之后的响应，</p>
-<p>如果只是单个的一个SYN，它表示的只是建立连接。</p>
-<p>TCP的几次握手就是通过这样的ACK表现出来的。</p>
-<p>但SYN与FIN是不会同时为1的，因为前者表示的是建立连接，而后者表示的是断开连接。</p>
-<p>RST一般是在FIN之后才会出现为1的情况，表示的是连接重置。</p>
-<p>一般地，当出现FIN包或RST包时，我们便认为客户端与服务器端断开了连接；而当出现SYN和SYN＋ACK包时，我们认为客户端与服务器建立了一个连接。</p>
-<p>PSH为1的情况，一般只出现在 DATA内容不为0的包中，也就是说PSH为1表示的是有真正的TCP数据包内容被传递。</p>
-<p>TCP的连接建立和连接关闭，都是通过请求－响应的模式完成的。</p>
-<p>概念补充-TCP三次握手：<br>TCP(Transmission Control Protocol)传输控制协议<br>TCP是主机对主机层的传输控制协议，提供可靠的连接服务，采用三次握手确认建立一个连接：</p>
-<p>位码即tcp标志位，有6种标示：SYN(synchronous建立联机) ACK(acknowledgement 确认) PSH(push传送) FIN(finish结束) RST(reset重置) URG(urgent紧急)Sequence number(顺序号码) Acknowledge number(确认号码)<br>第一次握手：主机A发送位码为syn＝1，随机产生seq number=1234567的数据包到服务器，主机B由SYN=1知道，A要求建立联机；<br>第二次握手：主机B收到请求后要确认联机信息，向A发送ack number=(主机A的seq+1)，syn=1，ack=1，随机产生seq=7654321的包；<br>第三次握手：主机A收到后检查ack number是否正确，即第一次发送的seq number+1，以及位码ack是否为1，若正确，主机A会再发送ack number=(主机B的seq+1)，ack=1，主机B收到后确认seq值与ack=1则连接建立成功。<br>完成三次握手，主机A与主机B开始传送数据。<br>TCP采用三次握手建立连接如下图所示。<br><img src="/2017/03/08/TCP的几个状态码/connect.png" alt="logo"><br>用大白话就是这样：<br><img src="/2017/03/08/TCP的几个状态码/connect2.png" alt="logo"></p>
-<p>在TCP/IP协议中，TCP协议提供可靠的连接服务，采用三次握手建立一个连接。<br>第一次握手：建立连接时，客户端发送syn包(syn=j)到服务器，并进入SYN_SEND状态，等待服务器确认；<br>第二次握手：服务器收到syn包，必须确认客户的SYN（ack=j+1），同时自己也发送一个SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；<br>第三次握手：客户端收到服务器的SYN＋ACK包，向服务器发送确认包ACK(ack=k+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。完成三次握手，客户端与服务器开始传送数据.</p>
-<p>关闭连接：<br>由于TCP连接是全双工的，因此每个方向都必须单独进行关闭。这个原则是当一方完成它的数据发送任务后就能发送一个FIN来终止这个方向的连接。收到一个 FIN只意味着这一方向上没有数据流动，一个TCP连接在收到一个FIN后仍能发送数据。首先进行关闭的一方将执行主动关闭，而另一方执行被动关闭。</p>
-<p> CP的连接的拆除需要发送四个包，因此称为四次挥手(four-way handshake)。客户端或服务器均可主动发起挥手动作，在socket编程中，任何一方执行close()操作即可产生挥手操作。</p>
-<p>（1）客户端A发送一个FIN，用来关闭客户A到服务器B的数据传送。 </p>
-<p>（2）服务器B收到这个FIN，它发回一个ACK，确认序号为收到的序号加1。和SYN一样，一个FIN将占用一个序号。 </p>
-<p>（3）服务器B关闭与客户端A的连接，发送一个FIN给客户端A。 </p>
-<p>（4）客户端A发回ACK报文确认，并将确认序号设置为收到序号加1。 </p>
-<p>TCP采用四次挥手关闭连接如下图所示。<br><img src="/2017/03/08/TCP的几个状态码/close.png" alt="logo"></p>
+<h1 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h1><blockquote>
+<p>第一次握手</p>
+</blockquote>
+<p>客户端像服务端发送SYN=1,seq=n;</p>
+<blockquote>
+<p>第二次握手</p>
+</blockquote>
+<p>服务端接收到消息返回ACK=1,SYN=1,seq=m,ack=n+1;</p>
+<blockquote>
+<p>第三次握手</p>
+</blockquote>
+<p>客户端接到消息返回ACK=1,ack=m+1。</p>
+<p>TCP采用三次握手建立连接如下图所示。</p>
+<p> <img src="https://pics1.baidu.com/feed/d8f9d72a6059252d20d93b0a6645fb3e59b5b9d2.jpeg?token=c86d4509157378798ebbccbe843486d1&amp;s=9746F8123F5754CA48D574DA0300D0B2" alt="img"> </p>
+<h2 id="为什么不是两次，不是4次？"><a href="#为什么不是两次，不是4次？" class="headerlink" title="为什么不是两次，不是4次？"></a>为什么不是两次，不是4次？</h2><p>假设经过前两次握手，此时在服务端的角度来看，服务端技能接收消息，也能发送消息，但是不知道发出去的消息能不能被客户端接收，经过第三次客户端的回应之后，双方都能保证自己既能接收消息，也能发送消息，所以第三次握手之后就建立了安全的连接。</p>
+<p>为什么不是4次就很简单了，多了浪费。</p>
+<h1 id="四次握手"><a href="#四次握手" class="headerlink" title="四次握手"></a>四次握手</h1><blockquote>
+<p>第一次挥手</p>
+</blockquote>
+<p>客户端向服务端发送FIN=1,seq=n，表示准备好要断开连接了；</p>
+<blockquote>
+<p>第二次挥手</p>
+</blockquote>
+<p>服务端向客户端发送ACK=1,ack=n+1，表示收到了客户端要断开连接的消息了，但是此时需要等一等，需要将数据传输完毕（基于安全的考虑）；</p>
+<blockquote>
+<p>第三次挥手</p>
+</blockquote>
+<p>服务端向客户端发送FIN=1,seq=m，表示服务端这边也准备好可以断开连接了；</p>
+<blockquote>
+<p>第四次挥手</p>
+</blockquote>
+<p>客户端向服务端发送ACK=1,ack=m+1，表示收到了服务端断开的消息，就此分手。</p>
+<p>TCP采用四次挥手关闭连接如下图所示。</p>
+<p> <img src="https://pics5.baidu.com/feed/48540923dd54564e5260495ce0006487d0584fb6.jpeg?token=c3a743af38e25ff66deb6a07891be58e&amp;s=C584FC1A71CFF4EE1A75A45203007073" alt="img"> </p>
 
       
 
@@ -363,7 +378,7 @@ RST表示连接重置。">
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACMUlEQVR42u3azW7qQAwGUN7/pal0V5VQwmc7VBfnZBVBOszJwh3/PB7x9fx3vX7y+/PX+9dn8pUfn7gwMDC+lvE8vc6Xzp+vrpnvDQMD4z6MfLmjbyfBdL4yBgYGxnkArYbs6pMYGBgYvSNa9ZiY/C0GBgbGOSMJgnmymqyfH0AvzsUxMDC+kFFtDPzl/Qf7GxgYGF/CeBavSatyHl4Pd4WBgbGaMSnfJ+nrBFNtfGJgYGxl5CnrPHHtsaNXg4GBsZpxVRLbG8vobfGD5TYMDIz/kpGPU1TTznzNfCeH9xgYGKsZ1cCXD0z0avjJOm/KbRgYGOsY1bGG/BjXG+DoHRMxMDDuwJiE2nyArNyvCNqlGBgYd2BUq1WTpLfX2szTaQwMjN2M6tDDZJyiefjL02kMDIx1jCS8JqlmL2Qn7zhqLWBgYNyAkRT6kwNiFVkt8B3+FgYGxmrGZGwr31DeHuiV9jAwMO7G6JXDesWySYp7mIVjYGAsZSSbqLYbewMZSavyDRgDA2MdY3Jcm4xoVH89CrIYGBirGZPGQG/8Ij8URm0GDAyM1YzozDgorvUOoKNcHAMDYx1jXsrPC3BXBeLD/xsYGBhLGaM4XRztqh4oqw0GDAyM3YxqslptJPSS4fK7x8DAuAGjmrjONz0ZsCjMjGBgYNyMkbQY8+GJalviTXEQAwMDY5IBFxuTvcQYAwPjDoxJMyBBVrdeHs7AwMBYzZiHyKvS4MmAGgYGxlLGD17YYL4vAWdlAAAAAElFTkSuQmCC" alt="微信分享二维码">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACvklEQVR42u3aQU7DQAwFUO5/aZBYIUGSb3tMQXpZRbSkflNpxrX99hZf75/X1/vvf0ne+f09V59V/a/RhYeHh9cK/eq6D/oqlPulyV9NlvghEjw8PLw1Xh5WTrpfpnkM0XPw8PDwXsrLk937Jahi8PDw8P4vr0qap9ovOPfw8PDwYl5SjEhezWuqvXLDYq0FDw8PL+b1GmCvvV/v7+Hh4eG1uurJ1dvWkzQ6efUhNjw8PLwFXjUh7jW6JsXcpP32EDkeHh7eAq+3+VaLDvkS5PfVhcPDw8Ob85I0d+M3fsLOE+vL+PHw8PCWeb0E936bPtXQSo6Hh5kIPDw8vEO8XuO/NxRVTYh7JYmHyQg8PDy8Q7zqQ3sfMBqKiuMsf4d4eHh4LV4SYp58TwYF8gUqVKnx8PDwjvLyokA+KFA9JCYFkfJMBB4eHt4hXiHvbhUX8uNk/gVEowN4eHh4A16vVd97T6+0MRlowMPDw9vm5aFUM9hTTa/8OYUTCQ8PD6/Iy4eZ8q0/KTfkzbPeQAMeHh7eHi9B9hr51UbX5L48OoCHh4d3lFct105GDXqLW/4sPDw8vKO8Sck1b1PlDbZ5IfiH/h4eHh7eAi8/DKolhnlRuDwo0KtP4+Hh4bV4+ZbdzNyLaXpS+HgobeDh4eEt8CZpcbUpVR0CuD8eqocHHh4e3gav+rO/t7n3ePMEHQ8PD+8sL9lqew2qybY+Ly7j4eHh/Q6vl9om230V0zvNypMReHh4eEXee/FK2JMUvDdYcPm/eHh4eAu80XkyGDU4VRA5Vn3Bw8PDK/Lysap5ynv/hN5oV6Gzh4eHh3eUN2kyJcl072kHji48PDy8P8ZLRqlOjR00B8Lw8PDwXspLSgP5tp6TeoMFeHh4eNu8vBCQjwhMQs/LHw9lYjw8PLwF3kbJ9ezmXl1cPDw8vDXeB+e3Fttu2bfFAAAAAElFTkSuQmCC" alt="微信分享二维码">
     </div>
 </div>
 
@@ -408,7 +423,7 @@ RST表示连接重置。">
  
   <section id="comments">
     <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-TCP的几个状态码" data-title="TCP的几个状态码" data-url="http://yzy755.github.io/2017/03/08/TCP的几个状态码/"></div>
+    <div class="ds-thread" data-thread-key="post-TCP的三次握手和四次挥手" data-title="TCP的三次握手和四次挥手" data-url="http://yzy755.github.io/2017/03/08/TCP的三次握手和四次挥手/"></div>
     <!-- 多说评论框 end -->
     <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
     <script type="text/javascript">

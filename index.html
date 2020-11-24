@@ -881,11 +881,14 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>JAVA内存模型 即 Java Memory Model 即 JMM，它定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。<br>JMM 体现在以下几个方面</p>
-<pre><code>* 原子性 - 保证指令不会受到线程上下文切换的影响
-* 可见性 - 保证指令不会受 cpu 缓存的影响
-* 有序性 - 保证指令不会受 cpu 指令并行优化的影响
-</code></pre>
+        <ol>
+<li>程序计数器</li>
+<li>虚拟机栈</li>
+<li>本地方法栈</li>
+<li>堆</li>
+<li>方法区  </li>
+<li>直接内存（jdk1.8后）</li>
+</ol>
         
           <a class="article-more-a" href="/2019/05/02/JAVA内存结构/#more">more >></a>
         
