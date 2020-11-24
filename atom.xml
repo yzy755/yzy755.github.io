@@ -437,10 +437,10 @@
   
   <entry>
     <title>JAVA内存模型</title>
-    <link href="http://yzy755.github.io/2019/05/02/JAVA%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"/>
-    <id>http://yzy755.github.io/2019/05/02/JAVA内存模型/</id>
-    <published>2019-05-02T12:17:53.000Z</published>
-    <updated>2020-11-11T10:38:08.536Z</updated>
+    <link href="http://yzy755.github.io/2019/06/05/JAVA%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"/>
+    <id>http://yzy755.github.io/2019/06/05/JAVA内存模型/</id>
+    <published>2019-06-05T13:22:51.000Z</published>
+    <updated>2020-11-24T10:03:19.373Z</updated>
     
     <content type="html"><![CDATA[<p>JAVA内存模型 即 Java Memory Model 即 JMM，它定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。<br>JMM 体现在以下几个方面</p>
 <pre><code>* 原子性 - 保证指令不会受到线程上下文切换的影响
@@ -451,7 +451,7 @@
 <h1 id="原子性问题"><a href="#原子性问题" class="headerlink" title="原子性问题"></a>原子性问题</h1><p>如果一个语句执行一个单独不可分割的指令，那么它是原子的。严格的原子操作排除了任何抢占的可能性，更方便的理解是这个值永远是最新的 <strong>一个或多个操作，要么全部执行且在执行过程中不被任何因素打断</strong> </p>
 <p>在学线程并发执行临界区代码时就容易发生非原子性操作，比如i++操作，保证原子性可以用synchronized、Lock独占锁解决，也可使用cas无锁机制解决</p>
 <h1 id="可见性问题"><a href="#可见性问题" class="headerlink" title="可见性问题"></a>可见性问题</h1><h2 id="cpu缓存结构"><a href="#cpu缓存结构" class="headerlink" title="cpu缓存结构"></a>cpu缓存结构</h2><p>现在的cpu都是多核的（单核cpu不存在线程并发请求临界资源问题），而且运行速度非常块，然而我们的存储设备（内存，硬盘）得读取速度远远跟不上的运算速度，所有就有了多级缓存（还有寄存器也可以看作缓存）</p>
-<p>结构如图：<img src="/2019/05/02/JAVA内存模型/1604914627101.png" alt="1604914627101"></p>
+<p>结构如图：<img src="/2019/06/05/JAVA内存模型/1604914627101.png" alt="1604914627101"></p>
 <p>不同线程在不同cpu核心上对临界资源进行读写就存在缓存一致性的问题，因为不同CPU核心上的线程如果缓存了同一份主存上的数据然后进行写操作，线程彼此之间是不可见的，最后更新主存值的时候就会不准确，解决这个问题的办法就是禁用CPU缓存，让线程每次都去主存上读写数据，java使用 volatile 关键字来确保变量的可见性，当然，使用synchronized关键字来修饰代码块也是可以保证的。</p>
 <h1 id="有序性问题"><a href="#有序性问题" class="headerlink" title="有序性问题"></a>有序性问题</h1><p>JVM 会在不影响正确性的前提下，可以调整语句的执行顺序，来充分发挥CPU运算单元的效率，前提是要符合as-if-serial语义，操作与操作之间要符合 happens-before 规则</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">as-if-serial语义：不管怎么重排序，单线程程序的执行结果不能被改变。编译器、处理器都必须遵守as-if-serial语义</div><div class="line"></div><div class="line">happens-before 反映在以下几种情况：</div><div class="line">	1、线程解锁 m 之前对变量的写，对于接下来对 m 加锁的其它线程对该变量的读可见</div><div class="line">	2、线程对 volatile 变量的写，对接下来其它线程对该变量的读可见</div><div class="line">	3、线程结束前对变量的写，对其它线程得知它结束后的读可见（比如其它线程调用 t1.isAlive() 或t1.join()等待它结束）</div><div class="line">	4、线程 t1 打断 t2（interrupt）前对变量的写，对于其他线程得知 t2 被打断后对变量的读可见（通过t2.interrupted 或 t2.isInterrupted）</div><div class="line">	5、具有传递性，如果 x hb-&gt; y 并且 y hb-&gt; z 那么有 x hb-&gt; z</div></pre></td></tr></table></figure>
