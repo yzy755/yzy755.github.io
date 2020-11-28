@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2020-11-27T10:08:36.471Z</updated>
+  <updated>2020-11-28T04:16:08.605Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -20,18 +20,18 @@
     <link href="http://yzy755.github.io/2020/11/20/spring-cloud-%E6%89%8B%E8%84%9A%E6%9E%B6%E6%90%AD%E5%BB%BA/"/>
     <id>http://yzy755.github.io/2020/11/20/spring-cloud-手脚架搭建/</id>
     <published>2020-11-20T03:48:05.000Z</published>
-    <updated>2020-11-27T10:08:36.471Z</updated>
+    <updated>2020-11-28T04:16:08.605Z</updated>
     
     <content type="html"><![CDATA[<p>公司一直都是dubbo架构微服务，在外面如火如荼的spring-cloud技术面前显得有些落后，所以决定慢慢将团队的架构往spring-cloud架构迁移，那手脚架必不可少。<br><a id="more"></a></p>
 <p>dubbo架构的项目图如下：</p>
-<p><img src="/2020/11/20/spring-cloud-手脚架搭建/Users\LXXLC\AppData\Roaming\Typora\typora-user-images\1606461618965.png" alt="1606461618965"></p>
+<p><img src="/2020/11/20/spring-cloud-手脚架搭建/1606461618965.png" alt="1606461618965"></p>
 <p>每个模块都会拆分为两个module，取名hc-facade-xxx、hc-service-xxx，</p>
 <ul>
 <li>facade中存放DTO,VO,enum等对外依赖的类，最重要的是存放dubbo对外暴露的facade接口</li>
 <li>service中主要是放数据库entity，dao，service，facade实现，所有的配置文件包括dubbo生产者消费者配置，spring，数据库等都会放在service中</li>
 </ul>
 <p>简单的项目依赖如下：</p>
-<p><img src="/2020/11/20/spring-cloud-手脚架搭建/Users\LXXLC\AppData\Roaming\Typora\typora-user-images\1606465156054.png" alt=""></p>
+<p><img src="/2020/11/20/spring-cloud-手脚架搭建/1606465156054.png" alt=""></p>
 <p>搭建手脚架也同样采用相同的项目结构和依赖关系，项目图如下：</p>
 <p><img src="/2020/11/20/spring-cloud-手脚架搭建/Users\LXXLC\AppData\Roaming\Typora\typora-user-images\1606466001746.png" alt="1606466001746"></p>
 <p>spring-cloud(Finchley.SR2) 使用以下组件</p>
