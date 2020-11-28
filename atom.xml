@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2020-11-04T10:34:45.120Z</updated>
+  <updated>2020-11-27T10:08:36.471Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -14,6 +14,127 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>spring-cloud 手脚架搭建</title>
+    <link href="http://yzy755.github.io/2020/11/20/spring-cloud-%E6%89%8B%E8%84%9A%E6%9E%B6%E6%90%AD%E5%BB%BA/"/>
+    <id>http://yzy755.github.io/2020/11/20/spring-cloud-手脚架搭建/</id>
+    <published>2020-11-20T03:48:05.000Z</published>
+    <updated>2020-11-27T10:08:36.471Z</updated>
+    
+    <content type="html"><![CDATA[<p>公司一直都是dubbo架构微服务，在外面如火如荼的spring-cloud技术面前显得有些落后，所以决定慢慢将团队的架构往spring-cloud架构迁移，那手脚架必不可少。<br><a id="more"></a></p>
+<p>dubbo架构的项目图如下：</p>
+<p><img src="/2020/11/20/spring-cloud-手脚架搭建/Users\LXXLC\AppData\Roaming\Typora\typora-user-images\1606461618965.png" alt="1606461618965"></p>
+<p>每个模块都会拆分为两个module，取名hc-facade-xxx、hc-service-xxx，</p>
+<ul>
+<li>facade中存放DTO,VO,enum等对外依赖的类，最重要的是存放dubbo对外暴露的facade接口</li>
+<li>service中主要是放数据库entity，dao，service，facade实现，所有的配置文件包括dubbo生产者消费者配置，spring，数据库等都会放在service中</li>
+</ul>
+<p>简单的项目依赖如下：</p>
+<p><img src="/2020/11/20/spring-cloud-手脚架搭建/Users\LXXLC\AppData\Roaming\Typora\typora-user-images\1606465156054.png" alt=""></p>
+<p>搭建手脚架也同样采用相同的项目结构和依赖关系，项目图如下：</p>
+<p><img src="/2020/11/20/spring-cloud-手脚架搭建/Users\LXXLC\AppData\Roaming\Typora\typora-user-images\1606466001746.png" alt="1606466001746"></p>
+<p>spring-cloud(Finchley.SR2) 使用以下组件</p>
+<ul>
+<li><p>注册中心：Eureka</p>
+</li>
+<li><p>配置中心：Apollo</p>
+</li>
+<li><p>接口调用：OpenFeign</p>
+</li>
+<li><p>网关：zuul</p>
+<p>注册中心用的是公司选择的Eureka而非alibaba的nacos，有点遗憾，不过大同小异了，使用上差不多，nacos多了配置中心的功能，而配置中心沿用了之前的技术选型Apollo，配置的转移工作量大，左右没有上config，OpenFeign 是为了调用service接口尽量像dubbo一样调用本地方法一样</p>
+</li>
+</ul>
+<blockquote>
+<p>搭建注册中心服务端</p>
+</blockquote>
+<p> 引入pom依赖 </p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka- server<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+<p> 配置文件 </p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="attr">eureka:</span></div><div class="line"><span class="attr"> server:</span></div><div class="line"> <span class="comment"># eureka缓存，true开启缓存，false关闭，生产环境建议为true</span></div><div class="line"><span class="attr"> enable-self-preservation:</span> <span class="literal">true</span></div><div class="line"><span class="attr"> client:</span></div><div class="line"><span class="attr"> register-with-eureka:</span> <span class="literal">false</span> <span class="comment"># 是否注册中心注册自己 true为是，可以在注册中心列表找到自己</span></div><div class="line"><span class="attr"> service-url:</span></div><div class="line"> <span class="comment"># Eureka客户端与Eureka服务端进行交互的地址</span></div><div class="line"><span class="attr"> defaultZone:</span> http://localhost:$&#123;server.port&#125;/eureka/</div><div class="line"> <span class="comment"># 是否从Eureka中获取服务信息</span></div><div class="line"><span class="attr"> fetch-registry:</span> <span class="literal">false</span></div><div class="line"> <span class="comment"># 多个注册中心集群</span></div><div class="line"> <span class="comment"># defaultZone: http://localhost:8761/eureka/,http://localhost:8080/eureka/</span></div></pre></td></tr></table></figure>
+<p> 启动类添加注解 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@EnableDiscoveryClient</span></div><div class="line"><span class="meta">@SpringBootApplication</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceApplication</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line"></div><div class="line">        SpringApplication.run(UserServiceApplication.class, args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p> 搭建注册中心客户端</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- eureka依赖 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-client<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">eureka.client.service-url.defaultZone=http://localhost:8088/eureka/</div><div class="line">eureka.instance.prefer-ip-address=true</div><div class="line">eureka.instance.instance-id = $&#123;spring.cloud.client.ip-address&#125;:$&#123;server.port&#125;</div></pre></td></tr></table></figure>
+<p>启动类添加注解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@SpringBootApplication</span></div><div class="line"><span class="meta">@EnableEurekaClient</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Product1Application</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        SpringApplication.run(Product1Application.class, args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>openfeign搭建</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- feign依赖 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-openfeign<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>调用示例</p>
+<ul>
+<li>封装接口</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(value = &#123; <span class="string">"/api/user/getbyid"</span> &#125;, method = &#123; RequestMethod.GET &#125;)</div><div class="line">    <span class="function">ApiResult&lt;UserVo&gt; <span class="title">getUserById</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(value = &#123; <span class="string">"/api/user/saveuser"</span> &#125;, method = &#123; RequestMethod.POST &#125;)</div><div class="line">    <span class="function">ApiResult&lt;Boolean&gt; <span class="title">saveUser</span><span class="params">(@RequestBody ApiParam&lt;UserVo&gt; param)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>FeignClient接口</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@FeignClient</span>(<span class="string">"hwuser-center"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserFacade</span> <span class="keyword">extends</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>service中的业务实现controller</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> <span class="keyword">implements</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(UserController.class);</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ApiResult&lt;UserVo&gt; <span class="title">getUserById</span><span class="params">()</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> ApiResult.success(<span class="keyword">new</span> UserVo());</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ApiResult&lt;Boolean&gt; <span class="title">saveUser</span><span class="params">(ApiParam&lt;UserVo&gt; param)</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ApiResult(<span class="keyword">true</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> ApiResult&lt;PageInfo&lt;UserVo&gt;&gt; saveUser11(ApiParam&lt;UserVo&gt; param) &#123;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ApiResult(<span class="keyword">true</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>web controller</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserBizController</span> <span class="keyword">implements</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOG = LoggerFactory.getLogger(UserBizController.class);</div><div class="line"></div><div class="line">    <span class="meta">@Resource</span></div><div class="line">    UserFacade userFacade;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ApiResult <span class="title">getById</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Long id)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            LOG.info(<span class="string">"enter"</span>);</div><div class="line">            UserVo vo = <span class="keyword">new</span> UserVo();</div><div class="line">            vo.setId(id);</div><div class="line">            ApiParam&lt;UserVo&gt; apiParam = ApiParam.newApiParam(vo, <span class="keyword">new</span> HcContext());</div><div class="line">            ApiResult&lt;UserVo&gt; apiResult = userFacade.getUserById();</div><div class="line">            <span class="keyword">return</span> apiResult;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            LOG.error(<span class="string">"getById异常：&#123;&#125;"</span>, e.getMessage(), e);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ApiResult(-<span class="number">1</span>, e.getMessage());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;公司一直都是dubbo架构微服务，在外面如火如荼的spring-cloud技术面前显得有些落后，所以决定慢慢将团队的架构往spring-cloud架构迁移，那手脚架必不可少。&lt;br&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="工作实践" scheme="http://yzy755.github.io/categories/%E5%B7%A5%E4%BD%9C%E5%AE%9E%E8%B7%B5/"/>
+    
+    
+      <category term="spring-cloud" scheme="http://yzy755.github.io/tags/spring-cloud/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>spring-cloud 手脚架搭建遇到的坑</title>
+    <link href="http://yzy755.github.io/2020/11/20/spring-cloud-%E6%89%8B%E8%84%9A%E6%9E%B6%E6%90%AD%E5%BB%BA%E9%81%87%E5%88%B0%E7%9A%84%E5%9D%91/"/>
+    <id>http://yzy755.github.io/2020/11/20/spring-cloud-手脚架搭建遇到的坑/</id>
+    <published>2020-11-20T03:48:05.000Z</published>
+    <updated>2020-11-27T10:08:02.893Z</updated>
+    
+    <content type="html"><![CDATA[<p>新技术总是能遇到各种各样的坑<br><a id="more"></a></p>
+<p>openfeign的坑</p>
+<p>因为spring-cloud调用服务是基于http协议的，所有需要定义没个接口的url，然后前端调用我们的web服务有需要一套url，如果定义两套url就显得非常麻烦，按照以前的习惯，接到需求后后台进行模块拆分，比如商品模块，订单模块，拆分后对应到代码就是controller的拆分，定义好controller和所有接口的url、入参、出参，开始编写接口文档…使用spring-cloud之后也希望能这样，所有对每个模块抽象出一个共用的api</p>
+<p>调用示例：</p>
+<p>封装接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/api/user"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(value = &#123; <span class="string">"/getbyid"</span> &#125;, method = &#123; RequestMethod.GET &#125;)</div><div class="line">    <span class="function">ApiResult&lt;UserVo&gt; <span class="title">getUserById</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(value = &#123; <span class="string">"/saveuser"</span> &#125;, method = &#123; RequestMethod.POST &#125;)</div><div class="line">    <span class="function">ApiResult&lt;Boolean&gt; <span class="title">saveUser</span><span class="params">(@RequestBody ApiParam&lt;UserVo&gt; param)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后多了一步就是定义一个FeignClient接口来继承我们封装的api接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@FeignClient</span>(<span class="string">"hwuser-center"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserFacade</span> <span class="keyword">extends</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后service中定义controller对外提供服务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> <span class="keyword">implements</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(UserController.class);</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ApiResult&lt;UserVo&gt; <span class="title">getUserById</span><span class="params">()</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> ApiResult.success(<span class="keyword">new</span> UserVo());</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ApiResult&lt;Boolean&gt; <span class="title">saveUser</span><span class="params">(ApiParam&lt;UserVo&gt; param)</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ApiResult(<span class="keyword">true</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> ApiResult&lt;PageInfo&lt;UserVo&gt;&gt; saveUser11(ApiParam&lt;UserVo&gt; param) &#123;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ApiResult(<span class="keyword">true</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>最后就是controller来实现我们封装的api接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserBizController</span> <span class="keyword">implements</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOG = LoggerFactory.getLogger(UserBizController.class);</div><div class="line"></div><div class="line">    <span class="meta">@Resource</span></div><div class="line">    UserFacade userFacade;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ApiResult <span class="title">getById</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Long id)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            LOG.info(<span class="string">"enter"</span>);</div><div class="line">            UserVo vo = <span class="keyword">new</span> UserVo();</div><div class="line">            vo.setId(id);</div><div class="line">            ApiParam&lt;UserVo&gt; apiParam = ApiParam.newApiParam(vo, <span class="keyword">new</span> HcContext());</div><div class="line">            ApiResult&lt;UserVo&gt; apiResult = userFacade.getUserById();</div><div class="line">            <span class="keyword">return</span> apiResult;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            LOG.error(<span class="string">"getById异常：&#123;&#125;"</span>, e.getMessage(), e);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ApiResult(-<span class="number">1</span>, e.getMessage());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>感觉大功告成，但是一启动报错了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Caused by: java.lang.IllegalStateException: Ambiguous mapping. Cannot map <span class="string">'com.gzhc365.hw.user.facade.UserFacade'</span> method </div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> com.gzhc365.cloud.commons.api.ApiResult&lt;com.gzhc365.hw.user.vo.UserVo&gt; com.gzhc365.hw.user.api.UserApi.getUserById()</div><div class="line">to &#123;[/api/user/getbyid],methods=[GET]&#125;: There is already <span class="string">'userController'</span> bean method</div><div class="line"><span class="keyword">public</span> com.gzhc365.cloud.commons.api.ApiResult&lt;com.gzhc365.hw.user.vo.UserVo&gt; com.gzhc365.hw.user.web.controller.UserController.getUserById() mapped.</div><div class="line">	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.assertUniqueMethodMapping(AbstractHandlerMethodMapping.java:<span class="number">581</span>)</div></pre></td></tr></table></figure>
+<p>这里我让@RequestMapping(“/api/user”)直接修饰userApi接口，用来暴露出去统一前缀，然后FeignClient继承了这个Mapping，spring加载会动态代理出FeignClient的实现类来模拟userApi中定义的mapping，然后我们的service中对外暴露的controller也实现了userApi，所有spring加载了两套一模一样url的mapping就报错了。解决的办法就是将userApi接口上的@RequestMapping(“/api/user”)去掉，将完成的url写在每个接口上，但是这样有个问题就是没法给暴露出去的api做统一前缀了。 </p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;新技术总是能遇到各种各样的坑&lt;br&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="工作实践" scheme="http://yzy755.github.io/categories/%E5%B7%A5%E4%BD%9C%E5%AE%9E%E8%B7%B5/"/>
+    
+    
+      <category term="spring-cloud" scheme="http://yzy755.github.io/tags/spring-cloud/"/>
+    
+  </entry>
   
   <entry>
     <title>spring-cloud-alibaba操作手册之分布式事务</title>
@@ -1404,122 +1525,6 @@ if __name__ == &apos;__main__&apos;:
       <category term="python" scheme="http://yzy755.github.io/tags/python/"/>
     
       <category term="数据分析" scheme="http://yzy755.github.io/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>抢购秒杀功能的并发设计</title>
-    <link href="http://yzy755.github.io/2017/04/20/%E6%8A%A2%E8%B4%AD%E7%A7%92%E6%9D%80%E5%8A%9F%E8%83%BD%E7%9A%84%E5%B9%B6%E5%8F%91%E8%AE%BE%E8%AE%A1/"/>
-    <id>http://yzy755.github.io/2017/04/20/抢购秒杀功能的并发设计/</id>
-    <published>2017-04-20T06:54:36.000Z</published>
-    <updated>2018-09-04T09:19:14.904Z</updated>
-    
-    <content type="html"><![CDATA[<p>最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！<br><a id="more"></a><br>其实说到底就是多线程并发请求的数据一致性的问题，当然也有很多处理方法，最先想到的肯定是锁（synchronized），可以明确的是加锁是肯定可以解决该问题的，但是所谓互联网项目，若有朝一日并发请求量有的突破，这种线程阻塞的访问方式肯定是体验糟糕的，所以我想试试其他方式。</p>
-<p>首先想到的就是基于单线程，多路复用io（mutiplexing）模式的redis，结合我们的业务是关于众筹抢购的，用户占用众筹名额的记录用redis记录非常适用：<br>redis提供了 INCR key 方法，下面是该方法官方的解释：<br>    对存储在指定key的数值执行原子的加1操作。<br>    如果指定的key不存在，那么在执行incr操作之前，会先将它的值设定为0。<br>    如果指定的key中存储的值不是字符串类型（fix：）或者存储的字符串类型不能表示为一个整数，<br>    那么执行这个命令时服务器会返回一个错误(eq:(error) ERR value is not an integer or out of range)。<br>    这个操作仅限于64位的有符号整型数据。<br>注意看，是原子的加1操作，所以记录众筹的数量后，不管并发多少用户抢购众筹，众筹数都是原子加1，不会出现少加从而出现超卖的情况，加上我们业务控制到达限额数量后停止购买功能。<br>有个问题是用户抢占了名额后迟迟不付款，所以我利用了原先就有的检查未付款订单过期的任务，在检查到未支付的众筹订单过期后使用 DECRBY key decrement 做减操作，该方法官方的解释：<br>    将key对应的数字减decrement。如果key不存在，操作之前，key就会被置为0。如果key的value类型错误或者是个不能表示成数字的字符串，就返回错误。这个操作最多支持64位有符号的正型数字。<br>当热，值的添加和删除肯定也是要用到的，参考官方文档 <a href="http://www.redis.cn/" target="_blank" rel="external">http://www.redis.cn/</a><br>这样就释放的未支付抢占的名额，同样这是原子操作。这样整体就保持了高效和线程安全。</p>
-<p>一些想法（一些摘抄- -）：<br>    1.Redis为什么使用单进程单线程方式也这么快？<br>        Redis采用的是基于内存的采用的是单进程单线程模型的KV数据库，由C语言编写。官方提供的数据是可以达到100000+的qps。这个数据不比采用单进程多线程的同样基于内存的KV数据库Memcached差。<br>        Redis快的主要原因是：</p>
-<pre><code>        完全基于内存
-        数据结构简单，对数据操作也简单
-        使用多路 I/O 复用模型
-
-        多路 I/O 复用模型是利用select、poll、epoll可以同时监察多个流的 I/O 事件的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有I/O事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll是只轮询那些真正发出了事件的流），并且只依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。这里“多路”指的是多个网络连接，“复用”指的是复用同一个线程。采用多路 I/O 复用技术可以让单个线程高效的处理多个连接请求（尽量减少网络IO的时间消耗），且Redis在内存中操作数据的速度非常快（内存内的操作不会成为这里的性能瓶颈），主要以上两点造就了Redis具有很高的吞吐量。
-2.volatile 容易掉的坑
-    在众筹功能上，占用的众筹数是一个实体变量，我就想volatile关键字不是说是轻量级的synchronized吗，想直接用volatile修饰，其实不然，与 synchronized 块相比，volatile 变量所需的编码较少，并且运行时开销也较少，但是它所能实现的功能也仅是 synchronized的一部分
-
-    锁提供了两种主要特性：互斥（mutual exclusion） 和可见性（visibility）。互斥即一次只允许一个线程持有某个特定的锁，因此可使用该特性实现对共享数据的协调访问协议，这样，一次就只有一个线程能够使用该共享数据。可见性要更加复杂一些，它必须确保释放锁之前对共享数据做出的更改对于随后获得该锁的另一个线程是可见的 —— 如果没有同步机制提供的这种可见性保证，线程看到的共享变量可能是修改前的值或不一致的值，这将引发许多严重问题
-
-    Volatile 变量具有 synchronized 的可见性特性，但是不具备原子特性。这就是说线程能够自动发现 volatile 变量的最新值。Volatile 变量可用于提供线程安全，但是只能应用于非常有限的一组用例：多个变量之间或者某个变量的当前值与修改后值之间没有约束。因此，单独使用 volatile 还不足以实现计数器、互斥锁或任何具有与多个变量相关的不变式（Invariants）的类（例如 “start &lt;=end”）。
-
-    出于简易性或可伸缩性的考虑，您可能倾向于使用 volatile 变量而不是锁。当使用 volatile 变量而非锁时，某些习惯用法（idiom）更加易于编码和阅读。此外，volatile 变量不会像锁那样造成线程阻塞，因此也很少造成可伸缩性问题。在某些情况下，如果读操作远远大于写操作，volatile 变量还可以提供优于锁的性能优势。
-
-    要使 volatile 变量提供理想的线程安全，必须同时满足下面两个条件：
-    1.对变量的写操作不依赖于当前值。
-    2.该变量没有包含在具有其他变量的不变式中。
-
-    实际上，这些条件表明，可以被写入 volatile 变量的这些有效值独立于任何程序的状态，包括变量的当前状态。
-    第一个条件的限制使 volatile 变量不能用作线程安全计数器。虽然增量操作（x++）看上去类似一个单独操作，实际上它是一个由读取－修改－写入操作序列组成的组合操作，必须以原子方式执行，而 volatile 不能提供必须的原子特性。实现正确的操作需要使 x 的值在操作期间保持不变，而 volatile 变量无法实现这点。（然而，如果将值调整为只从单个线程写入，那么可以忽略第一个条件。）
-    大多数编程情形都会与这两个条件的其中之一冲突，使得 volatile 变量不能像 synchronized 那样普遍适用于实现线程安全。清单 1 显示了一个非线程安全的数值范围类。它包含了一个不变式 —— 下界总是小于或等于上界。
-
-    所以，还是离volatile远点吧，要始终牢记使用 volatile 的限制 —— 只有在状态真正独立于程序内其他内容时才能使用 volatile。
-
-    贴一段我的测试代码
-
-    @Test
-    public void setSynchronizedValue() {
-        final Jedis superjedis = getJedis();
-        superjedis.set(&quot;age&quot;, &quot;1&quot;);
-        for (int i = 0; i &lt; 50; i++) {
-            new Thread(new Runnable() {
-                Jedis jedis = getJedis();
-                @Override
-                public void run() {
-                    System.out.println(jedis.incr(&quot;age&quot;));
-                }
-            }).start();
-        }
-
-    }
-
-    @Test
-    public void setNormalValue() {
-        for (int i = 0; i &lt; 50; i++) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-                    int currAge = age; // age 使用volatile static全局定义
-                    System.out.println(++ currAge);
-                    testInt = currAge;
-                }
-            }).start();
-        }
-    }
-
-    运行后可以看出，程序运行的结果是不确定的，这说明了++ currAge并不是原子级别的操作。
-
-    原因是声明为volatile的变量若与自身相关，如以下的声明方式：n=n+1,n++等，那么声明为volatile的变量就不起作用，也就是说关键字volatile无效。
-</code></pre>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;最近云课堂系统出现了购买商品出现并发数据错乱的问题，这是类似电商网站所不能接受的现象，果断重构该模块的业务代码刻不容缓- -！&lt;br&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="工作实践" scheme="http://yzy755.github.io/categories/%E5%B7%A5%E4%BD%9C%E5%AE%9E%E8%B7%B5/"/>
-    
-    
-      <category term="redis" scheme="http://yzy755.github.io/tags/redis/"/>
-    
-      <category term="线程安全" scheme="http://yzy755.github.io/tags/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>redis启动错误</title>
-    <link href="http://yzy755.github.io/2017/04/18/redis%E5%90%AF%E5%8A%A8%E9%94%99%E8%AF%AF/"/>
-    <id>http://yzy755.github.io/2017/04/18/redis启动错误/</id>
-    <published>2017-04-18T03:11:36.000Z</published>
-    <updated>2017-04-18T03:36:59.796Z</updated>
-    
-    <content type="html"><![CDATA[<p>Creating Server TCP listening socket *:6379: bind:Unknown error<br><a id="more"></a><br>今天遇到的问题，摘抄下网上的解决方案<br>按顺序输入如下命令就可以连接成功</p>
-<ol>
-<li>redis-cli.exe</li>
-<li>shutdown</li>
-<li>exit</li>
-<li>redis-server.exe redis.windows.conf</li>
-</ol>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Creating Server TCP listening socket *:6379: bind:Unknown error&lt;br&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    
-    
-      <category term="redis" scheme="http://yzy755.github.io/tags/redis/"/>
     
   </entry>
   

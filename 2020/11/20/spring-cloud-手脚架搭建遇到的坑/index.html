@@ -6,17 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>Archives: 2020 | 易泽源的博客</title>
+  <title>spring-cloud 手脚架搭建遇到的坑 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="记录学习点滴">
-<meta property="og:type" content="website">
-<meta property="og:title" content="易泽源的博客">
-<meta property="og:url" content="http://yzy755.github.io/archives/2020/index.html">
+  <meta name="description" content="新技术总是能遇到各种各样的坑">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring-cloud 手脚架搭建遇到的坑">
+<meta property="og:url" content="http://yzy755.github.io/2020/11/20/spring-cloud-手脚架搭建遇到的坑/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="记录学习点滴">
+<meta property="og:description" content="新技术总是能遇到各种各样的坑">
+<meta property="og:updated_time" content="2020-11-27T10:08:02.893Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="易泽源的博客">
-<meta name="twitter:description" content="记录学习点滴">
+<meta name="twitter:title" content="spring-cloud 手脚架搭建遇到的坑">
+<meta name="twitter:description" content="新技术总是能遇到各种各样的坑">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -172,36 +173,80 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-spring-cloud-手脚架搭建遇到的坑" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/11/20/spring-cloud-手脚架搭建/" class="archive-article-date">
-  	<time datetime="2020-11-20T03:48:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-11-20</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/11/20/spring-cloud-手脚架搭建/">spring-cloud 手脚架搭建</a>
+    <h1 class="article-title" itemprop="name">
+      spring-cloud 手脚架搭建遇到的坑
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2020/11/20/spring-cloud-手脚架搭建遇到的坑/" class="archive-article-date">
+  	<time datetime="2020-11-20T03:48:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-11-20</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>新技术总是能遇到各种各样的坑<br><a id="more"></a></p>
+<p>openfeign的坑</p>
+<p>因为spring-cloud调用服务是基于http协议的，所有需要定义没个接口的url，然后前端调用我们的web服务有需要一套url，如果定义两套url就显得非常麻烦，按照以前的习惯，接到需求后后台进行模块拆分，比如商品模块，订单模块，拆分后对应到代码就是controller的拆分，定义好controller和所有接口的url、入参、出参，开始编写接口文档…使用spring-cloud之后也希望能这样，所有对每个模块抽象出一个共用的api</p>
+<p>调用示例：</p>
+<p>封装接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/api/user"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(value = &#123; <span class="string">"/getbyid"</span> &#125;, method = &#123; RequestMethod.GET &#125;)</div><div class="line">    <span class="function">ApiResult&lt;UserVo&gt; <span class="title">getUserById</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(value = &#123; <span class="string">"/saveuser"</span> &#125;, method = &#123; RequestMethod.POST &#125;)</div><div class="line">    <span class="function">ApiResult&lt;Boolean&gt; <span class="title">saveUser</span><span class="params">(@RequestBody ApiParam&lt;UserVo&gt; param)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后多了一步就是定义一个FeignClient接口来继承我们封装的api接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@FeignClient</span>(<span class="string">"hwuser-center"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserFacade</span> <span class="keyword">extends</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后service中定义controller对外提供服务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> <span class="keyword">implements</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(UserController.class);</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ApiResult&lt;UserVo&gt; <span class="title">getUserById</span><span class="params">()</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> ApiResult.success(<span class="keyword">new</span> UserVo());</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ApiResult&lt;Boolean&gt; <span class="title">saveUser</span><span class="params">(ApiParam&lt;UserVo&gt; param)</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ApiResult(<span class="keyword">true</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> ApiResult&lt;PageInfo&lt;UserVo&gt;&gt; saveUser11(ApiParam&lt;UserVo&gt; param) &#123;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ApiResult(<span class="keyword">true</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>最后就是controller来实现我们封装的api接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserBizController</span> <span class="keyword">implements</span> <span class="title">UserApi</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOG = LoggerFactory.getLogger(UserBizController.class);</div><div class="line"></div><div class="line">    <span class="meta">@Resource</span></div><div class="line">    UserFacade userFacade;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ApiResult <span class="title">getById</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Long id)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            LOG.info(<span class="string">"enter"</span>);</div><div class="line">            UserVo vo = <span class="keyword">new</span> UserVo();</div><div class="line">            vo.setId(id);</div><div class="line">            ApiParam&lt;UserVo&gt; apiParam = ApiParam.newApiParam(vo, <span class="keyword">new</span> HcContext());</div><div class="line">            ApiResult&lt;UserVo&gt; apiResult = userFacade.getUserById();</div><div class="line">            <span class="keyword">return</span> apiResult;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            LOG.error(<span class="string">"getById异常：&#123;&#125;"</span>, e.getMessage(), e);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ApiResult(-<span class="number">1</span>, e.getMessage());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>感觉大功告成，但是一启动报错了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Caused by: java.lang.IllegalStateException: Ambiguous mapping. Cannot map <span class="string">'com.gzhc365.hw.user.facade.UserFacade'</span> method </div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> com.gzhc365.cloud.commons.api.ApiResult&lt;com.gzhc365.hw.user.vo.UserVo&gt; com.gzhc365.hw.user.api.UserApi.getUserById()</div><div class="line">to &#123;[/api/user/getbyid],methods=[GET]&#125;: There is already <span class="string">'userController'</span> bean method</div><div class="line"><span class="keyword">public</span> com.gzhc365.cloud.commons.api.ApiResult&lt;com.gzhc365.hw.user.vo.UserVo&gt; com.gzhc365.hw.user.web.controller.UserController.getUserById() mapped.</div><div class="line">	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.assertUniqueMethodMapping(AbstractHandlerMethodMapping.java:<span class="number">581</span>)</div></pre></td></tr></table></figure>
+<p>这里我让@RequestMapping(“/api/user”)直接修饰userApi接口，用来暴露出去统一前缀，然后FeignClient继承了这个Mapping，spring加载会动态代理出FeignClient的实现类来模拟userApi中定义的mapping，然后我们的service中对外暴露的controller也实现了userApi，所有spring加载了两套一模一样url的mapping就报错了。解决的办法就是将userApi接口上的@RequestMapping(“/api/user”)去掉，将完成的url写在每个接口上，但是这样有个问题就是没法给暴露出去的api做统一前缀了。 </p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/22432/alipay.jpg">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/79227/wxpay.png">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -213,7 +258,7 @@
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -226,460 +271,116 @@
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACvklEQVR42u3cwW7bMBAEUP//T6dAr4WVmV3SSYGnUyDXlB4LcJlZIq9XfH39vZ5/Tj7Nn/U88uELDw8PbzHcv1fCy/99O1nvwMk74+Hh4d3m5cXgbCFJisHz9H1jwcPDw/tRXv4Sz9PxPMLzHTw8PLz/izdb6Gfj4+Hh4f1+XhJGPN9pE9S8wHwoa8HDw8OLeafChU/+/AP9PTw8PLx4IW5LRdv+z4tN/Z54eHh4F3j55rhdgfP7eTMsmdZXOxweHh7egpcs3G14kU/K/gDB26fj4eHhfYSXbIjbg1CzQLbduH/T38PDw8Nb82YtpbxU7JFtYFH8v+Hh4eGNeG0kMfv0VBixOjqAh4eHd4iXLL5tENAWg9kkRoEFHh4e3jVe2/LPY998+5uXpajKzXJiPDw8vPJ39nbjm8e+s5KQxLVJUIKHh4d3g5cstXnDvt1qJ9Fw/t23kQQeHh7eIV6+rK9CgdGG+EBkjIeHh3erGzX8YyL7xv9si1wHynh4eHiXeW2UsNlADwPZNjLGw8PDO8rLY9av+GpHaMOOfHw8PDy827y2nb8JfPOCkTw3inHx8PDwDvGS12o3tW05aQ8iDA944eHh4R3i5QtxewCrvZOPWUQSeHh4eBd4s0HbZlheQjafFkEwHh4e3pq3f8VZc6uOZeOJfruxxsPDwzvEa6vHZoObf7eNRVa1Dg8PD28EmwUQ7SY4LzmntuN4eHh493gtZnYUoG2GHShveHh4eEd5s8fnDaf9AaxkhX/7XTw8PLwLvNlv9G0YsW+wXeny4eHh4S14m2KQLNabJlYeZERHB/Dw8PCO8jYL9OYQ1aYVFz0RDw8P7xfw2kMDeViQB7tFecDDw8P7UV5+Z39cdbN9x8PDw/sMbxYutAWgDRfaovI6NUN4eHh481NMr3ZL3ZaQNuwYhrl4eHh4Z3h/AHJSSt8CGBcjAAAAAElFTkSuQmCC" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/11/20/spring-cloud-手脚架搭建遇到的坑/" class="archive-article-date">
-  	<time datetime="2020-11-20T03:48:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-11-20</time>
-</a>
-        </div>
-    	 
+<nav id="article-nav">
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/11/20/spring-cloud-手脚架搭建遇到的坑/">spring-cloud 手脚架搭建遇到的坑</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-cloud</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践/" class="article-tag-list-link color5">工作实践</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/07/spring-cloud-alibaba操作手册之分布式事务/" class="archive-article-date">
-  	<time datetime="2020-03-07T08:55:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-07</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/07/spring-cloud-alibaba操作手册之分布式事务/">spring-cloud-alibaba操作手册之分布式事务</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-cloud</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/06/spring-cloud-alibaba操作手册之服务网关/" class="archive-article-date">
-  	<time datetime="2020-03-06T03:17:22.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-06</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/06/spring-cloud-alibaba操作手册之服务网关/">spring-cloud-alibaba操作手册之服务网关</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-cloud</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/" class="archive-article-date">
-  	<time datetime="2020-03-05T09:23:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-05</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/">spring-cloud-alibaba操作手册之整合 RocketMQ</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-cloud</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/工作实践学习笔记/" class="article-tag-list-link color5">工作实践 学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/04/spring-cloud-alibaba操作手册之Sentinel 服务限流降级/" class="archive-article-date">
-  	<time datetime="2020-03-04T07:20:21.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-04</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/04/spring-cloud-alibaba操作手册之Sentinel 服务限流降级/">spring-cloud-alibaba操作手册之Sentinel 服务限流降级</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-cloud</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/03/spring-cloud-alibaba操作手册之Ribbon 负载均衡/" class="archive-article-date">
-  	<time datetime="2020-03-03T02:50:20.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-03</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/03/spring-cloud-alibaba操作手册之Ribbon 负载均衡/">spring-cloud-alibaba操作手册之Ribbon 负载均衡</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-cloud</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/03/spring-cloud-alibaba操作手册之Nacos 服务发现与调用/" class="archive-article-date">
-  	<time datetime="2020-03-03T02:50:20.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-03</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/03/spring-cloud-alibaba操作手册之Nacos 服务发现与调用/">spring-cloud-alibaba操作手册之Nacos 服务发现与调用</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-cloud</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/03/spring-cloud-alibaba操作手册之Nacos 服务注册/" class="archive-article-date">
-  	<time datetime="2020-03-03T02:17:20.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-03</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/03/spring-cloud-alibaba操作手册之Nacos 服务注册/">spring-cloud-alibaba操作手册之Nacos 服务注册</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-cloud</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/02/spring-cloud-alibaba操作手册之创建父工程/" class="archive-article-date">
-  	<time datetime="2020-03-02T09:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/02/spring-cloud-alibaba操作手册之创建父工程/">spring-cloud-alibaba操作手册之创建父工程</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-cloud</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+    <a href="/2020/11/20/spring-cloud-手脚架搭建/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          spring-cloud 手脚架搭建
+        
+      </div>
+    </a>
   
   
-    </div></section>
+    <a href="/2020/03/07/spring-cloud-alibaba操作手册之分布式事务/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">spring-cloud-alibaba操作手册之分布式事务</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+  
+    <div class="duoshuo"></div>
   
 
-    
 
 
+ 
+  <section id="comments">
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="post-spring-cloud-手脚架搭建遇到的坑" data-title="spring-cloud 手脚架搭建遇到的坑" data-url="http://yzy755.github.io/2020/11/20/spring-cloud-手脚架搭建遇到的坑/"></div>
+    <!-- 多说评论框 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'yzy755'};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+    <!-- 多说公共JS代码 end -->
+  </section>
+  
           </div>
         </div>
       </div>
@@ -700,8 +401,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
