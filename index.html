@@ -324,6 +324,107 @@
 
  
   
+    <article id="post-docker学习笔记" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/09/22/docker学习笔记/">docker学习笔记</a>
+    </h1>
+  
+
+        
+        <a href="/2020/09/22/docker学习笔记/" class="archive-article-date">
+  	<time datetime="2020-09-22T12:48:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-09-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>[toc]</p>
+<h1 id="docker是什么"><a href="#docker是什么" class="headerlink" title="docker是什么"></a>docker是什么</h1><p>docker的思想来自于集装箱，将各式各样的服务打包装箱，集装箱与集装箱之间相互隔离，互不影响，这样的话这种不同的服务就都能在一艘船上打包运走而不需要正对不同的集装箱（服务）用不同的船（pc机）运走了，是一种容器化技术。</p>
+<h1 id="docker为什么出现"><a href="#docker为什么出现" class="headerlink" title="docker为什么出现"></a>docker为什么出现</h1><p>传统的服务部署一般都在虚拟机上，代表有VMware、OpenStack等，在各个虚拟机上需要各自安装服务，如果集群规模很大的话需要重复部署N套环境，而且环境复杂切容易出现不一致的情况，即便是使用镜像也需要不断的备份和分发，运维工作十分痛苦。</p>
+<p>docker也是虚拟化技术，属于轻量级的虚拟化，也叫容器化技术，docker不需要整套的操作系统环境，只需要必要的小规模环境，相遇虚拟机动辄几G十几G，docker镜像甚至只要M级别。docker对内存的利用率极高，因为他不需要想虚拟机一样固定分配一定的内存，docker就像是电脑上的一个进程，需要多少就分配多少。</p>
+<p>总结一下docker与虚拟机的不同</p>
+<ul>
+<li>传统虚拟机，虚拟出一条硬件，运行一个完整的操作系统，然后在这个系统上安装和运行软件</li>
+<li>容器内的应用直接运行在宿主机的内容，容器是没有自己的内核的，也没有虚拟我们的硬件，所以就轻便了</li>
+<li>每个容器间是互相隔离，每个容器内都有一个属于自己的文件系统，互不影响</li>
+</ul>
+<h1 id="docker的构成"><a href="#docker的构成" class="headerlink" title="docker的构成"></a>docker的构成</h1><p><strong>镜像（image）：</strong></p>
+<p>镜像好比java中类，java通过类来创建实例，docker通过镜像来创建一个或多个容器服务。</p>
+<p><strong>容器（container）:</strong></p>
+<p>利用容器独立运行一个或一组应用，是用过镜像来创建的。</p>
+<p><strong>仓库（repository）：</strong></p>
+<p>仓库是存放镜像的地方，需要什么环境的镜像就从仓库中直接拿，跟git类似分为公有仓库和私有仓库，docker hub、阿里云都有镜像服务器。</p>
+<h1 id="docker的使用"><a href="#docker的使用" class="headerlink" title="docker的使用"></a>docker的使用</h1><h2 id="docker安装"><a href="#docker安装" class="headerlink" title="docker安装"></a>docker安装</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">#1.卸载旧版本</div><div class="line">yum remove docker \</div><div class="line">                  docker-client \</div><div class="line">                  docker-client-latest \</div><div class="line">                  docker-common \</div><div class="line">                  docker-latest \</div><div class="line">                  docker-latest-logrotate \</div><div class="line">                  docker-logrotate \</div><div class="line">                  docker-engine</div><div class="line">#2.需要的安装包</div><div class="line">yum install -y yum-utils</div><div class="line"></div><div class="line">#3.设置镜像的仓库</div><div class="line">yum-config-manager \</div><div class="line">    --add-repo \</div><div class="line">    https://download.docker.com/linux/centos/docker-ce.repo</div><div class="line">#上述方法默认是从国外的，不推荐</div><div class="line"></div><div class="line">#推荐使用国内的</div><div class="line">yum-config-manager \</div><div class="line">    --add-repo \</div><div class="line">    https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo</div><div class="line">    </div><div class="line">#更新yum软件包索引</div><div class="line">yum makecache fast</div><div class="line"></div><div class="line">#4.安装docker相关的 docker-ce 社区版 而ee是企业版</div><div class="line">yum install docker-ce docker-ce-cli containerd.io # 这里我们使用社区版即可</div><div class="line"></div><div class="line">#5.启动docker</div><div class="line">systemctl start docker</div><div class="line"></div><div class="line">#6. 使用docker version查看是否按照成功</div><div class="line">docker version</div><div class="line"></div><div class="line">#7. 测试</div><div class="line">docker run hello-world</div><div class="line">12345678910111213141516171819202122232425262728293031323334353637</div><div class="line">#8.查看已经下载的镜像(从这里可以查看已有镜像的id)</div><div class="line">[root@iz2zeak7sgj6i7hrb2g862z ~]# docker images</div><div class="line">REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE</div><div class="line">hello-world           latest              bf756fb1ae65        4 months ago      13.3kB</div><div class="line">1234</div></pre></td></tr></table></figure>
+<h2 id="docker卸载"><a href="#docker卸载" class="headerlink" title="docker卸载"></a>docker卸载</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#1. 卸载依赖</div><div class="line">yum remove docker-ce docker-ce-cli containerd.io</div><div class="line">#2. 删除资源</div><div class="line">rm -rf /var/lib/docker</div></pre></td></tr></table></figure>
+<h1 id="docker常用命令"><a href="#docker常用命令" class="headerlink" title="docker常用命令"></a>docker常用命令</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">attach      Attach local standard input, output, and error streams to a running container</div><div class="line">  #当前shell下 attach连接指定运行的镜像</div><div class="line">  build       Build an image from a Dockerfile # 通过Dockerfile定制镜像</div><div class="line">  commit      Create a new image from a container&apos;s changes #提交当前容器为新的镜像</div><div class="line">  cp          Copy files/folders between a container and the local filesystem #拷贝文件</div><div class="line">  create      Create a new container #创建一个新的容器</div><div class="line">  diff        Inspect changes to files or directories on a container&apos;s filesystem #查看docker容器的变化</div><div class="line">  events      Get real time events from the server # 从服务获取容器实时时间</div><div class="line">  exec        Run a command in a running container # 在运行中的容器上运行命令</div><div class="line">  export      Export a container&apos;s filesystem as a tar archive #导出容器文件系统作为一个tar归档文件[对应import]</div><div class="line">  history     Show the history of an image # 展示一个镜像形成历史</div><div class="line">  images      List images #列出系统当前的镜像</div><div class="line">  import      Import the contents from a tarball to create a filesystem image #从tar包中导入内容创建一个文件系统镜像</div><div class="line">  info        Display system-wide information # 显示全系统信息</div><div class="line">  inspect     Return low-level information on Docker objects #查看容器详细信息</div><div class="line">  kill        Kill one or more running containers # kill指定docker容器</div><div class="line">  load        Load an image from a tar archive or STDIN #从一个tar包或标准输入中加载一个镜像[对应save]</div><div class="line">  login       Log in to a Docker registry # 注册或登录一个 docker 源服务器</div><div class="line">  logout      Log out from a Docker registry</div><div class="line">  logs        Fetch the logs of a container</div><div class="line">  pause       Pause all processes within one or more containers</div><div class="line">  port        List port mappings or a specific mapping for the container</div><div class="line">  ps          List containers</div><div class="line">  pull        Pull an image or a repository from a registry</div><div class="line">  push        Push an image or a repository to a registry</div><div class="line">  rename      Rename a container</div><div class="line">  restart     Restart one or more containers</div><div class="line">  rm          Remove one or more containers</div><div class="line">  rmi         Remove one or more images</div><div class="line">  run         Run a command in a new container</div><div class="line">  save        Save one or more images to a tar archive (streamed to STDOUT by default)</div><div class="line">  search      Search the Docker Hub for images</div><div class="line">  start       Start one or more stopped containers</div><div class="line">  stats       Display a live stream of container(s) resource usage statistics</div><div class="line">  stop        Stop one or more running containers</div><div class="line">  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE</div><div class="line">  top         Display the running processes of a container</div><div class="line">  unpause     Unpause all processes within one or more containers</div><div class="line">  update      Update configuration of one or more containers</div><div class="line">  version     Show the Docker version information</div><div class="line">  wait        Block until one or more containers stop, then print their exit codes</div></pre></td></tr></table></figure>
+<h1 id="docker加载原理"><a href="#docker加载原理" class="headerlink" title="docker加载原理"></a>docker加载原理</h1><blockquote>
+<p> 联合文件系统</p>
+</blockquote>
+<p>docker的镜像都是由一层一层的文件系统组成，docker利用文件版本管理来实现分层的复用，比如说镜像1依赖了centos层，docker下载完镜像1会在系统中记录centos的分层，镜像2页依赖了centos层，下载镜像2则不会再重复下载centos层，而是直接复用，简单来说每一层都是一条记录。</p>
+<blockquote>
+<p>加载原理分析</p>
+</blockquote>
+<p>平时用到的操作系统是基于 boot file system（bootfs），系统启动需要引导加载，加载内核，之后计算机内存的使用权由boot file system 转交给内核（kernel），boot file system 则被操作系统卸载，这个过程很慢，通常是分钟级别的，这个引导加载器是通用的。</p>
+<p>root file system（rootfs），在bootfs之上，对应的操作系统不同的发行版，比如linux系统的centos、ubuntu。</p>
+<p>虚拟机技术需要模拟这两种文件系统进行加载，所以系统很慢，而且体积庞大，而docker使用宿主机的内核，无需引导加载（无需boot file system），只需要提供root file system，可以自由精简命令和工具包，所以速度非常快，体积要小很多。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">docker</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/09/22/docker学习笔记/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+ 
+  
     <article id="post-spring-cloud-alibaba操作手册之分布式事务" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -856,82 +957,6 @@
 
  
   
-    <article id="post-spring-cloud-alibaba操作手册之创建父工程" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/02/spring-cloud-alibaba操作手册之创建父工程/">spring-cloud-alibaba操作手册之创建父工程</a>
-    </h1>
-  
-
-        
-        <a href="/2020/03/02/spring-cloud-alibaba操作手册之创建父工程/" class="archive-article-date">
-  	<time datetime="2020-03-02T09:17:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="创建父工程"><a href="#创建父工程" class="headerlink" title="创建父工程"></a>创建父工程</h2><p>Spring Cloud Alibaba 的环境在父工程中创建，微服务的各个组件作为子工程，继承父工程的环境。</p>
-<p>Spring Boot —》Spring Cloud —》Spring Cloud Alibaba</p>
-        
-          <a class="article-more-a" href="/2020/03/02/spring-cloud-alibaba操作手册之创建父工程/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-cloud</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/02/spring-cloud-alibaba操作手册之创建父工程/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
- 
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -1150,6 +1175,10 @@
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">JVM</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">docker</a>
               </li>
             
             <div class="clearfix"></div>
