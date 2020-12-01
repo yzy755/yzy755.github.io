@@ -141,10 +141,11 @@
     <link href="http://yzy755.github.io/2020/09/22/docker%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <id>http://yzy755.github.io/2020/09/22/docker学习笔记/</id>
     <published>2020-09-22T12:48:05.000Z</published>
-    <updated>2020-12-01T07:31:40.819Z</updated>
+    <updated>2020-12-01T07:34:08.687Z</updated>
     
     <content type="html"><![CDATA[<p>[toc]</p>
 <h1 id="docker是什么"><a href="#docker是什么" class="headerlink" title="docker是什么"></a>docker是什么</h1><p>docker的思想来自于集装箱，将各式各样的服务打包装箱，集装箱与集装箱之间相互隔离，互不影响，这样的话这种不同的服务就都能在一艘船上打包运走而不需要正对不同的集装箱（服务）用不同的船（pc机）运走了，是一种容器化技术。</p>
+<a id="more"></a>
 <h1 id="docker为什么出现"><a href="#docker为什么出现" class="headerlink" title="docker为什么出现"></a>docker为什么出现</h1><p>传统的服务部署一般都在虚拟机上，代表有VMware、OpenStack等，在各个虚拟机上需要各自安装服务，如果集群规模很大的话需要重复部署N套环境，而且环境复杂切容易出现不一致的情况，即便是使用镜像也需要不断的备份和分发，运维工作十分痛苦。</p>
 <p>docker也是虚拟化技术，属于轻量级的虚拟化，也叫容器化技术，docker不需要整套的操作系统环境，只需要必要的小规模环境，相遇虚拟机动辄几G十几G，docker镜像甚至只要M级别。docker对内存的利用率极高，因为他不需要想虚拟机一样固定分配一定的内存，docker就像是电脑上的一个进程，需要多少就分配多少。</p>
 <p>总结一下docker与虚拟机的不同</p>
@@ -177,7 +178,7 @@
     <summary type="html">
     
       &lt;p&gt;[toc]&lt;/p&gt;
-&lt;h1 id=&quot;docker是什么&quot;&gt;&lt;a href=&quot;#docker是什么&quot; class=&quot;headerlink&quot; title=&quot;docker是什么&quot;&gt;&lt;/a&gt;docker是什么&lt;/h1&gt;&lt;p&gt;docker的思想来自于集装箱，将各式各样的服务打包装箱，
+&lt;h1 id=&quot;docker是什么&quot;&gt;&lt;a href=&quot;#docker是什么&quot; class=&quot;headerlink&quot; title=&quot;docker是什么&quot;&gt;&lt;/a&gt;docker是什么&lt;/h1&gt;&lt;p&gt;docker的思想来自于集装箱，将各式各样的服务打包装箱，集装箱与集装箱之间相互隔离，互不影响，这样的话这种不同的服务就都能在一艘船上打包运走而不需要正对不同的集装箱（服务）用不同的船（pc机）运走了，是一种容器化技术。&lt;/p&gt;
     
     </summary>
     
