@@ -6,27 +6,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yzy755.github.io">
-  <title>jvm内存分配 | 易泽源的博客</title>
+  <title>Archives: 2020/12 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="java内存组成介绍：堆(Heap)和非堆(Non-heap)内存
-
-   按照官方的说法：“Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)”。可以看出JVM主要管理两种类型的内存：堆和非堆。简单来说堆就是Java代码可及的内存，是留给开发人员使用的；">
-<meta property="og:type" content="article">
-<meta property="og:title" content="jvm内存分配">
-<meta property="og:url" content="http://yzy755.github.io/2017/03/24/jvm内存分配/index.html">
+  <meta name="description" content="记录学习点滴">
+<meta property="og:type" content="website">
+<meta property="og:title" content="易泽源的博客">
+<meta property="og:url" content="http://yzy755.github.io/archives/2020/12/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="java内存组成介绍：堆(Heap)和非堆(Non-heap)内存
-
-   按照官方的说法：“Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)”。可以看出JVM主要管理两种类型的内存：堆和非堆。简单来说堆就是Java代码可及的内存，是留给开发人员使用的；">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/24/jvm内存分配/combination.PNG">
-<meta property="og:image" content="http://yzy755.github.io/2017/03/24/jvm内存分配/allocation.PNG">
-<meta property="og:updated_time" content="2017-03-24T10:09:41.798Z">
+<meta property="og:description" content="记录学习点滴">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jvm内存分配">
-<meta name="twitter:description" content="java内存组成介绍：堆(Heap)和非堆(Non-heap)内存
-
-   按照官方的说法：“Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)”。可以看出JVM主要管理两种类型的内存：堆和非堆。简单来说堆就是Java代码可及的内存，是留给开发人员使用的；">
-<meta name="twitter:image" content="http://yzy755.github.io/2017/03/24/jvm内存分配/combination.PNG">
+<meta name="twitter:title" content="易泽源的博客">
+<meta name="twitter:description" content="记录学习点滴">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -182,240 +172,73 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-jvm内存分配" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      jvm内存分配
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2020" class="archive-year">2020</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2020/12/02/ElasticSearch缓存引发的问题/" class="archive-article-date">
+  	<time datetime="2020-12-02T09:43:11.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-02</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2020/12/02/ElasticSearch缓存引发的问题/">ElasticSearch缓存引发的问题</a>
     </h1>
   
 
-        
-        <a href="/2017/03/24/jvm内存分配/" class="archive-article-date">
-  	<time datetime="2017-03-24T07:56:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-24</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <pre><code>java内存组成介绍：堆(Heap)和非堆(Non-heap)内存
-
-   按照官方的说法：“Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)”。可以看出JVM主要管理两种类型的内存：堆和非堆。简单来说堆就是Java代码可及的内存，是留给开发人员使用的；非堆就是JVM留给 自己用的，所以方法区、JVM内部处理或优化所需的内存(如JIT编译后的代码缓存)、每个类结构(如运行时常数池、字段和方法数据)以及方法和构造方法 的代码都在非堆内存中。
-</code></pre><a id="more"></a>
-<p><img src="/2017/03/24/jvm内存分配/combination.PNG" alt="logo"><br>               方法栈&amp;本地方法栈:<br>            线程创建时产生,方法执行时生成栈帧</p>
-<pre><code>        方法区
-        存储类的元数据信息 常量等
-
-        堆
-        java代码中所有的new操作
-        native Memory(C heap)
-        Direct Bytebuffer JNI Compile GC;
-
-
-堆内存分配
-
-   JVM初始分配的内存由-Xms指定，默认是物理内存的1/64；JVM最大分配的内存由-Xmx指 定，默认是物理内存的1/4。默认空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制；空余堆内存大于70%时，JVM会减少堆直到 -Xms的最小限制。因此服务器一般设置-Xms、-Xmx相等以避免在每次GC 后调整堆的大小。对象的堆内存由称为垃圾回收器的自动内存管理系统回收。
-</code></pre><p><img src="/2017/03/24/jvm内存分配/allocation.PNG" alt="logo"></p>
-<pre><code>      组成                    详解
-      Young Generation        即图中的Eden + From Space + To Space
-      Eden                    存放新生的对象
-      Survivor Space            有两个，存放每次垃圾回收后存活的对象
-      Old Generation            Tenured Generation 即图中的Old Space 主要存放应用程序中生命周期长的存活对象
-
-非堆内存分配
-JVM使用-XX:PermSize设置非堆内存初始值，默认是物理内存的1/64；由XX:MaxPermSize设置最大非堆内存的大小，默认是物理内存的1/4。
-
-      组成                    详解
-      Permanent Generation    保存虚拟机自己的静态(refective)数据
-                              主要存放加载的Class类级别静态对象如class本身，method，field等等
-                              permanent generation空间不足会引发full GC(详见HotSpot VM GC种类)
-      Code Cache                用于编译和保存本地代码（native code）的内存
-                              JVM内部处理或优化
-
-JVM内存限制(最大值)
-
-JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处理器虽然 可控内存空间有4GB,但是具体的操作系统会给一个限制，这个限制一般是2GB-3GB（一般来说Windows系统下为1.5G-2G，Linux系统 下为2G-3G），而64bit以上的处理器就不会有限制了。
-</code></pre>
-      
-
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/22432/alipay.jpg">
-                      <span class="reward-type">支付宝</span>
-                    </div>
-                    
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="http://bwyun.oss-cn-hangzhou.aliyuncs.com/2017/03/09/180935/79227/wxpay.png">
-                      <span class="reward-type">微信</span>
-                    </div>
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">jvm</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">内存分配</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">ElasticSearch</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
+        			<a href="/categories/工作实践/" class="article-tag-list-link color5">工作实践</a>
         		</li>
       		
 		</ul>
 	</div>
 
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACLklEQVR42u3aQY7jMAwEwPn/p7PXARYrd0vOAqbLp8AxYlUOBNnSz098fX5dv++sv/37/r9+eX3ntgsDA+OxjM/ySp5ZL3oNXrPzt2BgYLyBsS6F+VJOnl+X9Ys1Y2BgYAQl8q4SjIGBgXFvwU1emQy6CQkDAwMjGWLvGjjXMdzXZ3EMDIwHMvLU/f9//sr+BgYGxqMY3xhEk4YvbxmjVWFgYIxm5AUuX1zbXOYt48WTGBgYQxlJvHUS3CfftiFdfWYNAwPj4Yx2cE1Ct3zSzO/nJRsDA2MeI2/vTg5PtPlYu3mAgYExm3Fvr5U3gnlUd9JWYmBgzGC0cf/JEY29w2F1D4uBgTGOkZOSVrIN4FpkskIMDIx3Mtrof6903pYaYmBgjGO0YVY7cLYbk3k5jk6LYGBgjGC0UdperJaU2nYyPUoEMTAwHsVotwyLYTIoo3noVrSGGBgY4xjt0Yq2HWx/LYnk6pdhYGCMYJyHaO1mQFJMj7pdDAyMcYz8OEX+fDsen5RpDAyMdzLypewdm9jLyi7ei4GB8QLGSTOXF+g2zivGZgwMjJcx9spu++I2VrsYnjEwMIYyPuXVDpkJuC2+F70tBgbGOMbenmB7YOKEVxy2wMDAGM3Ii+ze0k/+jqLIYmBgvIBxMqzubRLcddQMAwMDo2W0G5nJ2yMwBgYGRhmWneRge80rBgbGGxh53J+XzvMjGgUbAwNjNCMviHsRW95Qnh/1wMDAGMf4A29fGQagZpL5AAAAAElFTkSuQmCC" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2017/04/11/基于shiro拓展并发登录人数控制/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          基于shiro拓展并发登录人数控制
-        
-      </div>
-    </a>
   
   
-    <a href="/2017/03/10/linux环境下ffmpeg加入libx264编译方法/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">linux环境下ffmpeg加入libx264编译方法</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-
-
-
-
-  
-    <div class="duoshuo"></div>
+    </div></section>
   
 
+    
 
 
- 
-  <section id="comments">
-    <!-- 多说评论框 start -->
-    <div class="ds-thread" data-thread-key="post-jvm内存分配" data-title="jvm内存分配" data-url="http://yzy755.github.io/2017/03/24/jvm内存分配/"></div>
-    <!-- 多说评论框 end -->
-    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-    <script type="text/javascript">
-    var duoshuoQuery = {short_name:'yzy755'};
-      (function() {
-        var ds = document.createElement('script');
-        ds.type = 'text/javascript';ds.async = true;
-        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-        ds.charset = 'UTF-8';
-        (document.getElementsByTagName('head')[0] 
-         || document.getElementsByTagName('body')[0]).appendChild(ds);
-      })();
-      </script>
-    <!-- 多说公共JS代码 end -->
-  </section>
-  
           </div>
         </div>
       </div>
@@ -436,8 +259,8 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
-		isArchive: false,
+		isPost: false,
+		isArchive: true,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
@@ -631,6 +454,10 @@ JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">docker</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">ElasticSearch</a>
               </li>
             
             <div class="clearfix"></div>
