@@ -194,50 +194,10 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>最近发现小程序社区模块的搜索偶发性地出现搜索异常：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">globalSearch==&gt; post content search exception:ElasticsearchStatusException[Elasticsearch exception [type=circuit_breaking_exception, reason=[parent] Data too large, data for [&lt;http_request&gt;] would be [247822678/236.3mb], which is larger than the limit of [246546432/235.1mb], real usage: [247821032/236.3mb], new bytes reserved: [1646/1.6kb], usages [request=0/0b, fielddata=227362/222kb, in_flight_requests=1646/1.6kb, accounting=28514116/27.1mb]]]</div><div class="line">        at org.elasticsearch.rest.BytesRestResponse.errorFromXContent(BytesRestResponse.java:177)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.parseEntity(RestHighLevelClient.java:1727)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.parseResponseException(RestHighLevelClient.java:1704)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.internalPerformRequest(RestHighLevelClient.java:1467)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.performRequest(RestHighLevelClient.java:1424)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.performRequestAndParseEntity(RestHighLevelClient.java:1394)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.search(RestHighLevelClient.java:930)</div></pre></td></tr></table></figure>
-<p>以及</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Suppressed: org.elasticsearch.client.ResponseException: method [POST], host [http://192.168.11.113:29201], URI [/post_content_4/_search?typed_keys=true&amp;ignore_unavailable=false&amp;expand_wildcards=open&amp;allow_no_indices=true&amp;ignore_throttled=true&amp;search_type=query_then_fetch&amp;batched_reduce_size=512&amp;ccs_minimize_roundtrips=true], status line [HTTP/1.1 429 Too Many Requests]</div></pre></td></tr></table></figure>
-<p>具体的报错json串如下：</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">	<span class="attr">"error"</span>: &#123;</div><div class="line">		<span class="attr">"root_cause"</span>: [&#123;</div><div class="line">			<span class="attr">"type"</span>: <span class="string">"circuit_breaking_exception"</span>,</div><div class="line">			<span class="attr">"reason"</span>: <span class="string">"[parent] Data too large, data for [&lt;http_request&gt;] would be [247995634/236.5mb], which is larger than the limit of [246546432/235.1mb], real usage: [247994080/236.5mb], new bytes reserved: [1554/1.5kb], usages [request=0/0b, fielddata=227362/222kb, in_flight_requests=1554/1.5kb, accounting=28514116/27.1mb]"</span>,</div><div class="line">			<span class="attr">"bytes_wanted"</span>: <span class="number">247995634</span>,</div><div class="line">			<span class="attr">"bytes_limit"</span>: <span class="number">246546432</span>,</div><div class="line">			<span class="attr">"durability"</span>: <span class="string">"PERMANENT"</span></div><div class="line">		&#125;],</div><div class="line">		<span class="attr">"type"</span>: <span class="string">"circuit_breaking_exception"</span>,</div><div class="line">		<span class="attr">"reason"</span>: <span class="string">"[parent] Data too large, data for [&lt;http_request&gt;] would be [247995634/236.5mb], which is larger than the limit of [246546432/235.1mb], real usage: [247994080/236.5mb], new bytes reserved: [1554/1.5kb], usages [request=0/0b, fielddata=227362/222kb, in_flight_requests=1554/1.5kb, accounting=28514116/27.1mb]"</span>,</div><div class="line">		<span class="attr">"bytes_wanted"</span>: <span class="number">247995634</span>,</div><div class="line">		<span class="attr">"bytes_limit"</span>: <span class="number">246546432</span>,</div><div class="line">		<span class="attr">"durability"</span>: <span class="string">"PERMANENT"</span></div><div class="line">	&#125;,</div><div class="line">	<span class="attr">"status"</span>: <span class="number">429</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>从报错的意思来看是某项配置的内存不够导致，用关键字“circuit_breaking_exception”搜索得知这跟es的三种缓存有关，将相关概念记录一下</p>
-<blockquote>
-<p> Query Cache</p>
-</blockquote>
-<p>Query Cache也称为Filter Cache，顾名思义它的作用就是对一个查询中包含的过滤器执行结果进行缓存。</p>
-<p>比如我们常用的term，terms，range过滤器都会在满足某种条件后被缓存，注意，这里的bool过滤器是不会被缓存的，但bool过滤器包含的子query clause会被缓存，我们可以用下面的命令来查询Query Cache的情况。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">http://192.168.0.109:9200/_stats/query_cache?pretty&amp;human</div></pre></td></tr></table></figure>
-<blockquote>
-<p>Request Cache</p>
-</blockquote>
-<p>当一个查询发送到ES集群的某个节点上时，这个节点会把该查询扩散到其他节点并在相应分片上执行，我们姑且把在分片上执行的结果叫“本地结果集“，这些本地结果集最终会汇集到最初请求到达的那个协调节点，这些“分片级”的结果集会合并成“全局”结果集返回给调用端。</p>
-<p>Request Cache模块就是为了缓存这些“分片级”的本地结果集，但是目前只会缓存查询中参数size=0的请求，所以就不会缓存hits 而是缓存 hits.total，aggregations和suggestions</p>
-<p>Request Cache是非常智能的，它能够保证和在近实时搜索中的非缓存查询结果一致。这句话读起来很难懂，简单解释下。</p>
-<p>我们都知道ES是一个“near real-time”（近实时）搜索引擎，为什么是近实时搜索呢，那是因为当我们向ES发送一个索引文档请求到这个文档变成Searchable（可搜索）默认的时间是1秒，我们可以通过index.refresh_interval参数来设置刷新时间间隔，也就是说我们在执行一个搜索请求时实际上数据是有延迟的。回到刚才的问题，刚才那句话其实指的就是：ES能保证在使用Request Cache的情况下的搜索结果和不使用Request Cache的近实时搜索结果相同，那ES是如何保证两者结果相同的呢？继续……</p>
-<p>Request Cache缓存失效是自动的，当索引refresh时就会失效，也就是说在默认情况下Request Cache是每1秒钟失效一次（注意：分片在这段时间内确实有改变才会失效）。也就是说当一个文档被索引到该文档变成Searchable之前的这段时间内，不管是否有请求命中缓存该文档都不会被返回，正是是因为如此ES才能保证在使用Request Cache的情况下执行的搜索和在非缓存近实时搜索的结果一致。如果我们把索引刷新时间设置得越长那么缓存失效的时间越长，如果缓存被写满将采用LRU策略清除。当然我们也可以手动设置参数indices.request.cache.expire指定失效时间，但是基本上我们没必要去这样做，因为缓存在每次索引refresh时都会自动失效。</p>
-<p> 在默认情况下Request Cache是关闭的，我们需要手动开启 </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">curl -XPUT localhost:9200/my_index/_settings -d&apos;</div><div class="line">&#123; &quot;index.requests.cache.enable&quot;: true &#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p>Fielddata</p>
-</blockquote>
-<p>一谈到Fielddata我们不得不提到doc_values，这两者的作用都是一样：能够让我们在inverted index（倒排索引）的基础之上做aggregation、sort或者在查询中通过script访问doc属性，这里我们不讨论doc_values，主要讲下Fielddata，doc values相关知识请戳：<a href="http://blog.csdn.net/chennanymy/article/details/52555055" target="_blank" rel="external">http://blog.csdn.net/chennanymy/article/details/52555055</a></p>
-<p>想必大家都知道倒排索引这种结构，如果我们仅仅依靠倒排是很难在查询中做到排序和统计的，因为它并不是像关系型数据库那样采用“列式存储”，而是基于一个“词”到“文档”的倒排。</p>
-<p>Fielddata是专门针对分词的字段在query-time（查询期间）的数据结构的缓存。当我们第一次在一个分词的字段上执行聚合、排序或通过脚本访问的时候就会触发该字段Fielddata Cache的加载，这种缓存是“segment”级别的，当有新的segment打开时旧的缓存不会重新加载，而是直接把新的segement对应的Fielddata Cache加载到内存。</p>
-<p>加载Fielddata Cache是一个非常昂贵的操作，一旦Fielddata被加载到内存，那么在该Fielddata Cache对应的Segement生命周期范围内都会驻留在内存中。也就是说当段合并时会触发合并后更大段的Fielddata Cache加载。</p>
-<p>Fielddata会消耗大部分的JVM堆内存，特别是当加载“高基数”的分词字段时（那些分词后存在大量不同词的字段），针对这种字段的聚合排序其实是非常没有意义的，我们更多的要去考虑是否能用not_analyzed代替（这样就可以使用doc_values实现聚合、排序）。</p>
-<p>默认情况下Fielddate Cache是默认开启的，我们可以通过下面的设置来关闭，关闭后就无法对分词字段执行聚合、排序操作了。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">PUT my_index</div><div class="line">&#123;</div><div class="line">  &quot;mappings&quot;: &#123;</div><div class="line">    &quot;my_type&quot;: &#123;</div><div class="line">      &quot;properties&quot;: &#123;</div><div class="line">        &quot;text&quot;: &#123;</div><div class="line">          &quot;type&quot;: &quot;string&quot;,</div><div class="line">          &quot;fielddata&quot;: &#123;</div><div class="line">            &quot;format&quot;: &quot;disabled&quot; </div><div class="line">          &#125;</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>FieldData<br>ES配置中提到的FieldData指的是字段数据。当排序（sort），统计（aggs）时，ES把涉及到的字段数据全部读取到内存（JVM Heap）中进行操作。相当于进行了数据缓存，提升查询效率。 </li>
-<li>Cache配置</li>
-</ul>
-<p>indices.fielddata.cache.size 配置fieldData的Cache大小，可以配百分比也可以配一个准确的数值。cache到达约定的内存大小时会自动清理，驱逐一部分FieldData数据以便容纳新数据。默认值为unbounded无限。<br>indices.fielddata.cache.expire用于约定多久没有访问到的数据会被驱逐，默认值为-1，即无限。expire配置不推荐使用，按时间驱逐数据会大量消耗性能。而且这个设置在不久之后的版本中将会废弃。</p>
-<p> 看来，Data too large异常就是由于fielddata.cache的默认值为unbounded导致的了。 </p>
-<p>在mapping中，我们可以这样设置：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="string">"tag"</span>: &#123;</div><div class="line">        <span class="string">"type"</span>:      <span class="string">"string"</span>,</div><div class="line">        <span class="string">"fielddata"</span>: &#123;</div><div class="line">            <span class="string">"format"</span>: <span class="string">"fst"</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>或者在不改配置的情况下定时清除fielddata缓存也可解决：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     * 清空指定索引的缓存</div><div class="line">     * <span class="doctag">@param</span> indexName 索引名</div><div class="line">     * <span class="doctag">@return</span>  清空结果</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">clearIndicesCache</span><span class="params">(String indexName)</span></span>&#123;</div><div class="line">        ClearIndicesCacheResponse response = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            response = client.indices()</div><div class="line">                    .clearCache(<span class="keyword">new</span> ClearIndicesCacheRequest(indexName)</div><div class="line">                            .fieldDataCache(<span class="keyword">true</span>),RequestOptions.DEFAULT</div><div class="line">                    );</div><div class="line">            log.info(<span class="string">"清理es&#123;&#125;帖子缓存, response:&#123;&#125;"</span>, indexName, response);</div><div class="line">            <span class="keyword">if</span> (response.getFailedShards()&gt;<span class="number">0</span>) &#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-
+        <p>最近发现小程序社区模块的搜索偶发性地出现搜索异常：<br></p>
+        
+          <a class="article-more-a" href="/2020/12/02/ElasticSearch缓存引发的问题/#more">more >></a>
+        
       
 
       
@@ -422,6 +382,84 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2020/11/20/spring-cloud-手脚架搭建/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+ 
+  
+    <article id="post-docker部署ElasticSearch" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/10/09/docker部署ElasticSearch/">docker部署ElasticSearch</a>
+    </h1>
+  
+
+        
+        <a href="/2020/10/09/docker部署ElasticSearch/" class="archive-article-date">
+  	<time datetime="2020-10-09T08:42:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-10-09</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p> 单机版</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker pull elasticsearch</div></pre></td></tr></table></figure>
+        
+          <a class="article-more-a" href="/2020/10/09/docker部署ElasticSearch/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">ElasticSearch</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/工作实践/" class="article-tag-list-link color5">工作实践</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/10/09/docker部署ElasticSearch/">展开全文 >></a>
         </p>
       
 
@@ -878,81 +916,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2020/03/03/spring-cloud-alibaba操作手册之Ribbon 负载均衡/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
- 
-  
-    <article id="post-spring-cloud-alibaba操作手册之Nacos 服务发现与调用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/03/spring-cloud-alibaba操作手册之Nacos 服务发现与调用/">spring-cloud-alibaba操作手册之Nacos 服务发现与调用</a>
-    </h1>
-  
-
-        
-        <a href="/2020/03/03/spring-cloud-alibaba操作手册之Nacos 服务发现与调用/" class="archive-article-date">
-  	<time datetime="2020-03-03T02:50:20.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Nacos-服务发现与调用"><a href="#Nacos-服务发现与调用" class="headerlink" title="Nacos 服务发现与调用"></a>Nacos 服务发现与调用</h2><p>pom.xml 添加 discovery，完成服务发现。</p>
-        
-          <a class="article-more-a" href="/2020/03/03/spring-cloud-alibaba操作手册之Nacos 服务发现与调用/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-cloud</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习笔记/" class="article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/03/03/spring-cloud-alibaba操作手册之Nacos 服务发现与调用/">展开全文 >></a>
         </p>
       
 

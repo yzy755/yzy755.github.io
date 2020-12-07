@@ -8,19 +8,16 @@
   <link rel="dns-prefetch" href="http://yzy755.github.io">
   <title>ElasticSearch缓存引发的问题 | 易泽源的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="最近发现小程序社区模块的搜索偶发性地出现搜索异常：
-12345678globalSearch==&amp;gt; post content search exception:ElasticsearchStatusException[Elasticsearch exception [type=circuit_breaking_exception, reason=[parent] Data too large">
+  <meta name="description" content="最近发现小程序社区模块的搜索偶发性地出现搜索异常：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ElasticSearch缓存引发的问题">
 <meta property="og:url" content="http://yzy755.github.io/2020/12/02/ElasticSearch缓存引发的问题/index.html">
 <meta property="og:site_name" content="易泽源的博客">
-<meta property="og:description" content="最近发现小程序社区模块的搜索偶发性地出现搜索异常：
-12345678globalSearch==&amp;gt; post content search exception:ElasticsearchStatusException[Elasticsearch exception [type=circuit_breaking_exception, reason=[parent] Data too large">
-<meta property="og:updated_time" content="2020-12-02T10:22:42.741Z">
+<meta property="og:description" content="最近发现小程序社区模块的搜索偶发性地出现搜索异常：">
+<meta property="og:updated_time" content="2020-12-07T09:39:41.701Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ElasticSearch缓存引发的问题">
-<meta name="twitter:description" content="最近发现小程序社区模块的搜索偶发性地出现搜索异常：
-12345678globalSearch==&amp;gt; post content search exception:ElasticsearchStatusException[Elasticsearch exception [type=circuit_breaking_exception, reason=[parent] Data too large">
+<meta name="twitter:description" content="最近发现小程序社区模块的搜索偶发性地出现搜索异常：">
   
     <link rel="alternative" href="/atom.xml" title="易泽源的博客" type="application/atom+xml">
   
@@ -196,7 +193,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>最近发现小程序社区模块的搜索偶发性地出现搜索异常：</p>
+        <p>最近发现小程序社区模块的搜索偶发性地出现搜索异常：<br><a id="more"></a></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">globalSearch==&gt; post content search exception:ElasticsearchStatusException[Elasticsearch exception [type=circuit_breaking_exception, reason=[parent] Data too large, data for [&lt;http_request&gt;] would be [247822678/236.3mb], which is larger than the limit of [246546432/235.1mb], real usage: [247821032/236.3mb], new bytes reserved: [1646/1.6kb], usages [request=0/0b, fielddata=227362/222kb, in_flight_requests=1646/1.6kb, accounting=28514116/27.1mb]]]</div><div class="line">        at org.elasticsearch.rest.BytesRestResponse.errorFromXContent(BytesRestResponse.java:177)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.parseEntity(RestHighLevelClient.java:1727)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.parseResponseException(RestHighLevelClient.java:1704)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.internalPerformRequest(RestHighLevelClient.java:1467)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.performRequest(RestHighLevelClient.java:1424)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.performRequestAndParseEntity(RestHighLevelClient.java:1394)</div><div class="line">        at org.elasticsearch.client.RestHighLevelClient.search(RestHighLevelClient.java:930)</div></pre></td></tr></table></figure>
 <p>以及</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Suppressed: org.elasticsearch.client.ResponseException: method [POST], host [http://192.168.11.113:29201], URI [/post_content_4/_search?typed_keys=true&amp;ignore_unavailable=false&amp;expand_wildcards=open&amp;allow_no_indices=true&amp;ignore_throttled=true&amp;search_type=query_then_fetch&amp;batched_reduce_size=512&amp;ccs_minimize_roundtrips=true], status line [HTTP/1.1 429 Too Many Requests]</div></pre></td></tr></table></figure>
