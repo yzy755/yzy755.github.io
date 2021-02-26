@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzy755.github.io/"/>
-  <updated>2020-12-07T09:39:41.701Z</updated>
+  <updated>2021-02-26T08:17:19.010Z</updated>
   <id>http://yzy755.github.io/</id>
   
   <author>
@@ -14,6 +14,71 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>rocketmq延迟消息实践</title>
+    <link href="http://yzy755.github.io/2021/02/26/rocketmq%E5%BB%B6%E8%BF%9F%E6%B6%88%E6%81%AF%E5%AE%9E%E8%B7%B5/"/>
+    <id>http://yzy755.github.io/2021/02/26/rocketmq延迟消息实践/</id>
+    <published>2021-02-26T09:17:53.000Z</published>
+    <updated>2021-02-26T08:17:19.010Z</updated>
+    
+    <content type="html"><![CDATA[<p>定时消息（延迟队列）是指消息发送到broker后，不会立即被消费，等待特定时间投递给真正的topic。</p>
+<p>broker有配置项messageDelayLevel，默认值为“1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h”，18个level。</p>
+<a id="more"></a>
+<p><strong>配置自定义messageDelayLevel=1s 5s 10s 30s 1m 2m 3m 4m 5m 10m 15m 20m 30m 1h 3h 6h 12h 24h</strong></p>
+<p>注意，messageDelayLevel是broker的属性，不属于某个topic。</p>
+<p>发消息时，设置delayLevel等级即可。level有以下三种情况：</p>
+<ul>
+<li>level == 0，消息为非延迟消息</li>
+<li>1&lt;=level&lt;=maxLevel，消息延迟特定时间，例如level==1，延迟1s</li>
+<li>level &gt; maxLevel，则level== maxLevel，例如level==20，延迟24h</li>
+</ul>
+<p>定时消息会暂存在名为SCHEDULE_TOPIC_XXXX的topic中，并根据delayTimeLevel存入特定的queue，queueId = delayTimeLevel – 1，即一个queue只存相同延迟的消息，保证具有相同发送延迟的消息能够顺序消费。broker会调度地消费SCHEDULE_TOPIC_XXXX，将消息写入真实的topic。</p>
+<p>需要注意的是，定时消息会在第一次写入和调度写入真实topic时都会计数，因此发送数量、tps都会变高。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     * 重试次数--延迟级别对应关系</div><div class="line">     */</div><div class="line">    <span class="keyword">static</span> ConcurrentHashMap&lt;Integer,Integer&gt; retryTimeDelayLevelMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</div><div class="line">    <span class="keyword">static</span>&#123;</div><div class="line">        retryTimeDelayLevelMap.put(<span class="number">1</span>,<span class="number">5</span>);<span class="comment">//1min</span></div><div class="line">        retryTimeDelayLevelMap.put(<span class="number">2</span>,<span class="number">7</span>);<span class="comment">//3min</span></div><div class="line">        retryTimeDelayLevelMap.put(<span class="number">3</span>,<span class="number">10</span>);<span class="comment">//10min</span></div><div class="line">        retryTimeDelayLevelMap.put(<span class="number">4</span>,<span class="number">14</span>);<span class="comment">//1h</span></div><div class="line">    &#125;</div><div class="line"> </div><div class="line"> </div><div class="line"><span class="comment">//发送延迟消息</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendDelayNotify</span><span class="params">(VideoStateChangeEvent event)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span>&#123;</div><div class="line">            <span class="keyword">if</span>(event.getRetryTimes()&gt;<span class="number">4</span> || event.getRetryTimes()&lt;<span class="number">1</span>)&#123;</div><div class="line">                LOG.warn(<span class="string">"仅仅支持重发4次 retryTimes:&#123;&#125;"</span>,event.getRetryTimes());</div><div class="line">                <span class="keyword">return</span>;</div><div class="line">            &#125;</div><div class="line">            org.springframework.messaging.Message mmm = MessageBuilder.withPayload(event).build();</div><div class="line">            ResultDTO r = rocketMQTemplate.syncSendDelay(mediaCallbackTopic + <span class="string">":"</span> + event.getEventType(), mmm, retryTimeDelayLevelMap.get(event.getRetryTimes()));</div><div class="line">            LOG.info(<span class="string">"send delay msg :&#123;&#125; result:&#123;&#125;"</span>, JSON.toJSONString(event),JSON.toJSONString(r));</div><div class="line"> </div><div class="line">        &#125;<span class="keyword">catch</span>(Exception e)&#123;</div><div class="line">            <span class="comment">//omit</span></div><div class="line">            LOG.error(<span class="string">"send msg failed. omit it. event:&#123;&#125;"</span>,JSON.toJSONString(event));</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;定时消息（延迟队列）是指消息发送到broker后，不会立即被消费，等待特定时间投递给真正的topic。&lt;/p&gt;
+&lt;p&gt;broker有配置项messageDelayLevel，默认值为“1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h”，18个level。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="工作实践" scheme="http://yzy755.github.io/categories/%E5%B7%A5%E4%BD%9C%E5%AE%9E%E8%B7%B5/"/>
+    
+    
+      <category term="rocketmq" scheme="http://yzy755.github.io/tags/rocketmq/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>rocketmq重试消息实践</title>
+    <link href="http://yzy755.github.io/2021/02/26/rocketmq%E9%87%8D%E8%AF%95%E6%B6%88%E6%81%AF%E5%AE%9E%E8%B7%B5/"/>
+    <id>http://yzy755.github.io/2021/02/26/rocketmq重试消息实践/</id>
+    <published>2021-02-26T06:19:11.000Z</published>
+    <updated>2021-02-26T08:17:52.722Z</updated>
+    
+    <content type="html"><![CDATA[<p>Consumer消费消息失败后，要提供一种重试机制，令消息再消费一次。Consumer消费消息失败通常可以认为有以下几种情况：</p>
+<a id="more"></a>
+<ul>
+<li>由于消息本身的原因，例如反序列化失败，消息数据本身无法处理（例如话费充值，当前消息的手机号被注销，无法充值）等。这种错误通常需要跳过这条消息，再消费其它消息，而这条失败的消息即使立刻重试消费，99%也不成功，所以最好提供一种定时重试机制，即过10秒后再重试。</li>
+<li>由于依赖的下游应用服务不可用，例如db连接不可用，外系统网络不可达等。遇到这种错误，即使跳过当前失败的消息，消费其他消息同样也会报错。这种情况建议应用sleep 30s，再消费下一条消息，这样可以减轻Broker重试消息的压力。</li>
+</ul>
+<p>RocketMQ会为每个消费组都设置一个Topic名称为“%RETRY%+consumerGroup”的重试队列（这里需要注意的是，这个Topic的重试队列是针对消费组，而不是针对每个Topic设置的），用于暂时保存因为各种异常而导致Consumer端无法消费的消息。考虑到异常恢复起来需要一些时间，会为重试队列设置多个重试级别，每个重试级别都有与之对应的重新投递延时，重试次数越多投递延时就越大。RocketMQ对于重试消息的处理是先保存至Topic名称为“SCHEDULE_TOPIC_XXXX”的延迟队列中，后台定时任务按照对应的时间进行Delay后重新保存至“%RETRY%+consumerGroup”的重试队列中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</div><div class="line"><span class="keyword">import</span> com.gzhc365.component.rocketmq.annotation.RocketMQMessageListener;</div><div class="line"><span class="keyword">import</span> com.gzhc365.component.rocketmq.core.RocketMQListener;</div><div class="line"><span class="keyword">import</span> com.gzhc365.mid.mediastore.base.common.MediaStorePlatformException;</div><div class="line"><span class="keyword">import</span> com.gzhc365.mid.mediastore.platform.entity.VodAppConfig;</div><div class="line"><span class="keyword">import</span> com.gzhc365.mid.mediastore.platform.service.AppConfigService;</div><div class="line"><span class="keyword">import</span> com.gzhc365.mid.mediastore.platform.vod.template.QQVodTemplate;</div><div class="line"><span class="keyword">import</span> org.apache.rocketmq.common.message.MessageExt;</div><div class="line"><span class="keyword">import</span> org.slf4j.Logger;</div><div class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</div><div class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</div><div class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</div><div class="line"> </div><div class="line"> </div><div class="line"><span class="comment">/**</span></div><div class="line"> * 消费者</div><div class="line"> * <span class="doctag">@author</span> henrypoter</div><div class="line"> * <span class="doctag">@create</span> 2019-11-15 16:52</div><div class="line"> */</div><div class="line"><span class="meta">@Service</span></div><div class="line"><span class="meta">@RocketMQMessageListener</span>(</div><div class="line">        consumerGroup = <span class="string">"$&#123;media-platform.callback.consumer&#125;"</span>,</div><div class="line">        topic = <span class="string">"$&#123;media-platform.callback.topic&#125;"</span>,</div><div class="line">        selectorExpression = <span class="string">"*"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MediaPlatformCallbackTopicConsumer</span> <span class="keyword">implements</span> <span class="title">RocketMQListener</span>&lt;<span class="title">MessageExt</span>&gt;</span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOG = LoggerFactory.getLogger(MediaPlatformCallbackTopicConsumer.class);</div><div class="line"> </div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    QQVodTemplate qqVodTemplate;</div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    AppConfigService appConfigService;</div><div class="line"> </div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onMessage</span><span class="params">(MessageExt msg)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">byte</span>[] bytes = msg.getBody();</div><div class="line">            VideoStateChangeEvent event = JSON.parseObject(bytes,VideoStateChangeEvent.class);</div><div class="line">            LOG.info(<span class="string">"media-platform.callback.consumer received msg: &#123;&#125;"</span>, JSON.toJSONString(event));</div><div class="line"> </div><div class="line">            VodAppConfig app = appConfigService.findVodAppByAppIdAndAcl(event.getAppId(),event.getAcl());</div><div class="line">            Boolean done = qqVodTemplate.notifyBizServer(app,event.getFileId());</div><div class="line">            LOG.info(<span class="string">"notify biz server  repsonse:&#123;&#125;"</span>,done);</div><div class="line">            <span class="keyword">if</span>(!done)&#123;</div><div class="line">                event.setRetryTimes(event.getRetryTimes()+<span class="number">1</span>);</div><div class="line">                qqVodTemplate.sendDelayNotify(event);</div><div class="line">            &#125;</div><div class="line">        &#125;<span class="keyword">catch</span> (MediaStorePlatformException e1)&#123;</div><div class="line">            <span class="comment">//对于特定异常类型，如果异常被catch后，没有往外抛，client认为消息已经被消费。</span></div><div class="line">            <span class="comment">//此时，消息会丢弃，业务需要自己记录该错误及消息id,方便问题排查</span></div><div class="line">            LOG.error(<span class="string">"业务执行消息处理时发生异常,忽略该消息：&#123;&#125;"</span>,msg.getMsgId(),e1);</div><div class="line">        &#125;<span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            LOG.error(<span class="string">"消费消息异常,进行重试 "</span>,e);</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MediaStorePlatformException(<span class="string">"消费消息异常,msgId:"</span>+msg.getMsgId(),e);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Consumer消费消息失败后，要提供一种重试机制，令消息再消费一次。Consumer消费消息失败通常可以认为有以下几种情况：&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="工作实践" scheme="http://yzy755.github.io/categories/%E5%B7%A5%E4%BD%9C%E5%AE%9E%E8%B7%B5/"/>
+    
+    
+      <category term="rocketmq" scheme="http://yzy755.github.io/tags/rocketmq/"/>
+    
+  </entry>
   
   <entry>
     <title>ElasticSearch缓存引发的问题</title>
@@ -308,7 +373,7 @@
     <link href="http://yzy755.github.io/2020/03/07/spring-cloud-alibaba%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C%E4%B9%8B%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/"/>
     <id>http://yzy755.github.io/2020/03/07/spring-cloud-alibaba操作手册之分布式事务/</id>
     <published>2020-03-07T08:55:54.000Z</published>
-    <updated>2020-11-04T10:34:45.120Z</updated>
+    <updated>2020-11-04T10:37:45.575Z</updated>
     
     <content type="html"><![CDATA[<h2 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h2><h2 id="模拟分布式事务异常"><a href="#模拟分布式事务异常" class="headerlink" title="模拟分布式事务异常"></a>模拟分布式事务异常</h2><p>1、创建两个工程 order、pay，pom.xml</p>
 <a id="more"></a>
@@ -432,7 +497,7 @@
     <link href="http://yzy755.github.io/2020/03/05/spring-cloud-alibaba%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C%E4%B9%8B%E6%95%B4%E5%90%88%20RocketMQ/"/>
     <id>http://yzy755.github.io/2020/03/05/spring-cloud-alibaba操作手册之整合 RocketMQ/</id>
     <published>2020-03-05T09:23:40.000Z</published>
-    <updated>2020-11-04T10:41:37.998Z</updated>
+    <updated>2020-11-04T10:42:42.563Z</updated>
     
     <content type="html"><![CDATA[<h2 id="整合-RocketMQ"><a href="#整合-RocketMQ" class="headerlink" title="整合 RocketMQ"></a>整合 RocketMQ</h2><h3 id="安装-RocketMQ"><a href="#安装-RocketMQ" class="headerlink" title="安装 RocketMQ"></a>安装 RocketMQ</h3><p>1、传入 Linux 服务器</p>
 <p>2、解压缩</p>
@@ -699,7 +764,7 @@
     <link href="http://yzy755.github.io/2020/03/02/spring-cloud-alibaba%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C%E4%B9%8B%E5%88%9B%E5%BB%BA%E7%88%B6%E5%B7%A5%E7%A8%8B/"/>
     <id>http://yzy755.github.io/2020/03/02/spring-cloud-alibaba操作手册之创建父工程/</id>
     <published>2020-03-02T09:17:53.000Z</published>
-    <updated>2020-11-04T10:19:36.800Z</updated>
+    <updated>2020-11-04T10:22:30.120Z</updated>
     
     <content type="html"><![CDATA[<h2 id="创建父工程"><a href="#创建父工程" class="headerlink" title="创建父工程"></a>创建父工程</h2><p>Spring Cloud Alibaba 的环境在父工程中创建，微服务的各个组件作为子工程，继承父工程的环境。</p>
 <p>Spring Boot —》Spring Cloud —》Spring Cloud Alibaba</p>
@@ -1205,140 +1270,11 @@ if __name__ == &apos;__main__&apos;:
       <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     
     
-      <category term="python" scheme="http://yzy755.github.io/tags/python/"/>
+      <category term="TensorFlow" scheme="http://yzy755.github.io/tags/TensorFlow/"/>
     
       <category term="AI" scheme="http://yzy755.github.io/tags/AI/"/>
     
-      <category term="TensorFlow" scheme="http://yzy755.github.io/tags/TensorFlow/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>TensorFlow的java API</title>
-    <link href="http://yzy755.github.io/2017/05/17/TensorFlow%E7%9A%84java%20API/"/>
-    <id>http://yzy755.github.io/2017/05/17/TensorFlow的java API/</id>
-    <published>2017-05-17T10:17:53.000Z</published>
-    <updated>2017-05-25T02:04:38.674Z</updated>
-    
-    <content type="html"><![CDATA[<p>对数学不好的人来讲，阅读TensorFlow实在是一件让人头皮发麻的事情，现在接触的这个大数据分析项目是想将使用TensorFlow写的算法打包供外部使用以及外部系统以rest接口方式来调用算法得到结果，写算法和调用这两个工作肯定是要分离的，暂且不管TensorFlow本身如何使用，研究了下用java调用TensorFlow的方式。<br><a id="more"></a><br>从 <a href="https://codeload.github.com/tensorflow/tensorflow/zip/v1.1.0" target="_blank" rel="external">https://codeload.github.com/tensorflow/tensorflow/zip/v1.1.0</a> 下载源码<br>电脑上用不超过3.5版本（anaconda3 4.2版本）的Python： pip install tensorflow 直接安装<br>然后就发现了很奇怪的地方，<a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/java/README.md" target="_blank" rel="external">https://github.com/tensorflow/tensorflow/blob/master/tensorflow/java/README.md</a> 上对TensorFlow for java的描述是说有linux、Mac、windows的库，但是在源码tensorflow-1.1.0\tensorflow\java目录下的readme文件中只给出了linux和mac的下载地址，无奈只能在先在linux虚拟机中尝试了，根据那个readme文件可以下载到.jar用于java调用TensorFlow api，还有一个.so文件用于底层调用native方法库，这样也不难理解，但是这样其实失去了java最强的跨平台特性。。。<br>建一个简单的java project，将下载的jar包加入classpath，写个main方法，一句话试下能不能用：System.out.println(TensorFlow.version());<br>报错：TensorFlow Java API methods will throw an UnsatisfiedLinkError unless native code shared libraries are loaded，意思是java的library中没有相应的库文件，执行System.out.println(System.getProperty(“java.library.path”));看下这台电脑的库路径是什么，将so文件放进去即可，或者是在该工程的jdk中加入自定义的库路径，然后就可以执行查看版本的方法了，</p>
-<p>将源码中的tensorflow\java\src代码拷贝到工程中，其中test包中都可以执行尝试下，最符合我研究目标的一个类躲在tensorflow\java\src\main\java\org\tensorflow\examples包中，里边是一个调用模型去识别图片中的物体的类：LabelImage.java<br>    <a href="https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip" target="_blank" rel="external">https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip</a> 下载算法模型和物品种类列表解压到目录下，这里是：/tmp/graph/<br>    创建一个调用类，main方法就一句话：LabelImage.main(new String[] { “/tmp/graph/“, “/tmp/graph/plane.jpg” });当然要准备一张合适的图片，然后他就给你识别，这是一张战斗飞机的图片，而识别的结果为：BEST MATCH: airliner (45.18% likely) ，意思是班机，都是飞机，八九不十</p>
-<p>源码中调用的是一个.pb文件，我的理解是该文件是用TensorFlow写好算法并训练完毕生成的模型，就以类似这种文件为界限，生成该文件的工作交给算法设计人员，调用该文件的工作交给技术人员，以后的算法打包也好，webservice调用也好都好理解。</p>
-<p>其实使用java这种方法去调用TensorFlow，在不了解TensorFlow使用的情况下还是写不出来什么代码，只是可以规避现有的java技术人员重新学习Python和搭建python web服务的时间成本和风险罢了，有时间的话最好还是用Python接，没有异构的问题。</p>
-<p>思考1：pb模型文件一旦产生如何提高学习的准确率，就像上面识别飞机也只有45.18%的概率，今日头条的推荐应该也是用这种训练学习的方式，你用得越多越久，它就越知道你想看什么，然后达到推荐的目的，如何保证持续学习训练。。。<br>    猜想：设置一个节点，无论是从时间维度还是数据量大小维度考虑，这个节点将获取的数据添加到训练集，重新训练得出模型</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;对数学不好的人来讲，阅读TensorFlow实在是一件让人头皮发麻的事情，现在接触的这个大数据分析项目是想将使用TensorFlow写的算法打包供外部使用以及外部系统以rest接口方式来调用算法得到结果，写算法和调用这两个工作肯定是要分离的，暂且不管TensorFlow本身如何使用，研究了下用java调用TensorFlow的方式。&lt;br&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    
-    
-      <category term="AI" scheme="http://yzy755.github.io/tags/AI/"/>
-    
-      <category term="TensorFlow" scheme="http://yzy755.github.io/tags/TensorFlow/"/>
-    
-      <category term="java" scheme="http://yzy755.github.io/tags/java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>基于python+flask+mysql的web开发初探</title>
-    <link href="http://yzy755.github.io/2017/05/12/%E5%9F%BA%E4%BA%8Epython+flask+mysql%E7%9A%84web%E5%BC%80%E5%8F%91%E5%88%9D%E6%8E%A2/"/>
-    <id>http://yzy755.github.io/2017/05/12/基于python+flask+mysql的web开发初探/</id>
-    <published>2017-05-12T07:40:53.000Z</published>
-    <updated>2017-05-12T09:07:07.785Z</updated>
-    
-    <content type="html"><![CDATA[<p>由于用Python开发一个Web框架十分容易，所以Python有上百个开源的Web框架，当下流行的是Flask,Django等<br>Flask是一个使用 Python 编写的轻量级 Web 应用框架。其 WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。<br><a id="more"></a><br>搭建的大致步骤和常见的问题：</p>
-<p>1.安装anaconda，anaconda里面集成了很多关于python科学计算的第三方库，主要是安装方便，而python是一个编译器，如果不使用anaconda，那么安装起来会比较痛苦，各个库之间的依赖性就很难连接的很好</p>
-<p>2.安装mysql</p>
-<p>3.安装mysql-python，命令:pip install MySql-python</p>
-<pre><code>错误1：Microsoft Visual C++ 14.0 is required. 
-升级.NET Framework 版本到4.5.1
-从错误提示的url下载，下载后安装visualcppbuildtools_full
-</code></pre><p>3.安装mysql connector, 下载地址：<a href="https://dev.mysql.com/downloads/connector/python/" target="_blank" rel="external">https://dev.mysql.com/downloads/connector/python/</a><br>我的系统为64， 下载的是mysql-connector-python-2.1.5-py3.4-winx64，还是报错，后来注意到寻找的目录是Program Files (x86)，又下了个32位的安装。错误过去了。但是又来新的错误：</p>
-<pre><code>LINK : error LNK2001: unresolved external symbol _DllMainCRTStartup
-build\lib.win-amd64-3.5\_mysql.cp35-win_amd64.pyd : fatal error LNK1120: 56 unresolved externalserror: command &apos;C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\BIN\\x86_amd64\\link.exe&apos; failed with exit status 1120
-</code></pre><p>5.安装第三方包pymysql。下载地址：<a href="https://pypi.python.org/pypi/PyMySQL#downloads" target="_blank" rel="external">https://pypi.python.org/pypi/PyMySQL#downloads</a><br>下载PyMySQL-0.7.11-py2.py3-none-any.whl，使用pip install PyMySQL-0.7.11-py2.py3-none-any.whl 即可，再执行pip install MySql-python就成功了</p>
-<p>python引入mysql方法：<br>import pymysql as MySQLdb</p>
-<p>首次尝试python的web开发：<br>源码:</p>
-<pre><code>db.py:
-
-    host=&quot;127.0.0.1&quot;
-    user=&quot;root&quot;
-    password=&quot;123456&quot;
-    charset=&quot;utf8&quot;
-    database=&quot;test&quot;
-    port=3306
-
-service.py:
-
-    import pymysql as MySQLdb
-    import sys
-    import db
-    class AService(object):
-        def getA(self,id):
-            conn = MySQLdb.connect(host=db.host,user=db.user,passwd=db.password,port=db.port,db=db.database,charset=db.charset)
-            result=[]
-            try:
-                cursor = conn.cursor()
-                cursor.execute(&quot;select id,sname from student where id=&apos;%d&apos;&quot;%(id))
-                result = cursor.fetchone()
-
-            finally:
-                cursor.close()
-                conn.close()
-            return result
-
-hello.py:
-
-    from flask import Flask, jsonify
-    import service
-    import sys
-
-    app = Flask(__name__)
-
-    @app.route(&apos;/service&apos;, methods=[&apos;GET&apos;])
-    def getSerivice():
-            mservice=service.AService()
-            result = mservice.getA(1)
-            json = &quot;&quot;
-            json +=&quot;{&quot;
-            json +=&quot;&apos;id&apos;:&quot;+str(result[0])+&quot;,&quot;
-            json +=&quot;&apos;sname&apos;:&apos;&quot;+result[1]+&quot;&apos;&quot;
-            json +=&quot;}&quot;
-            return json;
-    if __name__==&quot;__main__&quot;:
-        app.run()
-</code></pre><p>在cmd中执行 python hello.py<br>打开浏览器 <a href="http://localhost:5000" target="_blank" rel="external">http://localhost:5000</a><br>出现 {‘id’:1,’sname’:’yizeyuan’}<br>成功！</p>
-<p>这个例子太简单，实际上可以像平时javaweb开发一样使用MVC模式，上面的hello.py是控制器，service.py是model,而view我们同样可以使用html，Flask使用jinja2渲染<br>使用方式：<br>    from flask import Flask, request, render_template #加上render_template<br>当请求处理完成返回一个模板以及变量<br>    return render_template(‘index.html’, message=’欢迎使用flask’, username=’yizeyuan’)<br>首页的html代码为：</p>
-<pre><code>&lt;html&gt;
-    &lt;head&gt;
-      &lt;title&gt;index&lt;/title&gt;
-    &lt;/head&gt;
-    &lt;body&gt;
-      &lt;h1 style=&quot;font-style:italic&quot;&gt;Home&lt;/h1&gt;
-      {{message}}
-      欢迎你，{{username}}
-    &lt;/body&gt;
-&lt;/html&gt;
-</code></pre><p>很像angularjs有木有！</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;由于用Python开发一个Web框架十分容易，所以Python有上百个开源的Web框架，当下流行的是Flask,Django等&lt;br&gt;Flask是一个使用 Python 编写的轻量级 Web 应用框架。其 WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。&lt;br&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="学习笔记" scheme="http://yzy755.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    
-    
       <category term="python" scheme="http://yzy755.github.io/tags/python/"/>
-    
-      <category term="web开发" scheme="http://yzy755.github.io/tags/web%E5%BC%80%E5%8F%91/"/>
     
   </entry>
   
